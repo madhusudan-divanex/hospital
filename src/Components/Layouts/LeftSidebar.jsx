@@ -572,7 +572,7 @@ const isPatientActive =
                   </NavLink>
                 </li>
               }
-              {isOwner || permissions?.chat?.access && <li className="nav-item">
+              {(isOwner || permissions?.chat?.access) && <li className="nav-item">
                 <NavLink to="/chat" className={({ isActive }) =>
                     isActive ? "nav-link active-menu" : "nav-link"
                   }>

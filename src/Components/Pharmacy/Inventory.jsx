@@ -637,7 +637,7 @@ function Inventory() {
 
                                                                         {/* <Barcode value={item?.customId} width={1.3} displayValue={false}
                                                                             height={80} /> */}
-                                                                        <QRCodeCanvas color="#000" value={item?.customId} ref={(el) => (qrRefs.current[key] = el)} />
+                                                                        <QRCodeCanvas color="#000" value={item?.batchNumber} ref={(el) => (qrRefs.current[key] = el)} />
                                                                         {showBarcode == key &&
                                                                             <button className="prescription-nav w-100" onClick={() => handlePrintQR(key, item)}>
                                                                                 Print QR

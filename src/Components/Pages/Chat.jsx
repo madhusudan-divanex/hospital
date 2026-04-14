@@ -140,6 +140,7 @@ function Chat({ socket, startCall }) {
 
     const onReceiveMessage = (msg) => {
       if (!msg.conversationId) return;
+      if (msg.sender?._id === myUserId || msg.senderId === myUserId) return;
       const currentChat = selectedChatRef.current;
 
       if (currentChat && msg.conversationId === currentChat._id) {
