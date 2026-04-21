@@ -11,6 +11,7 @@ import API from "../../api/api";
 import { useEffect, useState } from "react";
 import { getApiData } from "../../Service/api";
 import Select from "react-select";
+import { toast } from "react-toastify";
 function CreateAccount() {
 
     const navigate = useNavigate();
@@ -28,6 +29,8 @@ function CreateAccount() {
     const [catData, setCatData] = useState([])
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isDisabled, setIsDisabled] = useState(true)
+    const [country, setCountry] = useState("");
+    const [countries, setCountries] = useState([])
 
     const [errors, setErrors] = useState({});
 
@@ -36,9 +39,10 @@ function CreateAccount() {
         let temp = {};
 
         if (!hospitalName.trim()) temp.hospitalName = "Hospital name is required";
+        if (!country.trim()) temp.country = "Country  is required";
         if (!licenseId.trim()) temp.licenseId = "License ID is required";
         if (!establishedYear.trim()) temp.establishedYear = "Established Year is required";
-        if (category?.length==0) temp.category = "Please select at least 1 category";
+        if (category?.length == 0) temp.category = "Please select at least 1 category";
 
         if (!mobileNo.trim()) temp.mobileNo = "Mobile number is required";
         else if (mobileNo.length !== 10) temp.mobileNo = "Mobile number must be 10 digits";
@@ -60,7 +64,18 @@ function CreateAccount() {
         return Object.keys(temp).length === 0;
     };
 
+    async function fetchCountries() {
+        try {
+            const response = await getApiData('api/location/countries')
+            const data = await response
+            setCountries(data)
+        } catch (error) {
 
+        } 
+    }
+    useEffect(() => {
+        fetchCountries()
+    }, [])
     // SUBMIT
     const submitBasic = async (e) => {
         e.preventDefault();
@@ -79,6 +94,9 @@ function CreateAccount() {
             };
 
             const reg = await API.post("/auth/register", registerPayload);
+            if(!reg.data.success){
+                toast.error(reg.data.message)
+            }
 
             // console.log("REGISTER SUCCESS:", reg.data);
             // console.log(reg.data.token)
@@ -96,15 +114,18 @@ function CreateAccount() {
             formData.append("email", email);
             formData.append("gstNumber", gst);
             formData.append("about", about);
+            formData.append("country", country);
             formData.append("category", category);
             if (logo) formData.append("logo", logo);
 
             const basic = await API.post("/hospital/basic", formData);
-
-            console.log("HOSPITAL BASIC SAVED:", basic.data);
-
-            // NEXT STEP
-            navigate("/create-account-image", { replace: true });
+            if(basic.data.success){
+                localStorage.setItem('user',JSON.stringify(basic.data.user))
+                console.log("HOSPITAL BASIC SAVED:", basic.data);
+    
+                // NEXT STEP
+                navigate("/create-account-image", { replace: true });
+            }
 
         } catch (err) {
             console.error(err.response?.data || err);
@@ -327,6 +348,23 @@ function CreateAccount() {
                                         value={about}
                                         onChange={(e) => setAbout(e.target.value)}
                                     ></textarea>
+                                </div>
+                                <div className="custom-frm-bx">
+                                    <label>Country</label>
+                                    <select
+                                        className="form-select"
+                                        value={country}
+                                        onChange={(e) => {
+                                            const data = countries?.filter(item => item?._id === e.target.value)
+                                            
+                                            setCountry(e.target.value)
+                                        }}
+                                    >
+                                        <option value="">---Select Country---</option>
+                                        {countries?.map((item, key) =>
+                                            <option value={item?._id} key={key}>{item?.name}</option>)}
+                                    </select>
+                                    {errors.country && <small className="text-danger">{errors.country}</small>}
                                 </div>
 
                                 {/* LOGO */}

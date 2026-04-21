@@ -143,8 +143,7 @@ function Doctors() {
                                 </div>
                             </div>
                             <div className="add-nw-bx">
-
-                                {(!isOwner || permissions?.doctors?.add) && (
+                                {(isOwner || permissions?.doctors?.add) && (
                                     <NavLink to="/new-doctor" className="add-nw-btn nw-thm-btn">
                                         <img src="/plus-icon.png" alt="" /> Add Doctor
                                     </NavLink>
@@ -152,7 +151,6 @@ function Doctors() {
                             </div>
                         </div>
                     </div>
-
                     <div className='new-panel-card'>
                         <div className="row">
                             <div className="d-flex align-items-center justify-content-between mb-3 gap-2 nw-box mobile-hospital-box">
@@ -391,9 +389,9 @@ function Doctors() {
                                                                     {doc?.employement?.status}
                                                                 </span> */}
                                                                 <span
-                                                                    className={`approved ${doc?.employement?.status === "Active"
+                                                                    className={`approved ${doc?.employement?.status === "active"
                                                                             ? "approved-active"
-                                                                            : doc?.employement?.status === "On Leave"
+                                                                            : doc?.employement?.status === "onleave"
                                                                                 ? "approved-active leaved"
                                                                                 : "approved-active inactive"
                                                                         }`}

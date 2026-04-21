@@ -3,7 +3,7 @@ import { BsFillFileImageFill } from "react-icons/bs";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import API from "../../api/api";
 import { getApiData } from "../../Service/api";
@@ -20,8 +20,8 @@ function CreateAccountAddress() {
     const [countries, setCountries] = useState([])
     const [states, setStates] = useState([])
     const [cities, setCities] = useState([])
-    const [loading,setLoading]=useState(false)
-    const [postLoading,setPostLoading]=useState(false)
+    const [loading, setLoading] = useState(false)
+    const [postLoading, setPostLoading] = useState(false)
 
     const [errors, setErrors] = useState({});
 
@@ -116,7 +116,7 @@ function CreateAccountAddress() {
                                     <h6>Hospital Details</h6>
                                 </div>
                             </NavLink>
- 
+
                             <NavLink to="#">
                                 <div className="account-step-crd account-step-one account-progress-done">
                                     <div className="account-step-bx account-step-complete">
@@ -188,10 +188,11 @@ function CreateAccountAddress() {
                                     <select
                                         className="form-select"
                                         value={country}
-                                        onChange={(e) =>{
+                                        onChange={(e) => {
                                             const data = countries?.filter(item => item?._id === e.target.value)
                                             fetchStates(data[0].isoCode)
-                                             setCountry(e.target.value)}}
+                                            setCountry(e.target.value)
+                                        }}
                                     >
                                         <option value="">---Select Country---</option>
                                         {countries?.map((item, key) =>
@@ -206,10 +207,11 @@ function CreateAccountAddress() {
                                     <select
                                         className="form-select"
                                         value={state}
-                                        onChange={(e) =>{
-                                             const data = states?.filter(item => item?._id ===e.target.value)
+                                        onChange={(e) => {
+                                            const data = states?.filter(item => item?._id === e.target.value)
                                             fetchCities(data[0].isoCode)
-                                             setState(e.target.value)}}
+                                            setState(e.target.value)
+                                        }}
                                     >
                                         <option value="">---Select State---</option>
                                         {states?.map((item, key) =>
@@ -247,10 +249,16 @@ function CreateAccountAddress() {
                                 </div>
 
                                 {/* NEXT BUTTON */}
-                                <div className="mt-4">
+                                <div className="d-flex flex-column gap-3 mt-4">
                                     <button type="submit" disabled={postLoading} className="admin-lg-btn w-100">
-                                        {postLoading?'Submitting...':'Next'}
+                                        {postLoading ? 'Submitting...' : 'Next'}
                                     </button>
+                                    <Link
+                                        className="nw-thm-btn outline rounded-3 w-100"
+                                        to={'/create-account-person'}
+                                    >
+                                        Skip And Continue
+                                    </Link>
                                 </div>
 
                             </div>
@@ -259,12 +267,12 @@ function CreateAccountAddress() {
                     </div>
                 </div>
                 <div className="row">
-                        <div className="col-lg-12 px-0">
-                            <div className="footer-banner-wrap">
-                                <img src="/hospital-footer-bnner.png" alt="" />
-                            </div>
+                    <div className="col-lg-12 px-0">
+                        <div className="footer-banner-wrap">
+                            <img src="/hospital-footer-bnner.png" alt="" />
                         </div>
                     </div>
+                </div>
             </div>
         </section>
     );

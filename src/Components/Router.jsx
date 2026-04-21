@@ -140,6 +140,20 @@ import PurchaseOrder from "./CMS/PurchaseOrders";
 import CmsDynamic from "./CMS/CmsDynamic";
 import { useGlobalSocket } from "./Utils/useGlobalSocket";
 import StaffForm from "./Pages/StaffForm";
+import FitnessCertificate from "./Certificates/FitnessCertificate";
+import FitnessForm from "./Certificates/FitnessForm";
+import ViewFitnessCertificate from "../All Template file/Fitness certificate";
+import MedicalCertificate from "./Certificates/MedicalCertificate";
+import MedicalForm from "./Certificates/MedicalForm";
+import ViewMedicalCertificate from "../All Template file/Medical certificate";
+import BirthCertificate from "./Certificates/BirthCertificate";
+import BirthForm from "./Certificates/BirthForm";
+import ViewBirthCertificate from "../All Template file/Birth Certificate";
+import DeathCertificate from "./Certificates/DeathCertificate";
+import DeathForm from "./Certificates/DeathForm";
+import ViewDeathCertificate from "../All Template file/Death Certificate";
+import DoctorAptBookingReceipt from "../All Template file/Booking receipt";
+import MedicalPrescription from "../All Template file/Medical Prescription";
 
 function Router() {
  const { socket, startCall } = useGlobalSocket();
@@ -190,6 +204,14 @@ function Router() {
           path:"/page/:slug",
           element: <CmsDynamic />
 
+        },
+        {
+          path:"/template/:id",
+          element: <DoctorAptBookingReceipt />
+        },
+        {        
+          path:"/prescription-template/:id",
+          element: <MedicalPrescription />
         }
       ]
     },
@@ -339,6 +361,18 @@ function Router() {
 
 
         { path: "/department", element: <Departments /> },
+        { path: "/fitness-certificate", element: <FitnessCertificate /> },
+        { path: "/certificate/fitness/:id", element: <ViewFitnessCertificate /> },
+        { path: "/fitness-form", element: <FitnessForm /> },
+        { path: "/medical-certificate", element: <MedicalCertificate /> },
+        { path: "/medical-form", element: <MedicalForm /> },
+        { path: "/certificate/medical/:id", element: <ViewMedicalCertificate /> },
+        { path: "/birth-certificate", element: <BirthCertificate /> },
+        { path: "/birth-form", element: <BirthForm /> },
+        { path: "/certificate/birth/:id", element: <ViewBirthCertificate /> },
+        { path: "/death-certificate", element: <DeathCertificate /> },
+        { path: "/death-form", element: <DeathForm /> },
+        { path: "/certificate/death/:id", element: <ViewDeathCertificate /> },
 
 
         // Permissions

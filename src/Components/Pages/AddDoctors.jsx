@@ -73,7 +73,7 @@ function AddDoctors() {
         }],
     })
     const [employmentInfo, setEmploymentInfo] = useState({
-        position: '',
+        role: '',
         joinDate: '',
         onLeaveDate: '',
         contractStart: '',
@@ -81,8 +81,6 @@ function AddDoctors() {
         salary: '',
         note: '',
         department: null,
-        reportingTo: null,
-        employmentType: '',
         status: 'Active',
         fees: null
 
@@ -419,7 +417,7 @@ function AddDoctors() {
                     contractStart: result?.employmentDetails?.contractStart ? new Date(result?.employmentDetails?.contractStart)?.toISOString()?.split("T")[0] : null,
                     contractEnd: result?.employmentDetails?.contractEnd ? new Date(result?.employmentDetails?.contractEnd)?.toISOString()?.split("T")[0] : null,
                     joinDate: result?.employmentDetails?.contractEnd ? new Date(result?.employmentDetails?.joinDate)?.toISOString()?.split("T")[0] : null,
-                    onLeaveDate: result?.employmentDetails?.contractEnd ? new Date(result?.employmentDetails?.onLeaveDate)?.toISOString()?.split("T")[0] : null,
+                   
                 })
                 setAccessInfo({ ...accessInfo,email:result.employmentDetails?.email,
                     contactNumber:result.employmentDetails.contactNumber, permissionId: result?.employmentDetails?.permissionId?._id, password: '' })
@@ -566,15 +564,13 @@ function AddDoctors() {
     const employementSubmit = async (e) => {
         e.preventDefault();
         const requiredFields = [
-            "position",
+            "role",
             "joinDate",
             "contractStart",
             "contractEnd",
             "salary",
             "note",
             "department",
-            "reportingTo",
-            "employmentType",
             "fees"
         ];
 
@@ -1399,7 +1395,7 @@ function AddDoctors() {
                                                             type="text"
                                                             className="form-control nw-frm-select"
                                                             placeholder="Enter Position/Role"
-                                                            value={employmentInfo.position} name="position" onChange={handleEmploymentChange}
+                                                            value={employmentInfo.role} name="role" onChange={handleEmploymentChange}
                                                         />
                                                         {/* <select class="form-select custom-select" value={employmentInfo.position} name="position" onChange={handleEmploymentChange}>
                                                             <option>---Select Department---</option>
@@ -1417,7 +1413,7 @@ function AddDoctors() {
 
 
 
-                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                {/* <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div class="custom-frm-bx">
                                                         <label>Employment Type</label>
                                                         <div class="select-wrapper">
@@ -1430,7 +1426,7 @@ function AddDoctors() {
                                                             </select>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> */}
 
                                                 {/* <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div class="custom-frm-bx">
@@ -1474,9 +1470,9 @@ function AddDoctors() {
 
                                                 <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div class="custom-frm-bx">
-                                                        <label>Salary($)</label>
+                                                        <label>Salary(₹)</label>
                                                         <input
-                                                            type="text"
+                                                            type="number"
                                                             className="form-control nw-frm-select"
                                                             placeholder="Enter Salary"
                                                             value={employmentInfo.salary} name="salary" onChange={handleEmploymentChange}
@@ -1485,9 +1481,9 @@ function AddDoctors() {
                                                 </div>
                                                 <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div class="custom-frm-bx">
-                                                        <label>Fees($)</label>
+                                                        <label>Fees(₹)</label>
                                                         <input
-                                                            type="text"
+                                                            type="number"
                                                             className="form-control nw-frm-select"
                                                             placeholder="Enter Fees"
                                                             value={employmentInfo.fees} name="fees" onChange={handleEmploymentChange}

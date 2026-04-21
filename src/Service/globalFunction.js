@@ -91,5 +91,33 @@ const calculatePaymentDetails = (item) => {
     paymentStatus: pendingAmount === 0 ? "Payment Complete" : "Payment Pending",
   };
 };
+const saveFcmToken = async () => {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") return;
+            const token = await getToken(messaging, {
+                vapidKey: "BBhhJGO7sE7RgSoez4GqQoRlK04U-P-Mem9V6DHypsgNbCcIKWUrnL3nN9SzxUL0zxIsQ06LlVsrEYr8dHaqpVc"
+            });
 
-export { formatDateTime,calculateAge ,specialtyOptions,languageOptions,calculatePaymentDetails}
+            if (token) {
+                await API.post("/comman/save-fcm-token", { fcmToken: token });
+                console.log("✅ FCM Token Saved");
+            }
+        } catch (err) {
+            console.error("FCM error", err);
+        }
+    };
+const getDaysBetweenDates = (from, to) => {
+  if (!from || !to) return 0;
+
+  const fromDate = new Date(from);
+  const toDate = new Date(to);
+
+  const diffTime = toDate - fromDate;
+
+  // +1 because same day = 1 day
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+  return diffDays > 0 ? diffDays : 0;
+};
+export { formatDateTime,calculateAge ,specialtyOptions,languageOptions,calculatePaymentDetails,saveFcmToken,getDaysBetweenDates}

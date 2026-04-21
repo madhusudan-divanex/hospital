@@ -4,7 +4,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import API from "../../api/api";
 
@@ -246,7 +246,7 @@ function CreateAccountImage() {
                 </div>
 
                 {/* NEXT BUTTON */}
-                <div className="mt-4">
+                <div className="mt-4 gap-3 d-flex flex-column">
                   <button
                     className="admin-lg-btn w-100"
                     onClick={uploadImages}
@@ -255,6 +255,12 @@ function CreateAccountImage() {
                   >
                     {loading ? "Submitting..." : "Next"}
                   </button>
+                   <Link
+                    className="nw-thm-btn outline rounded-3 w-100"
+                    to={'/create-account-address'}
+                  >
+                    Skip And Continue
+                  </Link>
                 </div>
               </div>
             </div>

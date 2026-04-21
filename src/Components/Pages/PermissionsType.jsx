@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { deleteApiData, getSecureApiData, securePostData, updateApiData } from "../../Service/api";
 import Loader from "../Common/Loader";
-
+import Select from 'react-select'
 function PermissionType() {
   const user = JSON.parse(localStorage.getItem('user'))
   const userId = user.id
@@ -22,17 +22,41 @@ function PermissionType() {
   const [totalPage, setTotalPage] = useState()
   const [loading, setLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [staffData, setStaffData] = useState([])
+  const [staffEmp, setStaffEmp] = useState([])
+  const [selectedStaff, setSelectedStaff] = useState([]);
+  const [assignPId, setAssignPId] = useState()
+  const [permissionData, setPermissionData] = useState()
   const navigate = useNavigate()
 
   const [permissions, setPermissions] = useState([])
-  const fetchHospitalPermission = async () => {
+  const fetchHospitalPermission = async (limit = 10) => {
     setLoading(true)
     try {
-      const response = await getSecureApiData(`api/comman/permission/${userId}?page=${currentPage}&name=${search}&type=hospital`);
+      const response = await getSecureApiData(`api/comman/permission/${userId}?page=${currentPage}&name=${search}&type=hospital&limit=${limit}`);
       if (response.success) {
         setCurrentPage(response.pagination.page)
         setTotalPage(response.pagination.totalPages)
         setPermissions(response.data)
+      } else {
+        toast.error(response.message)
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Something went wrong");;
+    } finally {
+      setLoading(false)
+    }
+  }
+  const fetchStaffEmp = async () => {
+    setLoading(true)
+    try {
+      const response = await getSecureApiData(`api/staff/employment`);
+      if (response.success) {
+        const options = response.data.map((item) => ({
+          value: item._id,
+          label: item.userId?.name + " " + `(${item?.role})`
+        }));
+        setStaffData(options)
       } else {
         toast.error(response.message)
       }
@@ -76,6 +100,24 @@ function PermissionType() {
       }
     }
   }
+  const assignPermission = async (e) => {
+    e.preventDefault()
+    const data = { permissionId: assignPId, staffEmp }
+    try {
+      const response = await updateApiData(`api/comman/assign-permission`, data);
+      if (response.success) {
+        setAssignPId('')
+        fetchHospitalPermission()
+        document.getElementById('closeAssign')?.click()
+        toast.success("Permission assigned successfully")
+      } else {
+        toast.error(response.message)
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Something went wrong");;
+    }
+
+  }
   const deletePermission = async (id) => {
     // e.preventDefault()
     const data = { hospitalId: userId, permissionId: id }
@@ -95,10 +137,30 @@ function PermissionType() {
     fetchHospitalPermission()
   }, [currentPage, userId])
   useEffect(() => {
+    fetchStaffEmp()
+  }, [])
+  useEffect(() => {
     if (localStorage.getItem('doctorId')) {
       navigate('/dashboard')
     }
   }, [])
+  useEffect(() => {
+    if (assignPId && staffData.length > 0) {
+
+      const selectedPermission = permissions.find(
+        p => p._id === assignPId
+      );
+
+      if (!selectedPermission) return;
+
+      const preSelected = staffData.filter(item =>
+        selectedPermission.staffEmp?.includes(item.value)
+      );
+
+      setSelectedStaff(preSelected);
+      setStaffEmp(preSelected.map(item => item.value));
+    }
+  }, [assignPId, staffData, permissions]);
 
   return (
     <>
@@ -128,9 +190,15 @@ function PermissionType() {
                   </div>
                 </div>
 
-                <div className="add-nw-bx">
-                  <a href="javascript:void(0)" className="add-nw-btn thm-btn" data-bs-toggle="modal" data-bs-target="#permission-Name">
-                    <img src="/plus-icon.png" alt="" />Add Permission Name
+                <div className="add-nw-bx d-flex gap-3">
+                  <a href="javascript:void(0)" className="add-nw-btn nw-thm-btn" onClick={() =>{ fetchHospitalPermission(1000)
+                    setSelectedStaff([])
+                  }}
+                    data-bs-toggle="modal" data-bs-target="#permission-Assign">
+                    Assign permission
+                  </a>
+                  <a href="javascript:void(0)" className="add-nw-btn thm-btn" onClick={() => setEditId(null)} data-bs-toggle="modal" data-bs-target="#permission-Name">
+                    <img src="/plus-icon.png" alt="" />Add Permission
                   </a>
                 </div>
 
@@ -196,6 +264,7 @@ function PermissionType() {
                             <td>
                               <ul className="d-flex gap-2">
                                 <li><button type="button" onClick={() => {
+                                  setPermissionData(item)
                                   setName(item?.name)
                                   setEditId(item?._id)
                                 }} className="text-black" data-bs-toggle="modal" data-bs-target="#permission-Name"><FontAwesomeIcon icon={faPen} /></button></li>
@@ -248,6 +317,7 @@ function PermissionType() {
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="form-control" placeholder="Enter Role Name" />
                   </div>
 
+
                   <div>
                     <button type="submit" className="nw-thm-btn w-100" data-bs-dismiss="modal"> Submit</button>
                   </div>
@@ -261,6 +331,71 @@ function PermissionType() {
 
       {/* <!-- Meeting Alert Popup End --> */}
 
+      <div className="modal step-modal" id="permission-Assign" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content rounded-5">
+            <div className="d-flex align-items-center justify-content-between popup-nw-brd px-4 py-3">
+              <div>
+                <h6 className="lg_title mb-0">Assign Permission </h6>
+              </div>
+              <div>
+                <button type="button" className="" data-bs-dismiss="modal" id="closeAssign" aria-label="Close" style={{ color: "#00000040" }}>
+                  <FontAwesomeIcon icon={faCircleXmark} />
+                </button>
+              </div>
+            </div>
+            <div className="modal-body px-4">
+              <div className="row ">
+                <form onSubmit={assignPermission} className="col-lg-12">
+                  <div className="text-center ">
+                    <div className="model-permission-bx">
+                      <img src="/model-permission-icon.png" alt="" />
+                    </div>
+                  </div>
+
+                  <div className="custom-frm-bx">
+                    <label htmlFor="">Select Permisssion</label>
+                    <select
+                      value={assignPId}
+                      onChange={(e) => setAssignPId(e.target.value)}
+                      className="form-select"
+                    >
+                      <option value="">---Select---</option>
+                      {permissions?.map(p => (
+                        <option key={p._id} value={p._id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                    {/* <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="form-control" placeholder="Enter Role Name" /> */}
+                  </div>
+                  <div className="custom-frm-bx">
+                    <label htmlFor="">Select Staff</label>
+                    <Select
+                      options={staffData}
+                      isMulti
+                      value={selectedStaff}
+                      className="custom-select"
+                      placeholder="Select staff..."
+                      onChange={(selectedOptions) => {
+                        setSelectedStaff(selectedOptions);
+                        const ids = selectedOptions.map(item => item.value);
+                        setStaffEmp(ids);
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <button type="submit" className="nw-thm-btn w-100" data-bs-dismiss="modal"> Submit</button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   )
 }

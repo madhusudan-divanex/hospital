@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightToBracket, faBed, faBorderAll, faBriefcase, faBuilding, faChevronRight, faClose, faFlask, faFlaskVial, faHistory, faHospitalUser, faLock, faMessage, faServer, faUserAlt, faUserAltSlash, faUserDoctor, faUsers, } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightToBracket, faBed, faBorderAll, faBriefcase, faBuilding, faCertificate, faChevronRight, faClose, faFlask, faFlaskVial, faHistory, faHospitalUser, faLock, faMessage, faServer, faUserAlt, faUserAltSlash, faUserDoctor, faUsers, } from "@fortawesome/free-solid-svg-icons";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,7 +10,7 @@ function LeftSidebar() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { user, hospitalBasic, hospitalPerson } = useSelector(state => state.user)
-  const { permissions,isOwner ,staffUser} = useSelector(state => state.user)
+  const { permissions, isOwner, staffUser } = useSelector(state => state.user)
   useEffect(() => {
     dispatch(fetchUserDetail())
     dispatch(fetchEmpDetail(localStorage.getItem('staffId')))
@@ -23,31 +23,37 @@ function LeftSidebar() {
 
   const location = useLocation();
 
-const isPatientActive =
-  location.pathname === "/patient-ipd" ||
-  location.pathname === "/patient-opd" ||
-  location.pathname === "/patient-emergency";
+  const isPatientActive =
+    location.pathname === "/patient-ipd" ||
+    location.pathname === "/patient-opd" ||
+    location.pathname === "/patient-emergency";
 
   const isAppointmentActive =
-  location.pathname === "/appointment" ||
-  location.pathname === "/appointment-request";
+    location.pathname === "/appointment" ||
+    location.pathname === "/appointment-request";
 
   const isBedActive =
-  location.pathname === "/bed-management" ||
-  location.pathname === "/bed-allotment-history";
+    location.pathname === "/bed-management" ||
+    location.pathname === "/bed-allotment-history";
 
   const isLabActive =
-  location.pathname === "/tests" ||
-  location.pathname === "/lab-slots" ||
-  location.pathname === "/test-report-appointment";
+    location.pathname === "/tests" ||
+    location.pathname === "/lab-slots" ||
+    location.pathname === "/test-report-appointment";
 
   const isPharmacyActive =
-  location.pathname === "/inventory" ||
-  location.pathname === "/medicine-request" ||
-  location.pathname === "/sell" ||
-  location.pathname === "/supplier" ||
-  location.pathname === "/returns" ||
-  location.pathname === "/purchase-order";
+    location.pathname === "/inventory" ||
+    location.pathname === "/medicine-request" ||
+    location.pathname === "/sell" ||
+    location.pathname === "/supplier" ||
+    location.pathname === "/returns" ||
+    location.pathname === "/purchase-order";
+  
+  const isCertActive =
+    location.pathname === "/birth-certificate" ||
+    location.pathname === "/fitness-certificate" ||
+    location.pathname === "/death-certificate" || 
+    location.pathname === "/medical-certificate";
   return (
     <>
       <div className="dashboard-left-side text-white min-vh-100 flex-shrink-0">
@@ -90,20 +96,19 @@ const isPatientActive =
           </div>
 
           <div className="left-navigation flex-grow-1 overflow-auto">
-
             <ul className="nav flex-column mt-3" >
               <li className="nav-item">
                 <NavLink to="/dashboard" className={({ isActive }) =>
-                    isActive ? "nav-link active-menu" : "nav-link"
-                  }>
+                  isActive ? "nav-link active-menu" : "nav-link"
+                }>
                   <FontAwesomeIcon icon={faBorderAll} />
                   Dashboard
                 </NavLink>
               </li>
               <li className="nav-item">
                 <NavLink to="/doctor" className={({ isActive }) =>
-                    isActive ? "nav-link active-menu" : "nav-link"
-                  }>
+                  isActive ? "nav-link active-menu" : "nav-link"
+                }>
                   <FontAwesomeIcon icon={faUserDoctor} /> Doctors
                 </NavLink>
               </li>
@@ -136,60 +141,57 @@ const isPatientActive =
                 </ul>
               </li> */}
 
-             <li className="nav-item">
-  <a
-    href="#labReportsSubmenup"
-    className={`nav-link product-toggle ${isPatientActive ? "active-menu" : ""}`}
-    data-bs-toggle="collapse"
-    role="button"
-    aria-expanded="false"
-    aria-controls="labReportsSubmenup"
-  >
-    <FontAwesomeIcon icon={faHospitalUser} /> Patients
-    <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
-  </a>
+              <li className="nav-item">
+                <a
+                  href="#labReportsSubmenup"
+                  className={`nav-link product-toggle ${isPatientActive ? "active-menu" : ""}`}
+                  data-bs-toggle="collapse"
+                  role="button"
+                  aria-expanded="false"
+                  aria-controls="labReportsSubmenup"
+                >
+                  <FontAwesomeIcon icon={faHospitalUser} /> Patients
+                  <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
+                </a>
 
-  <ul
-    className="product-submenu collapse"
-    id="labReportsSubmenup"
-  >
-    <li className="nav-item">
-      <NavLink
-        to="/patient-ipd"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        IPD
-      </NavLink>
-    </li>
+                <ul
+                  className="product-submenu collapse"
+                  id="labReportsSubmenup"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      to="/patient-ipd"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      IPD
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/patient-opd"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        OPD
-      </NavLink>
-    </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/patient-opd"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      OPD
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/patient-emergency"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        EMERGENCY
-      </NavLink>
-    </li>
-  </ul>
-            </li>
-
-
-
+                  <li className="nav-item">
+                    <NavLink
+                      to="/patient-emergency"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      EMERGENCY
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
               {/* <li className="nav-item">
                 <NavLink
                   to="#labReportsSubmenu"
@@ -215,46 +217,46 @@ const isPatientActive =
               </li> */}
 
               <li className="nav-item">
-  <a
-    href="#labReportsSubmenu"
-    className={`nav-link product-toggle ${isAppointmentActive ? "active-menu" : ""}`}
-    data-bs-toggle="collapse"
-    role="button"
-    aria-expanded={isAppointmentActive ? "true" : "false"}
-    aria-controls="labReportsSubmenu"
-  >
-    <FontAwesomeIcon icon={faBriefcase} /> Appointment
-    <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
-  </a>
+                <a
+                  href="#labReportsSubmenu"
+                  className={`nav-link product-toggle ${isAppointmentActive ? "active-menu" : ""}`}
+                  data-bs-toggle="collapse"
+                  role="button"
+                  aria-expanded={isAppointmentActive ? "true" : "false"}
+                  aria-controls="labReportsSubmenu"
+                >
+                  <FontAwesomeIcon icon={faBriefcase} /> Appointment
+                  <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
+                </a>
 
-  <ul
-    className={`product-submenu collapse ${isAppointmentActive ? "show" : ""}`}
-    id="labReportsSubmenu"
-    data-bs-parent=".nav"
-  >
-    <li className="nav-item">
-      <NavLink
-        to="/appointment"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        All Appointments
-      </NavLink>
-    </li>
+                <ul
+                  className={`product-submenu collapse ${isAppointmentActive ? "show" : ""}`}
+                  id="labReportsSubmenu"
+                  data-bs-parent=".nav"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      to="/appointment"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      All Appointments
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/appointment-request"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Appointment Request
-      </NavLink>
-    </li>
-  </ul>
-            </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/appointment-request"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Appointment Request
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
 
 
 
@@ -283,45 +285,45 @@ const isPatientActive =
               </li> */}
 
               <li className="nav-item">
-  <a
-    href="#slabReportsSubmenu"
-    className={`nav-link product-toggle ${isBedActive ? "active-menu" : ""}`}
-    data-bs-toggle="collapse"
-    role="button"
-    aria-expanded={isBedActive ? "true" : "false"}
-    aria-controls="slabReportsSubmenu"
-  >
-    <FontAwesomeIcon icon={faBed} /> Bed management
-    <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
-  </a>
+                <a
+                  href="#slabReportsSubmenu"
+                  className={`nav-link product-toggle ${isBedActive ? "active-menu" : ""}`}
+                  data-bs-toggle="collapse"
+                  role="button"
+                  aria-expanded={isBedActive ? "true" : "false"}
+                  aria-controls="slabReportsSubmenu"
+                >
+                  <FontAwesomeIcon icon={faBed} /> Bed management
+                  <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
+                </a>
 
-  <ul
-    className={`product-submenu collapse ${isBedActive ? "show" : ""}`}
-    id="slabReportsSubmenu"
-    data-bs-parent=".nav"
-  >
-    <li className="nav-item">
-      <NavLink
-        to="/bed-management"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Bed Allotment
-      </NavLink>
-    </li>
+                <ul
+                  className={`product-submenu collapse ${isBedActive ? "show" : ""}`}
+                  id="slabReportsSubmenu"
+                  data-bs-parent=".nav"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      to="/bed-management"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Bed Allotment
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/bed-allotment-history"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Bed Allotment History
-      </NavLink>
-    </li>
-  </ul>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/bed-allotment-history"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Bed Allotment History
+                    </NavLink>
+                  </li>
+                </ul>
               </li>
 
 
@@ -353,57 +355,57 @@ const isPatientActive =
               </li> */}
 
               <li className="nav-item">
-  <a
-    href="#slabReportsSubmenulab"
-    className={`nav-link product-toggle ${isLabActive ? "active-menu" : ""}`}
-    data-bs-toggle="collapse"
-    role="button"
-    aria-expanded={isLabActive ? "true" : "false"}
-    aria-controls="slabReportsSubmenulab"
-  >
-    <FontAwesomeIcon icon={faFlask} /> Laboratory
-    <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
-  </a>
+                <a
+                  href="#slabReportsSubmenulab"
+                  className={`nav-link product-toggle ${isLabActive ? "active-menu" : ""}`}
+                  data-bs-toggle="collapse"
+                  role="button"
+                  aria-expanded={isLabActive ? "true" : "false"}
+                  aria-controls="slabReportsSubmenulab"
+                >
+                  <FontAwesomeIcon icon={faFlask} /> Laboratory
+                  <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
+                </a>
 
-  <ul
-    className={`product-submenu collapse ${isLabActive ? "show" : ""}`}
-    id="slabReportsSubmenulab"
-    data-bs-parent=".nav"
-  >
-    <li className="nav-item">
-      <NavLink
-        to="/tests"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Tests
-      </NavLink>
-    </li>
+                <ul
+                  className={`product-submenu collapse ${isLabActive ? "show" : ""}`}
+                  id="slabReportsSubmenulab"
+                  data-bs-parent=".nav"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      to="/tests"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Tests
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/lab-slots"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Slots
-      </NavLink>
-    </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/lab-slots"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Slots
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/test-report-appointment"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Lab Reports
-      </NavLink>
-    </li>
-  </ul>
-            </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/test-report-appointment"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Lab Reports
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
 
 
 
@@ -446,179 +448,244 @@ const isPatientActive =
               </li> */}
 
               <li className="nav-item">
-  <a
-    href="#slabReportsSubmenupharmacy"
-    className={`nav-link product-toggle ${isPharmacyActive ? "active-menu" : ""}`}
-    data-bs-toggle="collapse"
-    role="button"
-    aria-expanded={isPharmacyActive ? "true" : "false"}
-    aria-controls="slabReportsSubmenupharmacy"
-  >
-    <FontAwesomeIcon icon={faFlaskVial} /> Pharmacy
-    <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
-  </a>
+                <a
+                  href="#slabReportsSubmenupharmacy"
+                  className={`nav-link product-toggle ${isPharmacyActive ? "active-menu" : ""}`}
+                  data-bs-toggle="collapse"
+                  role="button"
+                  aria-expanded={isPharmacyActive ? "true" : "false"}
+                  aria-controls="slabReportsSubmenupharmacy"
+                >
+                  <FontAwesomeIcon icon={faFlaskVial} /> Pharmacy
+                  <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
+                </a>
 
-  <ul
-    className={`product-submenu collapse ${isPharmacyActive ? "show" : ""}`}
-    id="slabReportsSubmenupharmacy"
-    data-bs-parent=".nav"
-  >
-    <li className="nav-item">
-      <NavLink
-        to="/inventory"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Inventory
-      </NavLink>
-    </li>
+                <ul
+                  className={`product-submenu collapse ${isPharmacyActive ? "show" : ""}`}
+                  id="slabReportsSubmenupharmacy"
+                  data-bs-parent=".nav"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      to="/inventory"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Inventory
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/medicine-request"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        H1 Medicine Request
-      </NavLink>
-    </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/medicine-request"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      H1 Medicine Request
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/sell"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Sell
-      </NavLink>
-    </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/sell"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Sell
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/supplier"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Supplier
-      </NavLink>
-    </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/supplier"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Supplier
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/returns"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Returns
-      </NavLink>
-    </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/returns"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Returns
+                    </NavLink>
+                  </li>
 
-    <li className="nav-item">
-      <NavLink
-        to="/purchase-order"
-        className={({ isActive }) =>
-          isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
-        }
-      >
-        Purchase Order
-      </NavLink>
-    </li>
-  </ul>
-            </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/purchase-order"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Purchase Order
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
 
 
               {isOwner &&
                 <li className="nav-item">
                   <NavLink to="/department" className={({ isActive }) =>
-                      isActive ? "nav-link active-menu" : "nav-link"
-                    }>
+                    isActive ? "nav-link active-menu" : "nav-link"
+                  }>
                     <FontAwesomeIcon icon={faBuilding} /> Departments
                   </NavLink>
                 </li>
               }
+              <li className="nav-item">
+                <a
+                  href="#certificateList"
+                  className={`nav-link product-toggle ${isCertActive ? "active-menu" : ""}`}
+                  data-bs-toggle="collapse"
+                  role="button"
+                  aria-expanded={isCertActive ? "true" : "false"}
+                  aria-controls="certificateList"
+                >
+                  <FontAwesomeIcon icon={faCertificate} /> Certificates
+                  <FontAwesomeIcon icon={faChevronRight} className="ms-auto toggle-admin-icon" />
+                </a>
+
+                <ul
+                  className={`product-submenu collapse ${isCertActive ? "show" : ""}`}
+                  id="certificateList"
+                  data-bs-parent=".nav"
+                >
+                  <li className="nav-item">
+                    <NavLink
+                      to="/fitness-certificate"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Fitness
+                    </NavLink>
+                  </li>
+
+                  <li className="nav-item">
+                    <NavLink
+                      to="/medical-certificate"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Medical
+                    </NavLink>
+                  </li>
+
+                  <li className="nav-item">
+                    <NavLink
+                      to="/birth-certificate"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Birth
+                    </NavLink>
+                  </li>
+
+                  <li className="nav-item">
+                    <NavLink
+                      to="/death-certificate"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      Death
+                    </NavLink>
+                  </li>               
+
+                </ul>
+              </li>
+              
               {!isOwner && permissions?.staff?.list && <li className="nav-item">
                 <NavLink to="/staff-management" className={({ isActive }) =>
-                              isActive ? "nav-link active-menu" : "nav-link"
-                            }>
+                  isActive ? "nav-link active-menu" : "nav-link"
+                }>
                   <FontAwesomeIcon icon={faUsers} /> Staff
                 </NavLink>
               </li>}
               {isOwner && <li className="nav-item">
                 <NavLink to="/staff-management" className={({ isActive }) =>
-                    isActive ? "nav-link active-menu" : "nav-link"
-                  }>
+                  isActive ? "nav-link active-menu" : "nav-link"
+                }>
                   <FontAwesomeIcon icon={faUsers} /> Staff
                 </NavLink>
               </li>}
               {isOwner ?
                 <li className="nav-item">
                   <NavLink to="/permission-type" className={({ isActive }) =>
-                      isActive ? "nav-link active-menu" : "nav-link"
-                    }>
+                    isActive ? "nav-link active-menu" : "nav-link"
+                  }>
                     <FontAwesomeIcon icon={faUserAltSlash} /> Permissions
                   </NavLink>
                 </li>
                 :
                 <li className="nav-item">
                   <NavLink to="/my-permission" className={({ isActive }) =>
-                      isActive ? "nav-link active-menu" : "nav-link"
-                    }>
+                    isActive ? "nav-link active-menu" : "nav-link"
+                  }>
                     <FontAwesomeIcon icon={faUserAltSlash} />My Permissions
                   </NavLink>
                 </li>
               }
               {(isOwner || permissions?.chat?.access) && <li className="nav-item">
                 <NavLink to="/chat" className={({ isActive }) =>
-                    isActive ? "nav-link active-menu" : "nav-link"
-                  }>
+                  isActive ? "nav-link active-menu" : "nav-link"
+                }>
                   <FontAwesomeIcon icon={faMessage} /> Chat
                 </NavLink>
               </li>}
-              {!isOwner&&
-              <li className="nav-item">
+              {!isOwner &&
+                <li className="nav-item">
                   <NavLink to={`/staff-info-view/${staffUser?.nh12}`} className={({ isActive }) =>
-                      isActive ? "nav-link active-menu" : "nav-link"
-                    }>
+                    isActive ? "nav-link active-menu" : "nav-link"
+                  }>
                     <FontAwesomeIcon icon={faUserAlt} />My Profile
                   </NavLink>
                 </li>
               }
-              {isOwner && 
-              <>
-                <li className="nav-item">
-                  <NavLink to="/profile" className={({ isActive }) =>
+              {isOwner &&
+                <>
+                  <li className="nav-item">
+                    <NavLink to="/profile" className={({ isActive }) =>
                       isActive ? "nav-link active-menu" : "nav-link"
                     }>
-                    <FontAwesomeIcon icon={faUserAlt} /> Profile
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/services" className={({ isActive }) =>
-                        isActive ? "nav-link active-menu" : "nav-link"
-                      }>
-                    <FontAwesomeIcon icon={faServer} /> Services
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/change-password" className={({ isActive }) =>
-                    isActive ? "nav-link active-menu" : "nav-link"
-                  }>
-                    <FontAwesomeIcon icon={faLock} /> Change Password
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/audit-log" className={({ isActive }) =>
+                      <FontAwesomeIcon icon={faUserAlt} /> Profile
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/services" className={({ isActive }) =>
                       isActive ? "nav-link active-menu" : "nav-link"
                     }>
-                    <FontAwesomeIcon icon={faHistory} /> Audit Logs
-                  </NavLink>
-                </li>
-              </>}
+                      <FontAwesomeIcon icon={faServer} /> Services
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/change-password" className={({ isActive }) =>
+                      isActive ? "nav-link active-menu" : "nav-link"
+                    }>
+                      <FontAwesomeIcon icon={faLock} /> Change Password
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/audit-log" className={({ isActive }) =>
+                      isActive ? "nav-link active-menu" : "nav-link"
+                    }>
+                      <FontAwesomeIcon icon={faHistory} /> Audit Logs
+                    </NavLink>
+                  </li>
+                </>}
               <li className="nav-item">
                 <NavLink to="/" onClick={handleLogout} className="nav-link " data-bs-toggle="modal" data-bs-target="#logout" >
                   <FontAwesomeIcon icon={faArrowRightToBracket} /> Logout

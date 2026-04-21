@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { getToken } from "firebase/messaging";
 import { postApiData } from "../../Service/api";
 import { toast } from "react-toastify";
+import { saveFcmToken } from "../../Service/globalFunction";
 
 function Otp() {
     const navigate = useNavigate();
@@ -58,22 +59,7 @@ function Otp() {
         }
     };
     // ---------------- LOGIN SUBMIT ---------------- //
-    const saveFcmToken = async () => {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") return;
-            const token = await getToken(messaging, {
-                vapidKey: "BBhhJGO7sE7RgSoez4GqQoRlK04U-P-Mem9V6DHypsgNbCcIKWUrnL3nN9SzxUL0zxIsQ06LlVsrEYr8dHaqpVc"
-            });
-
-            if (token) {
-                await API.post("/comman/save-fcm-token", { fcmToken: token });
-                console.log("✅ FCM Token Saved");
-            }
-        } catch (err) {
-            console.error("FCM error", err);
-        }
-    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 

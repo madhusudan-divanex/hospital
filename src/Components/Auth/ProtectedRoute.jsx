@@ -20,9 +20,9 @@ function ProtectedRoute({ children }) {
         const res = await getSecureApiData("api/comman/profile");
         if (res?.success) {
           setIsAuthenticated(true);
-          if(res.nextStep){
-            navigate(res.nextStep)
-          }
+          // if(res.nextStep){
+          //   navigate(res.nextStep)
+          // }
         } else {
           throw new Error("Invalid token");
         }

@@ -14,6 +14,7 @@ import { saveAs } from "file-saver";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import DoctorAppointmentBilling from "./DoctorAppointmentBilling";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
+import DoctorAptBookingReceipt from "../../All Template file/Booking receipt";
 function Appointments() {
     const navigate = useNavigate()
     const user = JSON.parse(localStorage.getItem('user'))
@@ -516,7 +517,6 @@ function Appointments() {
                                                                                     Download Invoice
                                                                                 </button>
                                                                             </li>}
-                                                                            {console.log(item._id)}
                                                                             {item?.status=="completed" && item?.prescriptionId &&
                                                                             <li className="prescription-item">
                                                                                 <button className=" prescription-nav w-100"
@@ -683,7 +683,7 @@ function Appointments() {
                         </div>
                     </div>
                     <div className="d-none">
-                        {activeApt && <DoctorAppointmentBilling aptId={activeApt?._id}
+                        {activeApt && <DoctorAptBookingReceipt paymentId={activeApt?.invoiceId}
                             endLoading={() => setPdfLoading(false)}
                             pdfLoading={pdfLoading} />}
                     </div>

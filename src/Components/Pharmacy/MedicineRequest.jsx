@@ -77,7 +77,6 @@ function MedicineRequest() {
         }
     }
     useEffect(()=>{
-
         fetchSchedules()
     },[])
     useEffect(() => {

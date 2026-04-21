@@ -23,6 +23,8 @@ function Dashboard() {
   const [departments, setDepartments] = useState([])
   const dispatch = useDispatch()
   const { staffUser } = useSelector(state => state.user)
+  const [nextStep, setNextStep] = useState()
+  const [profileComlete, setProfileComplete] = useState(0)
   const [doctorId, setDoctorId] = useState('')
 
   useEffect(() => {
@@ -57,15 +59,18 @@ function Dashboard() {
     }
   }
   async function getDashboardData() {
+
     setLoading(true)
     try {
       const result = await getSecureApiData(`api/hospital/dashboard`)
       if (result.success) {
         setCardData(result.data)
         setDepartments(result.departments)
+        setNextStep(result.nextStep)
+        setProfileComplete(result.profileComplete)
       }
     } catch (error) {
-
+      console.log(error)
     } finally {
       setLoading(false)
     }
@@ -76,6 +81,7 @@ function Dashboard() {
       getAppointmentRequestData()
       getDashboardData()
     }
+    console.log("object", user)
   }, [user, doctorId])
   const appointmentAction = async (item, status) => {
     const data = { doctorId: item?.doctorId?._id, appointmentId: item?._id, status }
@@ -193,6 +199,19 @@ function Dashboard() {
               </div>
             </div>
           </div>
+          {nextStep && <div className="row mb-3">
+            <div className="col-10">
+              <div className="progress-container">
+                <span
+                  className="profile-progress-bar"
+                  style={{ width: `${profileComlete}%` }}
+                >{profileComlete} %</span>
+              </div>
+            </div>
+            <div className="col-2 text-center">
+              <Link to={nextStep} className="rq-scan-btn text-center w-100">Complete Now</Link>
+            </div>
+          </div>}
 
           <div className="row">
             <div className="col-lg-8 col-sm-12">

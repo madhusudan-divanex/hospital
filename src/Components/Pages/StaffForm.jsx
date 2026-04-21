@@ -24,6 +24,7 @@ function StaffForm() {
     const [cities, setCities] = useState([]);
     const [loading, setLoading] = useState(false);
     const { user, } = useSelector(state => state.user)
+    const [searchLoading, setSearchLoading] = useState(false);
     const navigate = useNavigate()
 
     // Error states
@@ -254,6 +255,7 @@ function StaffForm() {
 
     async function handleAddStaff() {
         try {
+            setSearchLoading(true);
             const result = await getSecureApiData(`api/staff/${staffNh12}`);
             if (result.success) {
                 setStaffId(result.staffData?.userId)
@@ -294,6 +296,8 @@ function StaffForm() {
             }
         } catch (error) {
             toast.error(error?.response?.data?.message);
+        } finally {
+            setSearchLoading(false);
         }
     }
 
@@ -585,10 +589,10 @@ function StaffForm() {
                                 value={staffNh12}
                                 onChange={(e) => setStaffNh12(e.target.value)}
                             />
-                            {loading && <small className="text-info">Checking...</small>}
+                            {searchLoading && <small className="text-info">Checking...</small>}
                         </div>
                         <div className="text-center mt-4">
-                            <button className="nw-thm-btn w-75" disabled={loading} onClick={handleAddStaff}>
+                            <button className="nw-thm-btn w-75" disabled={searchLoading} onClick={handleAddStaff}>
                                 Add
                             </button>
                         </div>

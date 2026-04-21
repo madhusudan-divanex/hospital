@@ -434,7 +434,7 @@ function DoctorView() {
                                 </div>
                               </div>
 
-                              <div className="ovrview-bx mb-3">
+                              {/* <div className="ovrview-bx mb-3">
                                 <h4 className="new_title">Other </h4>
                                 <div className="vw-contract-bx">
                                   <div>
@@ -454,7 +454,7 @@ function DoctorView() {
                                     </p>
                                   </div>
                                 </div>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>

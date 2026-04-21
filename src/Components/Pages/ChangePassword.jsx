@@ -81,8 +81,6 @@ function ChangePassword() {
                 </nav>
               </div>
             </div>
-
-
           </div>
         </div>
       </form>
@@ -90,75 +88,75 @@ function ChangePassword() {
         <div className="row justify-content-center">
           <div className="col-lg-4 col-md-12 col-sm-12">
             <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="username"
-            autoComplete="username"
-            value="hospital@email.com"
-            readOnly
-            hidden
-          />
-          {/* Current Password */}
-          <div className="custom-frm-bx">
-            <label>Current Password</label>
-            <input
-              type={show.current ? "text" : "password"}
-              className="form-control pe-5 nw-frm-select"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-            <span
-              className="search-item-bx"
-              onClick={() => setShow({ ...show, current: !show.current })}
-            >
-              <FontAwesomeIcon icon={show.current ? faEye : faEyeSlash} />
-            </span>
-          </div>
+              <input
+                type="text"
+                name="username"
+                autoComplete="username"
+                value="hospital@email.com"
+                readOnly
+                hidden
+              />
+              {/* Current Password */}
+              <div className="custom-frm-bx">
+                <label>Current Password</label>
+                <input
+                  type={show.current ? "text" : "password"}
+                  className="form-control pe-5 nw-frm-select"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+                <span
+                  className="search-item-bx"
+                  onClick={() => setShow({ ...show, current: !show.current })}
+                >
+                  <FontAwesomeIcon icon={show.current ? faEye : faEyeSlash} />
+                </span>
+              </div>
 
-          {/* New Password */}
-          <div className="custom-frm-bx">
-            <label>New Password</label>
-            <input
-              type={show.new ? "text" : "password"}
-              className="form-control pe-5 nw-frm-select"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-            <span
-              className="search-item-bx"
-              onClick={() => setShow({ ...show, new: !show.new })}
-            >
-              <FontAwesomeIcon icon={show.new ? faEye : faEyeSlash} />
-            </span>
-          </div>
+              {/* New Password */}
+              <div className="custom-frm-bx">
+                <label>New Password</label>
+                <input
+                  type={show.new ? "text" : "password"}
+                  className="form-control pe-5 nw-frm-select"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <span
+                  className="search-item-bx"
+                  onClick={() => setShow({ ...show, new: !show.new })}
+                >
+                  <FontAwesomeIcon icon={show.new ? faEye : faEyeSlash} />
+                </span>
+              </div>
 
-          {/* Confirm Password */}
-          <div className="custom-frm-bx">
-            <label>Confirm New Password</label>
-            <input
-              type={show.confirm ? "text" : "password"}
-              className="form-control pe-5 nw-frm-select"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-            <span
-              className="search-item-bx"
-              onClick={() => setShow({ ...show, confirm: !show.confirm })}
-            >
-              <FontAwesomeIcon icon={show.confirm ? faEye : faEyeSlash} />
-            </span>
-          </div>
+              {/* Confirm Password */}
+              <div className="custom-frm-bx">
+                <label>Confirm New Password</label>
+                <input
+                  type={show.confirm ? "text" : "password"}
+                  className="form-control pe-5 nw-frm-select"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <span
+                  className="search-item-bx"
+                  onClick={() => setShow({ ...show, confirm: !show.confirm })}
+                >
+                  <FontAwesomeIcon icon={show.confirm ? faEye : faEyeSlash} />
+                </span>
+              </div>
 
-          <div className="text-center mt-3">
-            <button className="nw-thm-btn" type="submit">
-              Change Password
-            </button>
-          </div>
-        </form>
-            
+              <div className="text-center mt-3">
+                <button className="nw-thm-btn" type="submit">
+                  Change Password
+                </button>
+              </div>
+            </form>
+
           </div>
 
         </div>

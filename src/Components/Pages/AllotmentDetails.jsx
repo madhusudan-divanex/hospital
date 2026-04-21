@@ -223,6 +223,12 @@ function AllotmentDetails() {
   const totalAmount = paymentData?.services?.reduce(
     (sum, item) => sum + (item.amount || 0),
     0
+  )+paymentData?.ipdPayment?.reduce(
+    (sum, item) => sum + (item.fees || 0),
+    0
+  )+paymentData?.bedCharges?.reduce(
+    (sum, item) => sum + (item.amount || 0),
+    0
   );
 
   // Total Paid Amount
@@ -746,10 +752,23 @@ function AllotmentDetails() {
                               </tr>
                             </thead>
                             <tbody>
+                              {paymentData?.services?.length>0 &&<tr>Services</tr>}
                               {paymentData?.services?.map((item, key) =>
                                 <tr key={key}>
                                   <td>{item?.name}</td>
-                                  <td>${item?.amount}</td>
+                                  <td>₹ {item?.amount}</td>
+                                </tr>)}
+                               {paymentData?.ipdPayment?.length>0 && <tr>Ipd Payments</tr>}
+                                {paymentData?.ipdPayment?.map((item, key) =>
+                                <tr key={key}>
+                                  <td>{item?.userId?.name} ({item?.userId?.role=='doctor'?'Doctor':'Healthcare Staff'})</td>
+                                  <td>₹ {item?.fees}</td>
+                                </tr>)}
+                                {paymentData?.bedCharges?.length>0 && <tr>Bed Charges</tr>}
+                                {paymentData?.bedCharges?.map((item, key) =>
+                                <tr key={key}>
+                                  <td>{item?.bedId?.bedName}</td>
+                                  <td>₹ {item?.amount}</td>
                                 </tr>)}
 
                             </tbody>
@@ -762,7 +781,7 @@ function AllotmentDetails() {
                           <ul className="lab-amount-list">
                             <li className="lab-amount-item">
                               Total :{" "}
-                              <span className="price-title fw-700">${totalAmount}</span>
+                              <span className="price-title fw-700">₹{totalAmount}</span>
                             </li>
                           </ul>
                         </div>
@@ -788,7 +807,7 @@ function AllotmentDetails() {
                                 <tr key={key}>
                                   <td>{item?.type}</td>
                                   <td>{new Date(item?.date)?.toLocaleDateString('en-GB')}</td>
-                                  <td>${item?.amount}</td>
+                                  <td>₹ {item?.amount}</td>
                                 </tr>)}
                             </tbody>
                           </table>
@@ -801,18 +820,18 @@ function AllotmentDetails() {
                     <ul className="appointment-crd-list">
                       <li className="appointment-crd-item">
                         Total Payment{" "}
-                        <span className="appointment-crd-title">${totalAmount}</span>
+                        <span className="appointment-crd-title">₹ {totalAmount}</span>
                       </li>
                       <li className="appointment-crd-item">
                         Payment Add{" "}
-                        <span className="appointment-crd-title">${paymentData?.payments?.reduce(
+                        <span className="appointment-crd-title">₹ {paymentData?.payments?.reduce(
                           (sum, item) => sum + (item.amount || 0),
                           0
                         )}</span>
                       </li>
                       <li className="appointment-crd-item">
                         Pending Payment{" "}
-                        <span className="appointment-crd-title"> ${pendingAmount}</span>
+                        <span className="appointment-crd-title"> ₹ {pendingAmount}</span>
                       </li>
                       <li className="appointment-crd-item">
                         Payment Status{" "}
@@ -824,10 +843,12 @@ function AllotmentDetails() {
                     </ul>
                   </div>
 
-                  <div className="report-remark mt-3">
-                    <h6 className="fw-400">Note: </h6>
-                    <p>{dischargeData?.note}</p>
-                  </div>
+                  {dischargeData?.dischargeNote && (
+                    <div className="report-remark mt-3">
+                      <h6 className="fw-400">Discharge Note: </h6>
+                      <p>{dischargeData?.dischargeNote}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

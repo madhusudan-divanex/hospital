@@ -5,7 +5,7 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FaPlusCircle } from "react-icons/fa";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import API from "../../api/api";
 
@@ -617,7 +617,7 @@ function CreateAccountUpload() {
                 </div>
 
                 {/* SUBMIT BUTTON */}
-                <div className="mt-4">
+                <div className="mt-4 d-flex flex-column gap-3">
                   <button
                     className="admin-lg-btn w-100"
                     disabled={loading}
@@ -625,6 +625,12 @@ function CreateAccountUpload() {
                   >
                     {loading ? "Submitting...." : "Submit"}
                   </button>
+                    <Link
+                      className="nw-thm-btn outline rounded-3 w-100"
+                      to={'/dashboard'}
+                    >
+                      Skip And Continue
+                    </Link>
 
                   <button
                     id="openModal"

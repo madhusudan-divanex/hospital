@@ -164,7 +164,7 @@ function EditProfile() {
         gstNumber: data?.basic?.gstNumber || "",
         about: data?.basic?.about || "",
         logo: data?.images?.logo?.[0]?.url || null,
-        category:data?.category || []
+        category:data?.category || [],
       });
 
       /* ----- IMAGES ----- */
@@ -253,7 +253,6 @@ function EditProfile() {
     data.append('gstNumber', basicForm.gstNumber)
     data.append('about', basicForm.about)
     data.append('category', JSON.stringify(basicForm.category))
-    console.log(basicForm.category)
     if (basicForm.logo instanceof File) {
       data.append('logo', basicForm.logo)
     }
@@ -695,6 +694,7 @@ function EditProfile() {
                                     onChange={(e) => setBasicForm((p) => ({ ...p, email: e.target.value }))}
                                   />
                                 </div>
+                              </div>
                                 <div className="col-lg-6">
                                   <div className="custom-frm-bx">
                                     <label htmlFor="">Category</label>
@@ -710,8 +710,6 @@ function EditProfile() {
                                     />
                                   </div>
                                 </div>
-                              </div>
-
                               <div className="col-lg-6">
                                 <div className="custom-frm-bx">
                                   <label>GST Number</label>
@@ -723,6 +721,8 @@ function EditProfile() {
                                   />
                                 </div>
                               </div>
+                              
+
 
                               <div className="col-lg-12">
                                 <div className="custom-frm-bx">

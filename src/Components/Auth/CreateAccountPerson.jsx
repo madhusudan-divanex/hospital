@@ -2,7 +2,7 @@ import { FaFlask } from "react-icons/fa6";
 import { BsFillFileImageFill } from "react-icons/bs";
 import { FaMapMarkerAlt, FaUser, FaCloudUploadAlt } from "react-icons/fa";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import API from "../../api/api";
 
@@ -16,7 +16,7 @@ function CreateAccountPerson() {
     const [gender, setGender] = useState("");
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [errors, setErrors] = useState({});
-    const [loading,setLoading]=useState(false)
+    const [loading, setLoading] = useState(false)
 
     // VALIDATION
     const validate = () => {
@@ -54,11 +54,11 @@ function CreateAccountPerson() {
             console.log("CONTACT SAVED:", res.data);
 
             // NEXT PAGE
-            navigate("/create-account-upload",{replace:true});
+            navigate("/create-account-upload", { replace: true });
 
         } catch (err) {
             console.error(err.response?.data || err);
-        }finally{
+        } finally {
             setLoading(false)
         }
     };
@@ -199,7 +199,7 @@ function CreateAccountPerson() {
 
                                 {/* Profile Photo */}
                                 <div className="custom-frm-bx" onDrop={(e) => photoDrop(e)}
-                                            onDragOver={photoDragOver}>
+                                    onDragOver={photoDragOver}>
                                     <label>Upload Profile Photo</label>
                                     <div className="upload-box nw-upload-bx p-3 justify-content-center align-items-center">
                                         <div className="upload-icon mb-2">
@@ -218,29 +218,35 @@ function CreateAccountPerson() {
 
                                             <div className="mt-3">
                                                 <label className="browse-btn" htmlFor="profileFile">
-                                                Browse File
-                                            <input
-                                                type="file"
-                                                id="profileFile"
-                                                className="d-none"
-                                                accept=".png,.jpg,.jpeg"
-                                                onChange={(e) => setProfilePhoto(e.target.files[0])}
-                                            />
+                                                    Browse File
+                                                    <input
+                                                        type="file"
+                                                        id="profileFile"
+                                                        className="d-none"
+                                                        accept=".png,.jpg,.jpeg"
+                                                        onChange={(e) => setProfilePhoto(e.target.files[0])}
+                                                    />
 
-                                             </label>
+                                                </label>
                                             </div>
 
-                                            {profilePhoto instanceof File && 
-                                            <img src={URL.createObjectURL(profilePhoto)} height={50} width={50}/>}
+                                            {profilePhoto instanceof File &&
+                                                <img src={URL.createObjectURL(profilePhoto)} height={50} width={50} />}
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* NEXT */}
-                                <div className="mt-4">
+                                <div className="d-flex flex-column gap-3 mt-4">
                                     <button type="submit" disabled={loading} className="admin-lg-btn w-100">
-                                        {loading?'Submitting...':'Next'}
+                                        {loading ? 'Submitting...' : 'Next'}
                                     </button>
+                                    <Link
+                                        className="nw-thm-btn outline rounded-3 w-100"
+                                        to={'/create-account-upload'}
+                                    >
+                                        Skip And Continue
+                                    </Link>
                                 </div>
 
                             </div>

@@ -23,6 +23,8 @@ import DailyIPDNotes from "./DailyIPDNotes";
 import AddAllotmentTest from "./AddAllotmentTest";
 import DepartmentTransfer from "./DepartmentTransfer";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
+import { Hospital } from "lucide-react";
+import HospitalTransfer from "./HospitalTransfer";
 function BedManagement() {
   const navigate = useNavigate();
   const dispatch = useDispatch()
@@ -412,6 +414,7 @@ function BedManagement() {
                       </span>
                     </a>
                   </li>
+                  
                   <li className="bed-list-item">
                     <a
                       href="#"

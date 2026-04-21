@@ -15,6 +15,8 @@ import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
+import { Hospital } from "lucide-react";
+import HospitalTransfer from "./HospitalTransfer";
 function BedAllotmentHistory() {
     const user = JSON.parse(localStorage.getItem('user'))
     const userId = user.id
@@ -46,6 +48,8 @@ function BedAllotmentHistory() {
                 setAllotments(result.data);
                 setCurrentPage(result.pagination.currentPage);
                 setTotalPages(result.pagination.totalPages);
+            } else {
+                toast.error(result.message || "Failed to fetch allotment history");
             }
         } catch (error) {
             console.log(error);
@@ -367,9 +371,10 @@ function BedAllotmentHistory() {
                                                                         { day: "numeric", month: "long", year: "numeric" })}</span></li>
                                                                     <li className="ad-info-item"> <b>Expected Discharge Date :</b><span className="add-info-title"> {item?.expectedDischargeDate ? new Date(item?.expectedDischargeDate)?.toLocaleDateString('en-GB',
                                                                         { day: "numeric", month: "long", year: "numeric" }) : '-'}</span></li>
-                                                                    <li className="ad-info-item"> <b>Actual Discharge :</b><span className="add-info-title not-discharge">
-                                                                        {item?.status == 'Active' ? 'Not discharged yet' : new Date(item?.dischargeId?.dischargeDate)?.toLocaleDateString('en-GB',
-                                                                            { day: "numeric", month: "long", year: "numeric" })}</span></li>
+                                                                    <li className="ad-info-item"> <b>Actual Discharge :</b>
+                                                                        <span className="add-info-title not-discharge">
+                                                                            {item?.status == 'Active' ? 'Not discharged yet' : new Date(item?.dischargeId?.createdAt)?.toLocaleDateString('en-GB',
+                                                                                { day: "numeric", month: "long", year: "numeric" })}</span></li>
                                                                 </ul>
                                                             </div>
                                                         </td>
@@ -377,12 +382,24 @@ function BedAllotmentHistory() {
                                                             {item?.paymentId ? <div className="admin-table-bx">
                                                                 <ul className="ad-info-list">
                                                                     <li className="ad-info-item"> Total Payment :
-                                                                        <span className="add-info-title"> ${item?.paymentId?.services?.reduce(
+                                                                        <span className="add-info-title"> ₹ {item?.paymentId?.services?.reduce(
+                                                                            (sum, p) => sum + (p.amount || 0),
+                                                                            0
+                                                                        ) + item?.paymentId?.ipdPayment?.reduce(
+                                                                            (sum, p) => sum + (p.fees || 0),
+                                                                            0
+                                                                        ) + item?.paymentId?.bedCharges?.reduce(
                                                                             (sum, p) => sum + (p.amount || 0),
                                                                             0
                                                                         )}</span></li>
                                                                     <li className="ad-info-item"> pending Payment :<span className="add-info-title">
-                                                                        ${item?.paymentId?.services?.reduce(
+                                                                        ₹ {item?.paymentId?.services?.reduce(
+                                                                            (sum, p) => sum + (p.amount || 0),
+                                                                            0
+                                                                        ) + item?.paymentId?.ipdPayment?.reduce(
+                                                                            (sum, p) => sum + (p.fees || 0),
+                                                                            0
+                                                                        ) + item?.paymentId?.bedCharges?.reduce(
                                                                             (sum, p) => sum + (p.amount || 0),
                                                                             0
                                                                         ) - item?.paymentId?.payments?.reduce(
@@ -438,6 +455,17 @@ function BedAllotmentHistory() {
                                                                             Add Payment
                                                                         </a>
                                                                     </li>
+                                                                    {item?.status=="Discharged" &&<li className="prescription-item">
+                                                                        <a
+                                                                            href="#"
+                                                                            className="prescription-nav"
+                                                                            data-bs-toggle="modal"
+                                                                            onClick={() => setSelected(item)}
+                                                                            data-bs-target="#hospital-Transfer"
+                                                                        >
+                                                                            Hospital Transfer
+                                                                        </a>
+                                                                    </li>}
                                                                     {item?.status == "Active" && <>
                                                                         <li className="prescription-item">
                                                                             <NavLink to="/edit-allotment" className="prescription-nav">
@@ -490,11 +518,9 @@ function BedAllotmentHistory() {
 
             {/* <!-- Discharge Patient Popup Start --> */}
             {/* <!--  data-bs-toggle="modal" data-bs-target="#discharge-Patient" --> */}
-            <DischargePatient allotmentId={selected?._id} fetchData={() => fetchAllotments()} />
-
-
-
+            <DischargePatient allotmentId={selected?._id} fetchData={() => fetchAllotments()} />         
             {/* <!-- Discharge Patient Popup End --> */}
+            <HospitalTransfer data={selected} getData={fetchAllotments} />
 
         </>
     )
