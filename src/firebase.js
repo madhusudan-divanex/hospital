@@ -2,30 +2,35 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
-apiKey: "AIzaSyCdvvJcViTZWv8XcXAcYseXjZnw_baFJMM",
-  authDomain: "neohelth-f9e9d.firebaseapp.com",
-  projectId: "neohelth-f9e9d",
-  storageBucket: "neohelth-f9e9d.firebasestorage.app",
-  messagingSenderId: "494629819602",
-  appId: "1:494629819602:web:5764cf4c9174517606890b",
-  measurementId: "G-D5WDKBFNJG"
+apiKey: "AIzaSyAC2yHXIIptDFannYC-u3eI4sibErN08vA",
+  authDomain: "neohelth-a97f7.firebaseapp.com",
+  projectId: "neohelth-a97f7",
+  storageBucket: "neohelth-a97f7.firebasestorage.app",
+  messagingSenderId: "10649086040",
+  appId: "1:10649086040:web:60124ab036f48647ed022d",
+  measurementId: "G-TWJTBPBTHF"
 };
 
 const app = initializeApp(firebaseConfig);
 export const messaging = getMessaging(app);
 
+
 export const listenForegroundNotification = (navigate) => {
-  const messaging = getMessaging();
+    const messaging = getMessaging();
 
-  onMessage(messaging, (payload) => {
-    const data = payload.data;
-navigate(`/chat/${data.conversationId}`);
-  //   if (data?.type === "chat") {
-  //     navigate(`/chat/${data.conversationId}`);
-  //   }
+    onMessage(messaging, (payload) => {
+        console.log("Foreground notification received:", payload);
+        const data = payload.data;
+        const { title, body } = payload.notification || {};
 
-  //   if (data?.type === "chat") {
-  //     navigate(`/chat/${data.fromUserId}`);
-  //   }
-  });
+        // toast.success(`${title}\n${body}`);
+        // navigate(`/chat`);
+        //   if (data?.type === "chat") {
+        //     navigate(`/chat/${data.conversationId}`);
+        //   }
+
+        //   if (data?.type === "chat") {
+        //     navigate(`/chat/${data.fromUserId}`);
+        //   }
+    });
 };

@@ -5,14 +5,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "react-toastify";
 import api from "../../api/api";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { getSecureApiData } from "../../Service/api";
 
 function Allotment() {
   const { id } = useParams();
   const location = useLocation();
-
+  const [searchParams,setSearchParams]=useSearchParams()
   const isEdit = location.pathname.includes("/edit-allotment");
   const bedId = !isEdit ? id : null;
   const allotmentId = isEdit ? id : null;
@@ -26,7 +26,7 @@ function Allotment() {
     patientId: "",
     doctorId: "",
     allotmentDate: "",
-    expectedDischargeDate: "",
+    expectedDischargeDate: "",patientDepartment:null,
     reason: "",
     note: "",
     staffDate: ""
@@ -161,7 +161,7 @@ function Allotment() {
 
   const fetchPatients = async () => {
     try {
-      const res = await api.get("/patients/list?limit=1000000&deptType=IPD&unique=true");
+      const res = await api.get("/patients/IPD-list?limit=100000");
       setPatient(res.data.data);
     } catch {
       toast.error("Failed to load patients");
@@ -262,13 +262,19 @@ function Allotment() {
       toast.error("Please fill all required fields");
       return;
     }
+    let data={...allotment}
+    const ptDept=patient.find(item=>item?.patientId?._id==allotment?.patientId)
+    
+    if(ptDept){
+      data.patientDepartment=ptDept?._id
+    }
 
     try {
       setLoading(true);
 
       if (isEdit) {
         const res = await api.put(`/bed/allotment/update/${allotmentId}`, {
-          allotmentDetails: allotment,
+          allotmentDetails: data,
           attendingStaff
         });
         if (res.data.success) {
@@ -279,7 +285,7 @@ function Allotment() {
       } else {
         const res = await api.post("/bed/allotment/add", {
           bedDetails: form,
-          allotmentDetails: allotment,
+          allotmentDetails: data,
           attendingStaff
         });
         if (res.data.success) {
@@ -297,6 +303,19 @@ function Allotment() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+  if (searchParams.get("patientId")) {
+    setAllotment((prev) => ({
+      ...prev,
+      patientId: searchParams.get("patientId"),
+    }));
+  }
+
+  return () => {
+  setSearchParams({});
+};
+}, []);
+ 
 
 
   return (
@@ -452,8 +471,8 @@ function Allotment() {
                     >
                       <option value="">---Select Patient---</option>
                       {patient.map(p => (
-                        <option key={p._id} value={p._id}>
-                          {p.name} {p?.contactNumber && (p?.contactNumber)}
+                        <option key={p._id} value={p?.patientId?._id}>
+                          {p?.patientId?.name} {p?.patientId?.contactNumber && (p?.patientId?.contactNumber)}
                         </option>
                       ))}
                     </select>

@@ -69,7 +69,7 @@ function FitnessForm() {
             const res = await securePostData("api/certificate/fitness", form);
             if (res.success) {
                 toast.success("Fitness certificate generated successfully");
-                navigate("/dashboard");
+                navigate("/fitness-certificate");
                 setErrors({});
             } else {
                 toast.error(res.message)

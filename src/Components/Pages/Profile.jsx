@@ -16,7 +16,7 @@ import base_url from "../../baseUrl";
 import html2canvas from "html2canvas";
 import Loader from "../Common/Loader";
 import { securePostData } from "../../Service/api";
-
+import { QRCodeCanvas } from "qrcode.react";
 function Profile() {
   const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ function Profile() {
       setLoading(false);
     }
   }
-  
+
   const [paymentForm, setPaymentForm] = useState({
     bankName: "",
     ifscCode: "",
@@ -386,7 +386,14 @@ function Profile() {
                                         <p>Hospital ID</p>
                                         <h6>{user?.nh12}</h6>
                                       </div>
-                                      <div className="qr-code-generate"></div>
+                                      <div className="qr-code-generate">
+                                        <QRCodeCanvas
+                                          value={`https://www.neohealthcard.com/user/${user?.nh12}`}
+                                          size={256}
+                                          // className="qr-code"
+                                          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                        />
+                                      </div>
                                     </div>
 
                                     <div className="d-flex flex-column gap-2 card-down-bx">

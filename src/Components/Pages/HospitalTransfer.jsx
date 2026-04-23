@@ -112,7 +112,7 @@ function HospitalTransfer({ data, getData }) {
             toHospital: form.toHospital,
             receivingDoctor: form.receivingDoctor,
             patientId: data.patientId?._id,
-            departmentFrom: data.bedId?.departmentId,
+            departmentFrom: data?.departmentId?._id,
             departmentTo: form.departmentTo,
             reasonForTransfer: {
                 diagnosis: form.diagnosis,

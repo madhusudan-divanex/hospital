@@ -12,12 +12,14 @@ function AddBed() {
   const [departments, setDepartments] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [doctorData, setDoctorData] = useState()
+  const [addData, setAddData] = useState(JSON.parse(localStorage.getItem('addBedData')))
   const [form, setForm] = useState({
     floorId: "",
     departmentId: "",
     roomId: "",
     bedName: "",
-    perDayFees: ""
+    perDayFees: "", doctorNh12: ""
   });
 
   /* ---------------- FETCH FLOORS ---------------- */
@@ -34,7 +36,7 @@ function AddBed() {
   const fetchDepartments = async () => {
     try {
       const res = await getSecureApiData(`api/department/list?limit=100`);
-      if(res.success){
+      if (res.success) {
         setDepartments(res.data);
       }
     } catch {
@@ -79,12 +81,15 @@ function AddBed() {
   /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form)
+    if(form?.doctorNh12?.length<12){
+      return toast.error("Please enter a valid doctor id   ")
+    }
 
     if (
       !form.floorId ||
       !form.departmentId ||
       !form.roomId ||
+      !form.doctorNh12.trim() ||
       !form.bedName.trim() ||
       form.perDayFees === "" || form.perDayFees === null
     ) {
@@ -99,6 +104,7 @@ function AddBed() {
         // 🔁 UPDATE
         const res = await api.put(`/bed/bed/update/${id}`, form);
         if (res.data.success) {
+          localStorage.removeItem('addBedData')
           toast.success("Bed updated successfully");
         } else {
           toast.error(res.data.message)
@@ -107,6 +113,7 @@ function AddBed() {
         // ➕ ADD
         const res = await api.post("/bed/bed/add", form);
         if (res.data.success) {
+          localStorage.removeItem('addBedData')
           toast.success("Bed added successfully");
         } else {
           toast.error(res.data.message)
@@ -134,7 +141,7 @@ function AddBed() {
         floorId: bed.floorId,
         departmentId: bed.departmentId?._id || bed.departmentId,
         roomId: bed.roomId?._id || bed.roomId,
-        bedName: bed.bedName,
+        bedName: bed.bedName, doctorNh12: bed.doctorId?.nh12 || "",
         perDayFees: bed.pricePerDay
       });
 
@@ -142,6 +149,15 @@ function AddBed() {
       toast.error("Failed to load bed");
     }
   };
+  useEffect(() => {
+    if (addData) {
+      fetchRooms(addData?.floorId)
+      setForm({
+        ...form, roomId: addData?.roomId, floorId: addData?.floorId,
+        departmentId: addData?.departmentId
+      })
+    }
+  }, [addData])
 
   useEffect(() => {
     fetchFloors();
@@ -151,7 +167,25 @@ function AddBed() {
       fetchBedById();
     }
   }, [id]);
+  async function fetchDoctorData() {
+    try {
+      const res = await api.get(`/comman/check-doctor-id/${form.doctorNh12}`);
+      if (res.data.success) {
+        setDoctorData(res.data.data)
+      } else {
+        toast.error("Doctor id not found")
+      }
 
+    } catch (error) {
+      toast.error("Doctor ID not found")
+    }
+  }
+  useEffect(() => {
+    setDoctorData()
+    if (form.doctorNh12?.length == 12) {
+      fetchDoctorData()
+    }
+  }, [form.doctorNh12])
 
   return (
     <>
@@ -283,12 +317,40 @@ function AddBed() {
                   />
                 </div>
               </div>
+              <div className="col-lg-4 col-md-6 col-sm-12">
+                <div className="custom-frm-bx">
+                  <label>Doctor NHC (Id)</label>
+                  <input
+                    type="number"
+                    className="form-control nw-frm-select"
+                    name="doctorNh12"
+                    value={form.doctorNh12}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              {doctorData?.name && form?.doctorNh12?.length==12 && <div className="row">
+                <div className="col-lg-4 col-md-6 col-sm-12">
+                  <div className="custom-frm-bx">
+                    <label>Doctor Name</label>
+                    <input
+                      type="text"
+                      className="form-control nw-frm-select"
+                      value={doctorData?.name}
+                      readOnly
+                    />
+                  </div>
+                </div>
+              </div>}
+
 
               {/* SUBMIT */}
               <div className="d-flex justify-content-between mt-3">
-                <Link to={-1} className="nw-thm-btn outline" >
+                <button  type="button" className="nw-thm-btn outline" onClick={() =>{
+                   localStorage.removeItem('addBedData')
+                   navigate("/bed-management")}}>
                   Go Back
-                </Link>
+                </button>
                 <button
                   type="submit"
                   className="nw-thm-btn"

@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 function CreateAccount() {
 
     const navigate = useNavigate();
-
+    const [loading,setLoading]=useState(false)
     const [hospitalName, setHospitalName] = useState("");
     const [licenseId, setLicenseId] = useState("");
     const [establishedYear, setEstablishedYear] = useState("");
@@ -30,7 +30,13 @@ function CreateAccount() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isDisabled, setIsDisabled] = useState(true)
     const [country, setCountry] = useState("");
+    const [state, setState] = useState("");
+    const [city, setCity] = useState("");
+    const [pinCode, setPinCode] = useState("");
+    const [fullAddress,setFullAddress]=useState('')
     const [countries, setCountries] = useState([])
+    const [states, setStates] = useState([])
+    const [cities, setCities] = useState([])
 
     const [errors, setErrors] = useState({});
 
@@ -39,7 +45,12 @@ function CreateAccount() {
         let temp = {};
 
         if (!hospitalName.trim()) temp.hospitalName = "Hospital name is required";
+        if (!fullAddress.trim()) temp.fullAddress = "Full Address is required";
+        if (!pinCode.trim()) temp.pinCode = "Pin code is required";
         if (!country.trim()) temp.country = "Country  is required";
+        if (!state.trim()) temp.state = "State is required";
+        if (!city.trim()) temp.city = "City is required";
+        if (!gst.trim()) temp.gst = "Gst is required";
         if (!licenseId.trim()) temp.licenseId = "License ID is required";
         if (!establishedYear.trim()) temp.establishedYear = "Established Year is required";
         if (category?.length == 0) temp.category = "Please select at least 1 category";
@@ -71,7 +82,7 @@ function CreateAccount() {
             setCountries(data)
         } catch (error) {
 
-        } 
+        }
     }
     useEffect(() => {
         fetchCountries()
@@ -83,6 +94,7 @@ function CreateAccount() {
         if (!validate()) return;
 
         try {
+            setLoading(true)
             // -------------------------
             // CALL 1 → REGISTER USER
             // -------------------------
@@ -94,7 +106,7 @@ function CreateAccount() {
             };
 
             const reg = await API.post("/auth/register", registerPayload);
-            if(!reg.data.success){
+            if (!reg.data.success) {
                 toast.error(reg.data.message)
             }
 
@@ -115,20 +127,26 @@ function CreateAccount() {
             formData.append("gstNumber", gst);
             formData.append("about", about);
             formData.append("country", country);
+            formData.append("state", state);
+            formData.append("city", city);
+            formData.append("pinCode", pinCode);
+            formData.append("fullAddress", fullAddress);
             formData.append("category", category);
             if (logo) formData.append("logo", logo);
 
             const basic = await API.post("/hospital/basic", formData);
-            if(basic.data.success){
-                localStorage.setItem('user',JSON.stringify(basic.data.user))
+            if (basic.data.success) {
+                localStorage.setItem('user', JSON.stringify(basic.data.user))
                 console.log("HOSPITAL BASIC SAVED:", basic.data);
-    
+
                 // NEXT STEP
                 navigate("/create-account-image", { replace: true });
             }
 
         } catch (err) {
             console.error(err.response?.data || err);
+        } finally{
+            setLoading(false)
         }
     };
     const logoDrop = (e) => {
@@ -151,6 +169,30 @@ function CreateAccount() {
             setCatData(formattedData);
         });
     }, []);
+
+    async function fetchStates(value) {
+        setLoading(true)
+        try {
+            const response = await getApiData(`api/location/states/${value}`)
+            setStates(response)
+        } catch (error) {
+
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function fetchCities(value) {
+        setLoading(true)
+        try {
+            const response = await getApiData(`api/location/cities/${value}`)
+            setCities(response)
+        } catch (error) {
+
+        } finally {
+            setLoading(false)
+        }
+    }
     return (
         <section className="admin-login-section account-lg-section nw-create-account-section">
             <div className="container-fluid px-lg-0">
@@ -298,7 +340,7 @@ function CreateAccount() {
                                         }}
                                     />
 
-                                    {errors.category && <small className="text-danger">{errors.category}</small>}
+                                    {/* {errors.category && <small className="text-danger">{errors.category}</small>} */}
                                 </div>
 
                                 {/* PASSWORD */}
@@ -337,6 +379,7 @@ function CreateAccount() {
                                         value={gst}
                                         onChange={(e) => setGst(e.target.value)}
                                     />
+                                    {errors.gst && <small className="text-danger">{errors.gst}</small>}
                                 </div>
 
                                 {/* About */}
@@ -356,7 +399,7 @@ function CreateAccount() {
                                         value={country}
                                         onChange={(e) => {
                                             const data = countries?.filter(item => item?._id === e.target.value)
-                                            
+                                            fetchStates(data[0].isoCode)
                                             setCountry(e.target.value)
                                         }}
                                     >
@@ -365,6 +408,60 @@ function CreateAccount() {
                                             <option value={item?._id} key={key}>{item?.name}</option>)}
                                     </select>
                                     {errors.country && <small className="text-danger">{errors.country}</small>}
+                                </div>
+                                <div className="custom-frm-bx">
+                                    <label>State</label>
+                                    <select
+                                        className="form-select"
+                                        value={state}
+                                        disabled={states?.length==0}
+                                        onChange={(e) => {
+                                            const data = states?.filter(item => item?._id === e.target.value)
+                                            fetchCities(data[0].isoCode)
+                                            setState(e.target.value)
+                                        }}
+                                    >
+                                        <option value="">---Select State---</option>
+                                        {states?.map((item, key) =>
+                                            <option value={item?._id} key={key}>{item?.name}</option>)}
+                                    </select>
+                                    {errors.state && <small className="text-danger">{errors.state}</small>}
+                                </div>
+                                <div className="custom-frm-bx">
+                                    <label>City</label>
+                                    <select
+                                        className="form-select"
+                                        value={city}
+                                        disabled={cities?.length==0}
+                                        onChange={(e) => {
+                                            setCity(e.target.value)
+                                        }}
+                                    >
+                                        <option value="">---Select City---</option>
+                                        {cities?.map((item, key) =>
+                                            <option value={item?._id} key={key}>{item?.name}</option>)}
+                                    </select>
+                                    {errors.city && <small className="text-danger">{errors.city}</small>}
+                                </div>
+                                <div className="custom-frm-bx admin-frm-bx">
+                                    <label>Pin Code </label>
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={pinCode}
+                                        onChange={(e) => setPinCode(e.target.value)}
+                                    />
+                                    {errors.pinCode && <small className="text-danger">{errors.pinCode}</small>}
+                                </div>
+                                <div className="custom-frm-bx admin-frm-bx">
+                                    <label>Full Address</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={fullAddress}
+                                        onChange={(e) => setFullAddress(e.target.value)}
+                                    />
+                                    {errors.fullAddress && <small className="text-danger">{errors.fullAddress}</small>}
                                 </div>
 
                                 {/* LOGO */}
@@ -409,8 +506,8 @@ function CreateAccount() {
 
                                 {/* SUBMIT BUTTON */}
                                 <div className="mt-3">
-                                    <button type="submit" className="admin-lg-btn w-100">
-                                        Next
+                                    <button type="submit" disabled={loading} className="admin-lg-btn w-100">
+                                        {loading?"Submitting...":"Next"}
                                     </button>
                                 </div>
 

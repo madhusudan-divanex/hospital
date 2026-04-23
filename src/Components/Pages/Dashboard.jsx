@@ -383,7 +383,7 @@ function Dashboard() {
                                   <li className="ad-info-item"> <b>Floor :</b><span className="add-info-title"> {item?.bedId?.floorId?.floorName}</span></li>
                                   <li className="ad-info-item"> <b>Bed :</b><span className="add-info-title"> {item?.bedId?.bedName}</span></li>
                                   <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ${item?.bedId?.pricePerDay}</span></li>
-                                  <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.bedId?.departmentId?.departmentName}</span></li>
+                                  <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.departmentId?.departmentName}</span></li>
                                   <li className="ad-info-item"> Day:<span className="add-info-title"> 5</span></li>
                                 </ul>
                               </div>

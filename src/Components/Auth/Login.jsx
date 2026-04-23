@@ -30,13 +30,31 @@ function Login() {
     const validate = () => {
         let temp = {};
 
-        // if (!contactNumber.trim()) temp.contactNumber = "Mobile Number is required";
-        // else if (contactNumber?.length<10)
-        //     temp.email = "Invalid mobile number";
+        if (emailLogin) {
+            // ✅ Email validation
+            if (!email.trim()) {
+                temp.email = "Email is required";
+            } else if (!/\S+@\S+\.\S+/.test(email)) {
+                temp.email = "Invalid email address";
+            }
+        } else {
+            // ✅ Mobile validation
+            if (!contactNumber.trim()) {
+                temp.contactNumber = "Mobile Number is required";
+            } else if (!/^\d{10}$/.test(contactNumber)) {
+                temp.contactNumber = "Invalid mobile number";
+            }
+        }
+        if(staffLogin && !hospitalId?.trim()){
+            temp.hospitalId="Hospital id is required"
+        }
 
-        if (!password.trim()) temp.password = "Password is required";
-        else if (password.length < 6)
+        // ✅ Password validation
+        if (!password.trim()) {
+            temp.password = "Password is required";
+        } else if (password.length < 6) {
             temp.password = "Password must be at least 6 characters";
+        }
 
         setValidation(temp);
 
@@ -44,11 +62,10 @@ function Login() {
     };
 
 
-
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // if (!validate()) return;
+        if (!validate()) return;
         setLoading(true);
         let data = { password, withOtp };
         if (emailLogin) {
@@ -167,9 +184,9 @@ function Login() {
                                                     name="hospitalId"
                                                     onChange={(e) => setHospitalId(e.target.value)}
                                                 />
-                                                {/* {validation.contactNumber && (
-                                            <small className="text-danger">{validation.contactNumber}</small>
-                                        )} */}
+                                                {validation.hospitalId && (
+                                            <small className="text-danger">{validation.hospitalId}</small>
+                                        )}
                                             </div>
                                             {emailLogin ?
                                                 <div className="custom-frm-bx">
@@ -181,9 +198,9 @@ function Login() {
                                                         value={email}
                                                         onChange={(e) => setEmail(e.target.value)}
                                                     />
-                                                    {/* {validation.contactNumber && (
-                                            <small className="text-danger">{validation.contactNumber}</small>
-                                        )} */}
+                                                    {validation.email && (
+                                                        <small className="text-danger">{validation.email}</small>
+                                                    )}
                                                 </div> : <div className="custom-frm-bx">
                                                     <label>Mobile Number</label>
                                                     <input
@@ -193,9 +210,9 @@ function Login() {
                                                         value={contactNumber}
                                                         onChange={(e) => setContactNumber(e.target.value)}
                                                     />
-                                                    {/* {validation.contactNumber && (
-                                            <small className="text-danger">{validation.contactNumber}</small>
-                                        )} */}
+                                                    {validation.contactNumber && (
+                                                        <small className="text-danger">{validation.contactNumber}</small>
+                                                    )}
                                                 </div>}
 
                                             {/* PASSWORD */}

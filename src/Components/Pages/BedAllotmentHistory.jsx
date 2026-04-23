@@ -358,7 +358,7 @@ function BedAllotmentHistory() {
                                                                     <li className="ad-info-item"> <b>Floor :</b><span className="add-info-title"> {item?.bedId?.floorId?.floorName}</span></li>
                                                                     <li className="ad-info-item"> <b>Bed :</b><span className="add-info-title"> {item?.bedId?.bedName}</span></li>
                                                                     <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ${item?.bedId?.pricePerDay}</span></li>
-                                                                    <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.bedId?.departmentId?.departmentName}</span></li>
+                                                                    <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.departmentId?.departmentName}</span></li>
                                                                     <li className="ad-info-item"> Day:<span className="add-info-title"> 5</span></li>
 
                                                                 </ul>
@@ -474,10 +474,10 @@ function BedAllotmentHistory() {
                                                                         </li>
 
                                                                         <li className="prescription-item">
-                                                                            <a className=" prescription-nav" onClick={() => setSelected(item)} href="#" data-bs-toggle="modal" data-bs-target="#discharge-Patient" >
+                                                                            <Link className=" prescription-nav" to={`/discharge/${item?._id}`} >
 
                                                                                 Discharge Patient
-                                                                            </a>
+                                                                            </Link>
                                                                         </li>
                                                                     </>}
                                                                     <li className="prescription-item">

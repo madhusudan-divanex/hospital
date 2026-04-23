@@ -83,11 +83,15 @@ function PatientsEmergency() {
         });
         if (!result.isConfirmed) return;
         try {
-            await API.put(`/patients/${id}`, {
+            const res=await API.put(`/patients/${id}`, {
                 status: status === "Active" ? "Inactive" : "Active",
                 patientId: id
             });
-            fetchPatients();
+            if(!res.data.success){
+                toast.error(res.data.message)
+            }else{
+                fetchPatients();
+            }
         } catch {
             toast.error("Status update failed");
         }
@@ -150,7 +154,7 @@ function PatientsEmergency() {
                                 </div>
                             </div>
                             <div className="add-nw-bx">
-                                <NavLink to="/add-patient" className="add-nw-btn nw-thm-btn">
+                                <NavLink to="/add-patient?type=EMERGENCY" className="add-nw-btn nw-thm-btn">
                                     <img src="/plus-icon.png" alt="" /> Add Patient
                                 </NavLink>
                             </div>

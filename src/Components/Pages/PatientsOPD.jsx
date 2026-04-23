@@ -83,11 +83,15 @@ function PatientsOPD() {
         });
         if (!result.isConfirmed) return;
         try {
-            await API.put(`/patients/${id}`, {
+            const res = await API.put(`/patients/${id}`, {
                 status: status === "Active" ? "Inactive" : "Active",
                 patientId: id
             });
-            fetchPatients();
+            if (!res.data.success) {
+                toast.error(res.data.message)
+            } else {
+                fetchPatients();
+            }
         } catch {
             toast.error("Status update failed");
         }
@@ -150,7 +154,7 @@ function PatientsOPD() {
                                 </div>
                             </div>
                             <div className="add-nw-bx">
-                                <NavLink to="/add-patient" className="add-nw-btn nw-thm-btn">
+                                <NavLink to="/add-patient?type=OPD" className="add-nw-btn nw-thm-btn">
                                     <img src="/plus-icon.png" alt="" /> Add Patient
                                 </NavLink>
                             </div>
@@ -247,7 +251,7 @@ function PatientsOPD() {
                                             </div>
                                         </div>
                                         <div>
-                                            <button className="nw-filtr-btn" onClick={downloadPatients}><FontAwesomeIcon icon={faDownload}  /></button>
+                                            <button className="nw-filtr-btn" onClick={downloadPatients}><FontAwesomeIcon icon={faDownload} /></button>
                                         </div>
 
                                     </div>
@@ -367,17 +371,17 @@ function PatientsOPD() {
                                         </table>
                                     </div>
 
-                                    
+
 
                                 </div>
                             </div>
                         </div>
                     </div>
-                      <div className="text-end mt-4">
-      <Link to={-1} className="nw-thm-btn outline" >
-                    Go Back
-                  </Link>
-    </div>
+                    <div className="text-end mt-4">
+                        <Link to={-1} className="nw-thm-btn outline" >
+                            Go Back
+                        </Link>
+                    </div>
                 </div>}
         </>
     )

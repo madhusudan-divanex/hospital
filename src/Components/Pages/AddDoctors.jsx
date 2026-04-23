@@ -306,10 +306,9 @@ function AddDoctors() {
             temp.fullAddress = "Address is required";
 
 
-
-        if (!address?.contact.contactNumber?.trim())
+        if (!personal?.contactNumber?.trim())
             temp.contactNumber = "Mobile number is required";
-        else if (address?.contact.contactNumber.length !== 10)
+        else if (personal?.contactNumber.length !== 10)
             temp.contactNumber = "Mobile number must be 10 digits";
 
         if (!address?.contact.emergencyContactName?.trim())
@@ -320,9 +319,9 @@ function AddDoctors() {
         else if (address?.contact.emergencyContactNumber.length !== 10)
             temp.emergencyNumber = "Emergency mobile number must be 10 digits";
 
-        if (!address?.contact?.email?.trim())
+        if (!personal?.email?.trim())
             temp.email = "Email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address?.contact?.email))
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(personal?.email))
             temp.email = "Invalid email format";
 
 
@@ -331,10 +330,10 @@ function AddDoctors() {
     };
     const personalSubmit = async (e) => {
         e.preventDefault()
-        if (!validate()) return;
         if (isDefault) {
-            return toast.error("Personal details are default and cannot be changed");
+            return  handleBack(e,"#profile-tab")
         }
+        if (!validate()) return;
         const formData = new FormData();
 
         // Append personal info
@@ -366,7 +365,7 @@ function AddDoctors() {
             if (result.success) {
                 setDoctorId(result.doctorId)
                 toast.success('Doctor Created')
-                handleBack(e, '#profile-tab')
+                switchTab(e, '#profile-tab')
             } else {
                 toast.error(result.message)
             }
@@ -388,8 +387,8 @@ function AddDoctors() {
             if (result.success) {
                 const general = result.data.doctor
                 const doctorAbout = result.data?.aboutDoctor
+                setIsDefault(true)
                 if (general?.dob && doctorAbout?.aboutYou) {
-                    setIsDefault(true)
                 }
                 setPersonal({
                     ...general,
@@ -408,8 +407,8 @@ function AddDoctors() {
                     aboutYou: doctorAbout?.aboutYou || ''
                 })
                 setProfessionalInfo({
-                    education: result?.aboutDoctorEduWork?.education,
-                    work: result?.aboutDoctorEduWork?.work,
+                    education: result?.aboutDoctorEduWork?.education || [],
+                    work: result?.aboutDoctorEduWork?.work || [],
                 })
                 setEmploymentInfo({
                     ...result?.employmentDetails,
@@ -419,8 +418,8 @@ function AddDoctors() {
                     joinDate: result?.employmentDetails?.contractEnd ? new Date(result?.employmentDetails?.joinDate)?.toISOString()?.split("T")[0] : null,
                    
                 })
-                setAccessInfo({ ...accessInfo,email:result.employmentDetails?.email,
-                    contactNumber:result.employmentDetails.contactNumber, permissionId: result?.employmentDetails?.permissionId?._id, password: '' })
+                setAccessInfo({ ...accessInfo,email:result?.employmentDetails?.email,
+                    contactNumber:result?.employmentDetails?.contactNumber, permissionId: result?.employmentDetails?.permissionId?._id, password: '' })
                 setFetchById(true)
                 fetchStates(doctorAbout?.countryId?.isoCode)
                 fetchCities(doctorAbout?.stateId?.isoCode)
@@ -429,7 +428,6 @@ function AddDoctors() {
             }
         } catch (error) {
             console.log(error)
-            toast.error("Failed to load doctor",);
         }
     };
     const fetchDepartments = async () => {
@@ -525,10 +523,10 @@ function AddDoctors() {
     };
     const professionalSubmit = async (e) => {
         e.preventDefault();
-        if (!validateProff()) return
         if (isDefault) {
-            return toast.error("Professional details are default and cannot be changed");
+            return handleBack(e,"#contact-tab");
         }
+        if (!validateProff()) return
         const formData = new FormData();
         const certMeta = license.medicalLicense.map(i => ({
             certName: i.certName,
@@ -558,6 +556,14 @@ function AddDoctors() {
             }
         } catch (error) {
             toast.error(error?.response?.data?.message || "Something went wrong");
+        }
+    };
+
+    const switchTab = (tabSelector) => {
+        const tabTrigger = document.querySelector(tabSelector);
+        if (tabTrigger) {
+            const tab = new Tab(tabTrigger);
+            tab.show();
         }
     };
 
@@ -593,12 +599,15 @@ function AddDoctors() {
                 data
             );
             if (result.success) {
+                handleBack(e,"#upload-tab")
                 toast.success("Employment Details Saved");
+                
                 // Redirect or perform other actions as needed
             } else {
                 toast.error(result.message);
             }
         } catch (error) {
+            console.log(error)
             toast.error(error?.response?.data?.message || "Something went wrong");
         }
     }
@@ -1093,7 +1102,7 @@ function AddDoctors() {
                                                 </div>
                                             </div>
                                             
-                                                {professionalInfo?.education.map((item, index) => (
+                                                {professionalInfo?.education?.map((item, index) => (
                                             <div className="education-frm-bx mb-3" key={index}>
                                                     <div className="row" >
 
@@ -1187,7 +1196,7 @@ function AddDoctors() {
                                                 </div>
                                             </div>
 
-                                                {professionalInfo.work.map((item, index) => (
+                                                {professionalInfo?.work?.map((item, index) => (
                                             <div className="education-frm-bx mb-3" key={index}>
                                                     <div className="row" >
 
@@ -1651,7 +1660,7 @@ function AddDoctors() {
                                                 </div>
                                                 <div className="d-flex align-items-center justify-content-end gap-3">
                                                     <button type="submit" className="nw-thm-btn outline rounded-3">Back </button>
-                                                    <button type="submit" className="nw-thm-btn rounded-3" data-bs-toggle="modal" data-bs-target="#added-Doctor" >Submit</button>
+                                                    <button type="submit" className="nw-thm-btn rounded-3" >Submit</button>
                                                 </div>
                                                 <a href="#" className="d-none" data-bs-toggle="modal" data-bs-target="#added-Doctor" id="addedDoctor" ></a>
 

@@ -31,7 +31,7 @@ function LandingFooter() {
                     <div className="col-lg-3">
                         <div className="footer-brand d-flex align-items-center">
                             <div className="footer-logo">
-                                <img src='logo.png' width={100} height={60} />
+                                <img src='/logo.png' width={100} height={60} />
                             </div>
 
                         </div>

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useParams, useNavigate, NavLink, useSearchParams } from "react-router-dom";
 import { FaPlusCircle } from "react-icons/fa";
-import { getApiData, getSecureApiData } from "../../Service/api";
+import { getApiData, getSecureApiData, securePostData } from "../../Service/api";
 function AddPatient() {
   const { id } = useParams();   // id aaye to edit mode
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [patientData, setPatientData] = useState()
 
@@ -82,22 +83,41 @@ function AddPatient() {
       } else {
         if (fetchById) {
           const data = { ...form, patientId }
-          const res = await api.put(`/patients/${patientId}`, data);
-          if (res.data.success) {
-            toast.success("Patient updated successfully");
+          const res = await securePostData(`api/patients/admit`, { patientId, departmentId: form.department });
+          if (res.success) {
+            toast.success("Patient added successfully");
+
+            if(searchParams.get('type')=="IPD"){
+              navigate(`/bed-management?patientId=${patientId}`)
+            }else if(searchParams.get('type')=="OPD"){
+              navigate('/patient-opd')
+            }else if(searchParams.get('type')=="EMERGENCY"){
+              navigate('/patient-emergency')
+            }else{
+              navigate('/dashboard')
+            }
           } else {
-            toast.error(res.data.message)
+            toast.error(res.message)
           }
         } else {
           const res = await api.post("/patients/add", form);
           if (res.data.success) {
+            const dept=department?.find(item=>item?._id==form?.department)
             toast.success("Patient added successfully");
+            if(dept?.type=="IPD"){
+              navigate(`/bed-management?patientId=${patientId}`)
+            }else if(dept?.type=="OPD"){
+              navigate('/patient-opd')
+            }else if(dept?.type=="EMERGENCY"){
+              navigate('/patient-emergency')
+            }else{
+              navigate('/dashboard')
+            }
           } else {
             toast.error(res.data.message)
           }
         }
       }
-      navigate("/dashboard");
       setErrors({});
     } catch (err) {
       console.log(err)
@@ -106,9 +126,11 @@ function AddPatient() {
   };
   const fetchDepartments = async () => {
     try {
-      const res = await getSecureApiData("api/department/list?limit=100");
-      if(res.success){
-
+      const res = await getSecureApiData(`api/department/list?limit=100&type=${searchParams.get('type') || ""}`);
+      if (res.success) {
+        if (res.data?.length == 1) {
+          setForm({ ...form, department: res.data[0]?._id })
+        }
         setDepartment(res.data);
       }
     } catch (err) {
@@ -130,7 +152,7 @@ function AddPatient() {
           contactNumber: general?.contactNumber,
           email: general?.email,
           address: demographic?.address,
-          department: result?.department?.departmentId,
+          department: result?.department?.departmentId || form.department,
           contact: {
             emergencyContactName: demographic?.contact?.emergencyContactName,
             emergencyContactNumber: demographic?.contact?.emergencyContactNumber,
@@ -285,14 +307,14 @@ function AddPatient() {
         const general = result.user
         const demographic = result.demographic
         setPatientId(general?.userId)
-        setForm({
+        setForm({...form,
           patientId,
           name: general.name,
           gender: general?.gender,
           contactNumber: general?.contactNumber,
           email: general?.email,
           address: demographic?.address,
-          department: result?.department?.departmentId,
+          // department: result?.department?.departmentId || form.department,
           contact: {
             emergencyContactName: demographic?.contact?.emergencyContactName,
             emergencyContactNumber: demographic?.contact?.emergencyContactNumber,
@@ -316,6 +338,8 @@ function AddPatient() {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message)
+    } finally{
+      // fetchDepartments()
     }
   }
   return (
@@ -333,8 +357,8 @@ function AddPatient() {
 
               <div>
                 <button onClick={() => setById(false)} className="nw-exprt-btn">
-                <FaPlusCircle /> Add Patient Manually
-              </button>
+                  <FaPlusCircle /> Add Patient Manually
+                </button>
               </div>
             </div>
 
@@ -364,7 +388,7 @@ function AddPatient() {
               </button>
             </div>
           </div>
-        </div> : 
+        </div> :
         <div className="main-content flex-grow-1 p-3 overflow-auto">
           <div className="row ">
             <div className="d-flex align-items-center justify-content-between">
@@ -448,19 +472,19 @@ function AddPatient() {
                 <div className="col-lg-4 col-md-6 col-sm-12">
                   <div className="custom-frm-bx">
                     <label>Gender</label>
-                        <select
-                        name="gender"
-                        value={form.gender}
-                        onChange={handleChange}
-                        disabled={fetchById}
-                        className="form-select nw-frm-select"
-                      >
-                        <option value="">Select</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                      </select>
-                      {errors.gender && <small className="text-danger">{errors.gender}</small>}
+                    <select
+                      name="gender"
+                      value={form.gender}
+                      onChange={handleChange}
+                      disabled={fetchById}
+                      className="form-select nw-frm-select"
+                    >
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    {errors.gender && <small className="text-danger">{errors.gender}</small>}
                   </div>
                 </div>
 
@@ -531,20 +555,20 @@ function AddPatient() {
                 <div className="col-lg-4 col-md-6 col-sm-12">
                   <div className="custom-frm-bx">
                     <label>Department</label>
-                     <select
-                        name="department"
-                        value={form.department}
-                        onChange={handleChange}
-                        className="form-select nw-frm-select"
-                      >
-                        <option value="">---Select Department---</option>
-                        {department.map((d) => (
-                          <option key={d._id} value={d._id}>
-                            {d.departmentName}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.department && <small className="text-danger">{errors.department}</small>}
+                    <select
+                      name="department"
+                      value={form.department}
+                      onChange={handleChange}
+                      className="form-select nw-frm-select"
+                    >
+                      <option value="">---Select Department---</option>
+                      {department.map((d) => (
+                        <option key={d._id} value={d._id}>
+                          {d.departmentName}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.department && <small className="text-danger">{errors.department}</small>}
                   </div>
                 </div>
 
@@ -567,20 +591,20 @@ function AddPatient() {
                   <div className="custom-frm-bx">
                     <label htmlFor="">Counrty</label>
                     <select
-                        className="form-select nw-frm-select"
-                        value={form.countryId}
-                        name="countryId"
-                        onChange={handleChange}
-                        disabled={fetchById}
-                      >
-                        <option value="">---Select Country---</option>
-                        {countries.map((s) => (
-                          <option key={s._id} value={s._id} >
-                            {s.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.countryId && <small className="text-danger">{errors.countryId}</small>}
+                      className="form-select nw-frm-select"
+                      value={form.countryId}
+                      name="countryId"
+                      onChange={handleChange}
+                      disabled={fetchById}
+                    >
+                      <option value="">---Select Country---</option>
+                      {countries.map((s) => (
+                        <option key={s._id} value={s._id} >
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.countryId && <small className="text-danger">{errors.countryId}</small>}
 
                   </div>
                 </div>
@@ -589,20 +613,20 @@ function AddPatient() {
                   <div className="custom-frm-bx">
                     <label htmlFor="">State</label>
                     <select
-                        className="form-select nw-frm-select"
-                        value={form.stateId}
-                        name="stateId"
-                        disabled={!form.countryId || fetchById}
-                        onChange={handleChange}
-                      >
-                        <option value="">---Select State---</option>
-                        {states.map((s) => (
-                          <option key={s._id} value={s._id}>
-                            {s.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.stateId && <small className="text-danger">{errors.stateId}</small>}
+                      className="form-select nw-frm-select"
+                      value={form.stateId}
+                      name="stateId"
+                      disabled={!form.countryId || fetchById}
+                      onChange={handleChange}
+                    >
+                      <option value="">---Select State---</option>
+                      {states.map((s) => (
+                        <option key={s._id} value={s._id}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.stateId && <small className="text-danger">{errors.stateId}</small>}
 
                   </div>
                 </div>
@@ -611,20 +635,20 @@ function AddPatient() {
                   <div className="custom-frm-bx">
                     <label htmlFor="">City</label>
                     <select
-                        className="form-select nw-frm-select"
-                        value={form.cityId}
-                        name="cityId"
-                        onChange={handleChange}
-                        disabled={!form.stateId || fetchById}
-                      >
-                        <option value="">---Select City---</option>
-                        {cities.map((c, index) => (
-                          <option key={index} value={c._id}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.cityId && <small className="text-danger">{errors.cityId}</small>}
+                      className="form-select nw-frm-select"
+                      value={form.cityId}
+                      name="cityId"
+                      onChange={handleChange}
+                      disabled={!form.stateId || fetchById}
+                    >
+                      <option value="">---Select City---</option>
+                      {cities.map((c, index) => (
+                        <option key={index} value={c._id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.cityId && <small className="text-danger">{errors.cityId}</small>}
                   </div>
                 </div>
 
@@ -650,14 +674,14 @@ function AddPatient() {
                 <div className="col-lg-4 col-md-6 col-sm-12">
                   <div className="custom-frm-bx">
                     <label htmlFor="">Status</label>
-                       <select name="status"
-                        value={form.status}
-                        onChange={handleChange}
-                        className="form-select nw-frm-select">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
-                      {errors.status && <small className="text-danger">{errors.status}</small>}
+                    <select name="status"
+                      value={form.status}
+                      onChange={handleChange}
+                      className="form-select nw-frm-select">
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    {errors.status && <small className="text-danger">{errors.status}</small>}
 
                   </div>
                 </div>

@@ -7,11 +7,11 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import API from "../../api/api";
 import { getApiData } from "../../Service/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserDetail } from "../../redux/features/userSlice";
 
 function CreateAccountAddress() {
-
     const navigate = useNavigate();
-
     const [address, setAddress] = useState("");
     const [country, setCountry] = useState("");
     const [state, setState] = useState("");
@@ -22,7 +22,9 @@ function CreateAccountAddress() {
     const [cities, setCities] = useState([])
     const [loading, setLoading] = useState(false)
     const [postLoading, setPostLoading] = useState(false)
-
+    const { hospitalBasic, hospitalAddress, paymentInfo,
+    } = useSelector(state => state.user)
+    const dispatch=useDispatch()
     const [errors, setErrors] = useState({});
 
     // VALIDATION
@@ -52,7 +54,6 @@ function CreateAccountAddress() {
                 pinCode: pin,
             });
 
-            console.log("ADDRESS SAVED:", res.data);
 
             navigate("/create-account-person");
         } catch (err) {
@@ -99,6 +100,14 @@ function CreateAccountAddress() {
             setLoading(false)
         }
     }
+    useEffect(() => {
+        if (hospitalAddress) {
+            navigate('/create-account-person')
+        }
+    }, [hospitalAddress])
+    useEffect(()=>{
+        dispatch(fetchUserDetail())
+    },[dispatch])
     return (
         <section className="admin-login-section account-lg-section nw-create-account-section">
             <div className="container-fluid px-lg-0">
@@ -181,72 +190,73 @@ function CreateAccountAddress() {
                                     />
                                     {errors.address && <small className="text-danger">{errors.address}</small>}
                                 </div>
+                                
+                                    {/* Country */}
+                                    <div className="custom-frm-bx">
+                                        <label>Country</label>
+                                        <select
+                                            className="form-select"
+                                            value={country}
+                                            onChange={(e) => {
+                                                const data = countries?.filter(item => item?._id === e.target.value)
+                                                fetchStates(data[0].isoCode)
+                                                setCountry(e.target.value)
+                                            }}
+                                        >
+                                            <option value="">---Select Country---</option>
+                                            {countries?.map((item, key) =>
+                                                <option value={item?._id} key={key}>{item?.name}</option>)}
+                                        </select>
+                                        {errors.country && <small className="text-danger">{errors.country}</small>}
+                                    </div>
 
-                                {/* Country */}
-                                <div className="custom-frm-bx">
-                                    <label>Country</label>
-                                    <select
-                                        className="form-select"
-                                        value={country}
-                                        onChange={(e) => {
-                                            const data = countries?.filter(item => item?._id === e.target.value)
-                                            fetchStates(data[0].isoCode)
-                                            setCountry(e.target.value)
-                                        }}
-                                    >
-                                        <option value="">---Select Country---</option>
-                                        {countries?.map((item, key) =>
-                                            <option value={item?._id} key={key}>{item?.name}</option>)}
-                                    </select>
-                                    {errors.country && <small className="text-danger">{errors.country}</small>}
-                                </div>
+                                    {/* State */}
+                                    <div className="custom-frm-bx">
+                                        <label>State</label>
+                                        <select
+                                            className="form-select"
+                                            value={state}
+                                            onChange={(e) => {
+                                                const data = states?.filter(item => item?._id === e.target.value)
+                                                fetchCities(data[0].isoCode)
+                                                setState(e.target.value)
+                                            }}
+                                        >
+                                            <option value="">---Select State---</option>
+                                            {states?.map((item, key) =>
+                                                <option value={item?._id} key={key}>{item?.name}</option>)}
+                                        </select>
+                                        {errors.state && <small className="text-danger">{errors.state}</small>}
+                                    </div>
 
-                                {/* State */}
-                                <div className="custom-frm-bx">
-                                    <label>State</label>
-                                    <select
-                                        className="form-select"
-                                        value={state}
-                                        onChange={(e) => {
-                                            const data = states?.filter(item => item?._id === e.target.value)
-                                            fetchCities(data[0].isoCode)
-                                            setState(e.target.value)
-                                        }}
-                                    >
-                                        <option value="">---Select State---</option>
-                                        {states?.map((item, key) =>
-                                            <option value={item?._id} key={key}>{item?.name}</option>)}
-                                    </select>
-                                    {errors.state && <small className="text-danger">{errors.state}</small>}
-                                </div>
+                                    {/* City */}
+                                    <div className="custom-frm-bx">
+                                        <label>City</label>
+                                        <select
+                                            className="form-select"
+                                            value={city}
+                                            onChange={(e) => setCity(e.target.value)}
+                                        >
+                                            <option value="">---Select City---</option>
+                                            {cities?.map((item, key) =>
+                                                <option value={item?._id} key={key}>{item?.name}</option>)}
+                                        </select>
+                                        {errors.city && <small className="text-danger">{errors.city}</small>}
+                                    </div>
 
-                                {/* City */}
-                                <div className="custom-frm-bx">
-                                    <label>City</label>
-                                    <select
-                                        className="form-select"
-                                        value={city}
-                                        onChange={(e) => setCity(e.target.value)}
-                                    >
-                                        <option value="">---Select City---</option>
-                                        {cities?.map((item, key) =>
-                                            <option value={item?._id} key={key}>{item?.name}</option>)}
-                                    </select>
-                                    {errors.city && <small className="text-danger">{errors.city}</small>}
-                                </div>
-
-                                {/* Pin Code */}
-                                <div className="custom-frm-bx">
-                                    <label>Pin Code</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Enter Pin code"
-                                        value={pin}
-                                        onChange={(e) => setPin(e.target.value)}
-                                    />
-                                    {errors.pin && <small className="text-danger">{errors.pin}</small>}
-                                </div>
+                                    {/* Pin Code */}
+                                    <div className="custom-frm-bx">
+                                        <label>Pin Code</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Enter Pin code"
+                                            value={pin}
+                                            onChange={(e) => setPin(e.target.value)}
+                                        />
+                                        {errors.pin && <small className="text-danger">{errors.pin}</small>}
+                                    </div>
+                                
 
                                 {/* NEXT BUTTON */}
                                 <div className="d-flex flex-column gap-3 mt-4">

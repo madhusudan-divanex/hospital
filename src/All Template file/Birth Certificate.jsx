@@ -6,10 +6,13 @@ import { getApiData } from "../Service/api";
 import { NavLink, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { QRCodeCanvas } from "qrcode.react";
+import { useSelector } from "react-redux";
+import base_url from "../baseUrl";
 
 export default function ViewBirthCertificate() {
   const { id } = useParams()
   const pdfRef = useRef();
+  const {hospitalBasic}=useSelector(state=>state.user)
   const [certificateData, setCertificateData] = useState()
   async function fetchCertificateData(params) {
     try {
@@ -28,7 +31,7 @@ export default function ViewBirthCertificate() {
   const element = pdfRef.current;
 
   const opt = {
-    margin: 0.3,
+    margin: 0,
     filename: `${certificateData?.customId}.pdf`,
     image: { type: "jpeg", quality: 1 },
     html2canvas: {
@@ -81,7 +84,8 @@ export default function ViewBirthCertificate() {
         <div className="d-flex justify-content-between align-items-start">
           <div className="d-flex">
             <div style={s.logo}>
-              <img src="/logo.png" alt="" />
+              <img src={hospitalBasic?.logoFileId ? 
+              `${base_url}/api/file/${hospitalBasic?.logoFileId}`: "/logo.png"} alt="" />
             </div>
             <div style={{ marginLeft: 10 }}>
               <div style={s.title}>Birth Certificate</div>

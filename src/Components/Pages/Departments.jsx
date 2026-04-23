@@ -23,6 +23,8 @@ function Departments() {
     const [totalPages, setTotalPages] = useState(1);
     const [search, setSearch] = useState("");
     const [type, setType] = useState("");
+    const [floors, setFloors] = useState([]);
+    const [rooms, setRooms] = useState([]);
     const navigate = useNavigate()
 
 
@@ -31,6 +33,10 @@ function Departments() {
         type: "OPD",
         headOfDepartment: "",
         employees: [],
+        otherData: {
+            floorId: null,
+            roomId: null,
+        }
     });
 
     const [editId, setEditId] = useState(null);
@@ -60,10 +66,34 @@ function Departments() {
             toast.error("Failed to load staff");
         }
     };
+    const fetchFloors = async () => {
+        try {
+            const res = await getSecureApiData("api/bed/floor/list");
+            setFloors(res.data);
+        } catch {
+            toast.error("Failed to load floors");
+        }
+    };
+    const fetchRooms = async (floorId) => {
+        if (!floorId) {
+            setRooms([]);
+            return;
+        }
+
+        try {
+            const res = await getSecureApiData(`api/bed/room/${floorId}`);
+            setRooms(res.data);
+        } catch {
+            toast.error("Failed to load rooms");
+        }
+    };
     useEffect(() => {
         fetchDepartments();
         fetchStaff();
     }, [page, limit, type]);
+    useEffect(() => {
+        fetchFloors()
+    }, [])
 
     const handleAddDepartment = async (e) => {
         e.preventDefault();
@@ -92,6 +122,10 @@ function Departments() {
             departmentName: dept.departmentName,
             type: dept.type,
             headOfDepartment: dept.headOfDepartment?._id || "",
+            otherData: {
+                floorId: dept?.otherData?.floorId || null,
+                roomId: dept?.otherData?.roomId || null,
+            },
             employees: (dept.employees || []).map(emp => ({
                 employeeId:
                     typeof emp.employeeId === "object"
@@ -100,6 +134,9 @@ function Departments() {
                 role: emp.role || ""
             }))
         });
+        if (dept?.otherData?.floorId) {
+            fetchRooms(dept?.otherData?.floorId)
+        }
     };
 
     const handleUpdateDepartment = async (e) => {
@@ -174,7 +211,20 @@ function Departments() {
                             </div>
 
                             <div className="add-nw-bx">
-                                <a href="javascript:void(0)" className="add-nw-btn nw-thm-btn" data-bs-toggle="modal" data-bs-target="#add-Department">
+                                <a href="javascript:void(0)"
+                                    onClick={() =>
+                                        setForm({
+                                            departmentName: "",
+                                            type: "OPD",
+                                            headOfDepartment: "",
+                                            employees: [],
+                                            otherData: {
+                                                floorId: null,
+                                                roomId: null,
+                                            }
+                                        })
+                                    }
+                                    className="add-nw-btn nw-thm-btn" data-bs-toggle="modal" data-bs-target="#add-Department">
                                     <img src="/plus-icon.png" alt="" /> Add Department
                                 </a>
                             </div>
@@ -447,10 +497,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="OPD"
+                                                            id="opdRadio"
                                                             checked={form.type === "OPD"}
                                                             onChange={e => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="textOption">
+                                                        <label className="form-check-label ms-1" htmlFor="opdRadio">
                                                             OPD
                                                         </label>
                                                     </div>
@@ -460,10 +511,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="IPD"
+                                                            id="ipdRadio"
                                                             checked={form.type === "IPD"}
                                                             onChange={e => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="selectOption">
+                                                        <label className="form-check-label ms-1" htmlFor="ipdRadio">
                                                             IPD
                                                         </label>
                                                     </div>
@@ -472,10 +524,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="EMERGENCY"
+                                                            id="emergencyRadio"
                                                             checked={form.type === "EMERGENCY"}
                                                             onChange={e => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="selectOption">
+                                                        <label className="form-check-label ms-1" htmlFor="emergencyRadio">
                                                             EMERGENCY
                                                         </label>
                                                     </div>
@@ -484,10 +537,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="LAB"
+                                                            id="labRadio"
                                                             checked={form.type === "LAB"}
                                                             onChange={(e) => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="selectOption">
+                                                        <label className="form-check-label ms-1" htmlFor="labRadio">
                                                             LAB
                                                         </label>
                                                     </div>
@@ -498,6 +552,68 @@ function Departments() {
 
                                             </div>
                                         </div>
+                                        {form.type == "IPD" && <>
+                                            <div className="custom-frm-bx">
+                                                <label htmlFor="">Select Floor </label>
+                                                <div className="select-wrapper">
+                                                    <select
+                                                        className="form-select custom-select"
+                                                        value={form?.otherData?.floorId}
+                                                        required
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+
+                                                            fetchRooms(value);
+
+                                                            setForm((prev) => ({
+                                                                ...prev,
+                                                                otherData: {
+                                                                    ...prev.otherData,
+                                                                    floorId: value,
+                                                                },
+                                                            }));
+                                                        }}
+                                                    >
+                                                        <option value="">---Select Floor---</option>
+                                                        {floors.map((item) => (
+                                                            <option key={item._id} value={item?._id}>
+                                                                {item.floorName}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            {rooms?.length > 0 &&
+                                                <div className="custom-frm-bx">
+                                                    <label htmlFor="">Select Room </label>
+                                                    <div className="select-wrapper">
+                                                        <select
+                                                            className="form-select custom-select"
+                                                            value={form?.otherData?.roomId}
+                                                            required
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+
+
+                                                                setForm((prev) => ({
+                                                                    ...prev,
+                                                                    otherData: {
+                                                                        ...prev.otherData,
+                                                                        roomId: value,
+                                                                    },
+                                                                }));
+                                                            }}
+                                                        >
+                                                            <option value="">---Select Room---</option>
+                                                            {rooms.map((item) => (
+                                                                <option key={item._id} value={item?._id}>
+                                                                    {item.roomName}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>}
+                                        </>}
 
 
                                         <div className="mt-3">
@@ -676,6 +792,7 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="OPD"
+                                                            id="opdRadio"
                                                             checked={form.type === "OPD"}
                                                             onChange={(e) => setForm({ ...form, type: e.target.value })}
                                                         />
@@ -687,7 +804,7 @@ function Departments() {
                                                             value="text"
                                                             defaultChecked
                                                         /> */}
-                                                        <label className="form-check-label" htmlFor="textOption">
+                                                        <label className="form-check-label ms-1" htmlFor="opdRadio">
                                                             OPD
                                                         </label>
                                                     </div>
@@ -697,10 +814,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="IPD"
+                                                            id="ipdRadio"
                                                             checked={form.type === "IPD"}
                                                             onChange={(e) => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="selectOption">
+                                                        <label className="form-check-label ms-1" htmlFor="ipdRadio">
                                                             IPD
                                                         </label>
                                                     </div>
@@ -709,10 +827,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="EMERGENCY"
+                                                            id="emergencyRadio"
                                                             checked={form.type === "EMERGENCY"}
                                                             onChange={(e) => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="selectOption">
+                                                        <label className="form-check-label ms-1" htmlFor="emergencyRadio">
                                                             EMERGENCY
                                                         </label>
                                                     </div>
@@ -721,10 +840,11 @@ function Departments() {
                                                             type="radio"
                                                             name="type"
                                                             value="LAB"
+                                                            id="labRadio"
                                                             checked={form.type === "LAB"}
                                                             onChange={(e) => setForm({ ...form, type: e.target.value })}
                                                         />
-                                                        <label className="form-check-label" htmlFor="selectOption">
+                                                        <label className="form-check-label ms-1" htmlFor="labRadio">
                                                             LAB
                                                         </label>
                                                     </div>
@@ -732,6 +852,68 @@ function Departments() {
                                             </div>
 
                                         </div>
+                                        {form.type == "IPD" && <>
+                                            <div className="custom-frm-bx">
+                                                <label htmlFor="">Select Floor </label>
+                                                <div className="select-wrapper">
+                                                    <select
+                                                        className="form-select custom-select"
+                                                        value={form?.otherData?.floorId}
+                                                        required
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+
+                                                            fetchRooms(value);
+
+                                                            setForm((prev) => ({
+                                                                ...prev,
+                                                                otherData: {
+                                                                    ...prev.otherData,
+                                                                    floorId: value,
+                                                                },
+                                                            }));
+                                                        }}
+                                                    >
+                                                        <option value="">---Select Floor---</option>
+                                                        {floors.map((item) => (
+                                                            <option key={item._id} value={item?._id}>
+                                                                {item.floorName}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            {rooms?.length > 0 &&
+                                                <div className="custom-frm-bx">
+                                                    <label htmlFor="">Select Room </label>
+                                                    <div className="select-wrapper">
+                                                        <select
+                                                            className="form-select custom-select"
+                                                            value={form?.otherData?.roomId}
+                                                            required
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+
+
+                                                                setForm((prev) => ({
+                                                                    ...prev,
+                                                                    otherData: {
+                                                                        ...prev.otherData,
+                                                                        roomId: value,
+                                                                    },
+                                                                }));
+                                                            }}
+                                                        >
+                                                            <option value="">---Select Room---</option>
+                                                            {rooms.map((item) => (
+                                                                <option key={item._id} value={item?._id}>
+                                                                    {item.roomName}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>}
+                                        </>}
 
 
                                         <div className="mt-3">

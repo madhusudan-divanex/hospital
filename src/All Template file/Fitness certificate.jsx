@@ -6,6 +6,7 @@ import { getApiData } from "../Service/api";
 import { QRCodeCanvas } from "qrcode.react"
 import html2canvas from "html2canvas";
 import html2pdf from "html2pdf.js";
+import base_url from "../baseUrl";
 export default function ViewFitnessCertificate() {
   const { id } = useParams()
   const pdfRef = useRef();
@@ -81,7 +82,7 @@ export default function ViewFitnessCertificate() {
             <div className="d-flex justify-content-between align-items-start mb-3">
               <div className="d-flex">
                 <div style={styles.logo}>
-                  <img src="/logo.png" alt="" />
+                  <img src={certificateData?.logo?`${base_url}/${certificateData?.logo}`: "/logo.png"} alt="" />
                 </div>
                 <div className="ms-2">
                   <div style={styles.title}>Fitness Certificate</div>

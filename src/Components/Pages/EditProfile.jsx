@@ -53,7 +53,7 @@ function EditProfile() {
     gstNumber: "",
     about: "",
     logo: null,
-    category:[]
+    category: []
   });
 
   /* ================================
@@ -164,7 +164,7 @@ function EditProfile() {
         gstNumber: data?.basic?.gstNumber || "",
         about: data?.basic?.about || "",
         logo: data?.images?.logo?.[0]?.url || null,
-        category:data?.category || [],
+        category: data?.basic?.category || [],
       });
 
       /* ----- IMAGES ----- */
@@ -252,7 +252,7 @@ function EditProfile() {
     data.append('email', basicForm.email)
     data.append('gstNumber', basicForm.gstNumber)
     data.append('about', basicForm.about)
-    data.append('category', JSON.stringify(basicForm.category))
+    data.append('category', basicForm.category)
     if (basicForm.logo instanceof File) {
       data.append('logo', basicForm.logo)
     }
@@ -695,21 +695,24 @@ function EditProfile() {
                                   />
                                 </div>
                               </div>
-                                <div className="col-lg-6">
-                                  <div className="custom-frm-bx">
-                                    <label htmlFor="">Category</label>
-                                    <Select
-                                      options={catData}
-                                      isMulti
-                                      className="custom-select"
-                                      placeholder="Select category..."
-                                      onChange={(selectedOptions) => {
-                                        const ids = selectedOptions.map((item) => item.value);
-                                        setBasicForm({...basicForm,category:ids});
-                                      }}
-                                    />
-                                  </div>
+                              <div className="col-lg-6">
+                                <div className="custom-frm-bx">
+                                  <label htmlFor="">Category</label>
+                                  <Select
+                                    options={catData}
+                                    isMulti
+                                    value={catData.filter(option =>
+                                      basicForm.category.includes(option.value)
+                                    )}
+                                    className="custom-select"
+                                    placeholder="Select category..."
+                                    onChange={(selectedOptions) => {
+                                      const ids = selectedOptions.map((item) => item.value);
+                                      setBasicForm({ ...basicForm, category: ids });
+                                    }}
+                                  />
                                 </div>
+                              </div>
                               <div className="col-lg-6">
                                 <div className="custom-frm-bx">
                                   <label>GST Number</label>
@@ -721,7 +724,7 @@ function EditProfile() {
                                   />
                                 </div>
                               </div>
-                              
+
 
 
                               <div className="col-lg-12">

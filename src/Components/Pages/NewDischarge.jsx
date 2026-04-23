@@ -654,7 +654,7 @@ function NewDischarge() {
                                         <input
                                             type="text"
                                             readOnly
-                                            value={allotmentData?.bedId?.departmentId?.departmentName}
+                                            value={allotmentData?.departmentId?.departmentName}
                                             placeholder="Email Address"
                                             className="form-control"
                                         />

@@ -13,6 +13,7 @@ import html2canvas from "html2canvas";
 import html2pdf from "html2pdf.js";
 import ReportDownload from "./ReportDownload";
 import Loader from "../Common/Loader";
+import MedicalPrescription from "../../All Template file/Medical Prescription";
 function PatientsView() {
   const navigate = useNavigate()
   const params = useParams()
@@ -34,7 +35,6 @@ function PatientsView() {
   const [labReports, setLabReports] = useState([])
   const [selectedTest, setSelectedTest] = useState([])
   const [showDownload, setShowDownload] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(null)
   const [selectedReport, setSelectedReport] = useState(null);
   const [customId, setCustomId] = useState()
   const [labAppointments, setLabAppointments] = useState([])
@@ -42,6 +42,8 @@ function PatientsView() {
   const [selectedType, setSelectedType] = useState('')
   const [departments, setDepartments] = useState([])
   const [selectedDepartment, setSelectedDepartment] = useState()
+  const [activePres, setActivePres] = useState()
+  const [pdfLoading, setPdfLoading] = useState(null)
   async function fetchAppointmentData() {
     setLoading(true)
     try {
@@ -184,7 +186,6 @@ function PatientsView() {
     }
   }
   useEffect(() => {
-    fetchPatientProfile()
     fetchPastAppointments()
     fetchLabReports()
   }, [appointmentData])
@@ -279,7 +280,7 @@ function PatientsView() {
         if (selectedType == "OPD") {
           navigate(`/patient-${selectedType?.toLocaleLowerCase()}`)
         } else {
-          navigate('/bed-management')
+          navigate(`/bed-management?patientId=${params.id}`)
         }
       } else {
         toast.error(res.message)
@@ -290,23 +291,8 @@ function PatientsView() {
   }
   const prescriptionRef = useRef()
   const handleDownload = async () => {
-    const element = prescriptionRef.current;
-    document.body.classList.add("hide-buttons");
-
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: "prescriptions.pdf",
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 3, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-    };
-    try {
-
-      await html2pdf().from(element).set(opt).save().then(() => { document.body.classList.remove("hide-buttons"); });
-    } catch (error) {
-
-    }
-
+    setActivePres(pastPresData)
+    setPdfLoading(true)
   };
 
   const handleReportDownload = (appointmentId, testId, id) => {
@@ -332,36 +318,36 @@ function PatientsView() {
               <div>
                 <h3 className="innr-title mb-2">View </h3>
                 <div className="d-flex gap-5 align-items-center">
-                <div className="admin-breadcrumb">
-                  <nav aria-label="breadcrumb">
-                    <ol className="breadcrumb custom-breadcrumb mb-0">
-                      <li className="breadcrumb-item">
-                        <NavLink to="/dashboard" className="breadcrumb-link">
-                          Dashboard
-                        </NavLink>
-                      </li>
+                  <div className="admin-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                      <ol className="breadcrumb custom-breadcrumb mb-0">
+                        <li className="breadcrumb-item">
+                          <NavLink to="/dashboard" className="breadcrumb-link">
+                            Dashboard
+                          </NavLink>
+                        </li>
 
-                      <li className="breadcrumb-item">
-                        <NavLink to="/patient" className="breadcrumb-link">
-                          Patients
-                        </NavLink>
-                      </li>
+                        <li className="breadcrumb-item">
+                          <NavLink to="/patient" className="breadcrumb-link">
+                            Patients
+                          </NavLink>
+                        </li>
 
-                      <li
-                        className="breadcrumb-item active"
-                        aria-current="page"
-                      >
-                        View
-                      </li>
-                    </ol>
-                  </nav>
-                </div>
-              {allotmentData?.length > 0 &&
-                <div className="d-flex gap-2 align-items-center">
-                  <h6 className="mb-0 text-black"><span style={{color : "#052F59", fontWeight : "600"}}>Bed-: </span>{allotmentData[0]?.bedId?.bedName}</h6>
-                  <h6 className="mb-0 text-black"><span style={{color : "#052F59", fontWeight : "600"}}>Department-:</span> {allotmentData[0]?.bedId?.departmentId?.departmentName}</h6>
-                  <span className={`approved rounded-5 py-1  ${allotmentData[0]?.status == "Discharged" && "discharge"}`}>  {allotmentData[0]?.status}</span>
-                </div>}
+                        <li
+                          className="breadcrumb-item active"
+                          aria-current="page"
+                        >
+                          View
+                        </li>
+                      </ol>
+                    </nav>
+                  </div>
+                  {allotmentData?.length > 0 &&
+                    <div className="d-flex gap-2 align-items-center">
+                      <h6 className="mb-0 text-black"><span style={{ color: "#052F59", fontWeight: "600" }}>Bed-: </span>{allotmentData[0]?.bedId?.bedName}</h6>
+                      <h6 className="mb-0 text-black"><span style={{ color: "#052F59", fontWeight: "600" }}>Department-:</span> {allotmentData[0]?.departmentId?.departmentName}</h6>
+                      <span className={`approved rounded-5 py-1  ${allotmentData[0]?.status == "Discharged" && "discharge"}`}>  {allotmentData[0]?.status}</span>
+                    </div>}
                 </div>
               </div>
               <div className="d-flex gap-2">
@@ -582,17 +568,17 @@ function PatientsView() {
                                               : <span className="approved approved-active leaved ">{item?.status} </span>}
                                               </td> */}
 
-                                              <td>
-                                          {item?.status === 'completed' ? (
-                                            <span className="approved approved-active">Completed</span>
-                                          ) : item?.status === 'rejected' ? (
-                                            <span className="approved approved-active inactive">Rejected</span>
-                                          ) : (
-                                            <span className="approved approved-active leaved">
-                                              {item?.status}
-                                            </span>
-                                          )}
-                                        </td>
+                                            <td>
+                                              {item?.status === 'completed' ? (
+                                                <span className="approved approved-active">Completed</span>
+                                              ) : item?.status === 'rejected' ? (
+                                                <span className="approved approved-active inactive">Rejected</span>
+                                              ) : (
+                                                <span className="approved approved-active leaved">
+                                                  {item?.status}
+                                                </span>
+                                              )}
+                                            </td>
 
                                             <td>
                                               <div class="dropdown">
@@ -738,24 +724,24 @@ function PatientsView() {
                                   <div className="new-pharmacy-detail-card">
                                     <div className="admin-table-bx d-flex align-items-center justify-content-between nw-pharmacy-details w-100 ">
                                       <div className="admin-table-sub-details d-flex align-items-center gap-2">
-                                          <img src={item?.prescriptionId?.status == 'Inactive' ? "/in-active.png" :
-                                            "/prescriptions.png"
-                                          } alt="" />
-                                          <div>
-                                            <h6 className="fs-16 fw-600 text-black">Prescriptions</h6>
-                                            <p className="fs-14 fw-500">{new Date(item?.prescriptionId?.createdAt)?.toLocaleDateString('en-GB')}</p>
-                                          </div>
+                                        <img src={item?.prescriptionId?.status == 'Inactive' ? "/in-active.png" :
+                                          "/prescriptions.png"
+                                        } alt="" />
+                                        <div>
+                                          <h6 className="fs-16 fw-600 text-black">Prescriptions</h6>
+                                          <p className="fs-14 fw-500">{new Date(item?.prescriptionId?.createdAt)?.toLocaleDateString('en-GB')}</p>
                                         </div>
+                                      </div>
 
                                       <div className="admin-table-bx">
-                                         <div className="admin-table-sub-details d-flex align-items-center gap-2 doctor-title ">
-                                            <img src={item?.doctorId?.doctorId?.profileImage ?
-                                              `${base_url}/${item?.doctorId?.doctorId?.profileImage}` : "/doctor-avatr.png"} alt="" />
-                                            <div>
-                                              <h6>{item?.doctorId?.name} </h6>
-                                              <p className="fs-14 fw-500">{item?.doctorId?.nh12}</p>
-                                            </div>
+                                        <div className="admin-table-sub-details d-flex align-items-center gap-2 doctor-title ">
+                                          <img src={item?.doctorId?.doctorId?.profileImage ?
+                                            `${base_url}/${item?.doctorId?.doctorId?.profileImage}` : "/doctor-avatr.png"} alt="" />
+                                          <div>
+                                            <h6>{item?.doctorId?.name} </h6>
+                                            <p className="fs-14 fw-500">{item?.doctorId?.nh12}</p>
                                           </div>
+                                        </div>
                                       </div>
 
                                       <div className="d-flex align-items-center gap-2 patient-mb-active">
@@ -794,24 +780,24 @@ function PatientsView() {
                                     <div className="row mt-3">
                                       <div className="col-lg-4">
                                         <div className="patient-barcode-cards">
-                                           <div className="barcd-content">
-                                          <h4>{item?.prescriptionId?.customId}</h4>
-                                          
-                                          <Barcode value={item?.prescriptionId?.customId} width={2} displayValue={false}
-                                            height={60} />
+                                          <div className="barcd-content">
+                                            <h4>{item?.prescriptionId?.customId}</h4>
 
+                                            <Barcode value={item?.prescriptionId?.customId} width={2} displayValue={false}
+                                              height={60} />
+
+                                          </div>
+
+                                          <div className="barcode-id-details">
+                                            <div>
+                                              <h6>Patient Id </h6>
+                                              <p>{customId}</p>
                                             </div>
-
-                                        <div className="barcode-id-details">
-                                          <div>
-                                            <h6>Patient Id </h6>
-                                            <p>{customId}</p>
+                                            <div>
+                                              <h6>Appointment ID </h6>
+                                              <p>{item?.customId}</p>
+                                            </div>
                                           </div>
-                                          <div>
-                                            <h6>Appointment ID </h6>
-                                            <p>{item?.customId}</p>
-                                          </div>
-                                        </div>
 
 
 
@@ -820,7 +806,7 @@ function PatientsView() {
 
 
 
-                                       
+
                                       </div>
                                     </div>
 
@@ -938,8 +924,8 @@ function PatientsView() {
                                                   <li className="ad-info-item"> Room Number :<span className="add-info-title"> {item?.bedId?.roomId?.roomName}</span></li>
                                                   <li className="ad-info-item"> <b>Floor :</b><span className="add-info-title"> {item?.bedId?.floorId?.floorName}</span></li>
                                                   <li className="ad-info-item"> <b>Bed :</b><span className="add-info-title"> {item?.bedId?.bedName}</span></li>
-                                                  <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ${item?.bedId?.pricePerDay}</span></li>
-                                                  <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.bedId?.departmentId?.departmentName}</span></li>
+                                                  <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ₹ {item?.bedId?.pricePerDay}</span></li>
+                                                  <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.departmentId?.departmentName}</span></li>
                                                   {/* <li className="ad-info-item"> Day:<span className="add-info-title"> 5</span></li> */}
                                                 </ul>
                                               </div>
@@ -1246,7 +1232,11 @@ function PatientsView() {
           </div>
         </div>
       </div>
-
+      <div className="d-none">
+        {activePres && <MedicalPrescription presId={activePres?._id}
+          endLoading={() => setPdfLoading(false)}
+          pdfLoading={pdfLoading} />}
+      </div>
     </>
   )
 }

@@ -50,7 +50,7 @@ export default function MedicalPrescription({presId, pdfLoading, endLoading }) {
       document.body.classList.add("hide-buttons");
       const opt = {
         margin: 0.5,
-        filename: `Invoice-${aptData?.transactionId}.pdf`,
+        filename: `Prescription-${prescription?.diagnosis}.pdf`,
         html2canvas: { scale: 2 },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
       };
@@ -74,7 +74,7 @@ export default function MedicalPrescription({presId, pdfLoading, endLoading }) {
     }
   }, [ptData, aptData, pdfLoading]);
   return (
-    <>
+    <div ref={invoiceRef}>
       <FontLink />
       <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -86,7 +86,7 @@ export default function MedicalPrescription({presId, pdfLoading, endLoading }) {
         .rx * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
 
         /* ---------- page bg ---------- */
-        .rx-page { background: #e2e2e2; min-height: 100vh; padding: 32px 16px; }
+        // .rx-page { background: #e2e2e2; min-height: 100vh; padding: 32px 16px; }
 
         /* ---------- card ---------- */
         .rx-card {
@@ -204,7 +204,7 @@ export default function MedicalPrescription({presId, pdfLoading, endLoading }) {
                 <div className="rx-h-name">{aptData?.orgName}</div>
                 <div className="rx-h-addr">
                   {aptData?.orgNh12}<br />
-                  {aptData?.orgAddress}
+                  {aptData?.orgAddress ? aptData?.orgAddress:''}
                 </div>
               </div>
             </div>
@@ -341,6 +341,6 @@ export default function MedicalPrescription({presId, pdfLoading, endLoading }) {
 
         </div>
       </div>
-    </>
+    </div>
   );
 }

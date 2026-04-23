@@ -139,7 +139,7 @@ export default function DoctorAptBookingReceipt({ paymentId, pdfLoading, endLoad
       const element = invoiceRef.current;
       document.body.classList.add("hide-buttons");
       const opt = {
-        margin: 0.5,
+        margin: 0,
         filename: `Invoice-${aptData?.transactionId}.pdf`,
         html2canvas: { scale: 2 },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
@@ -205,7 +205,7 @@ export default function DoctorAptBookingReceipt({ paymentId, pdfLoading, endLoad
             </div>
 
             <div style={{ ...styles.grid3, marginTop: 10 }}>
-              <KV k="Age / Sex" v={`${calculateAge(ptData?.dob)} / ${ptData?.gender?.charAt(0)?.toUpperCase() + ptData?.gender?.slice(1)}`} />
+              <KV k="Age / Sex" v={`${calculateAge(ptData?.dob,aptData?.createdAt)} / ${ptData?.gender?.charAt(0)?.toUpperCase() + ptData?.gender?.slice(1)}`} />
               <KV k="Email Address" v={ptData?.email} />
               <KV k="Patient ID" v={ptData?.nh12} />
 

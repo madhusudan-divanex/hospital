@@ -59,8 +59,8 @@ function DoctorView() {
         setCustomId(result?.customId);
         setDoctorEduWork(prev => ({
           ...prev,
-          education: result.aboutDoctorEduWork.education,
-          work: result.aboutDoctorEduWork.work
+          education: result?.aboutDoctorEduWork?.education ||[],
+          work: result?.aboutDoctorEduWork?.work || []
         }))
       } else {
         toast.error(result.message)
@@ -472,7 +472,7 @@ function DoctorView() {
 
                               <div className="ovrview-bx vw-qualification-main-bx mb-3">
                                 {doctorEduWork?.education?.length > 0 ? (
-                                  doctorEduWork.education.map(
+                                  doctorEduWork?.education?.map(
                                     (edu, i) => (
                                       <div
                                         key={i}

@@ -2,12 +2,13 @@ importScripts("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: "AIzaSyCdvvJcViTZWv8XcXAcYseXjZnw_baFJMM",
-  authDomain: "neohelth-f9e9d.firebaseapp.com",
-  projectId: "neohelth-f9e9d",
-  storageBucket: "neohelth-f9e9d.appspot.com", // ✅ FIXED
-  messagingSenderId: "494629819602",
-  appId: "1:494629819602:web:5764cf4c9174517606890b"
+  apiKey: "AIzaSyAC2yHXIIptDFannYC-u3eI4sibErN08vA",
+  authDomain: "neohelth-a97f7.firebaseapp.com",
+  projectId: "neohelth-a97f7",
+  storageBucket: "neohelth-a97f7.firebasestorage.app",
+  messagingSenderId: "10649086040",
+  appId: "1:10649086040:web:60124ab036f48647ed022d",
+  measurementId: "G-TWJTBPBTHF"
 });
 
 const messaging = firebase.messaging();

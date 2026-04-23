@@ -7,9 +7,12 @@ import html2pdf from "html2pdf.js";
 import './Template css/medicalCertificate.css'
 import { getApiData } from "../Service/api";
 import { getDaysBetweenDates } from "../Service/globalFunction";
+import { useSelector } from "react-redux";
+import base_url from "../baseUrl";
 const ViewMedicalCertificate = () => {
   const { id } = useParams()
   const pdfRef = useRef();
+  const { hospitalBasic } = useSelector(state => state.user)
   const [certificateData, setCertificateData] = useState()
   async function fetchCertificateData(params) {
     try {
@@ -28,7 +31,7 @@ const ViewMedicalCertificate = () => {
     const element = pdfRef.current;
 
     const opt = {
-      margin: 0.3,
+      margin: 0,
       filename: `${certificateData?.customId}.pdf`,
       image: { type: "jpeg", quality: 1 },
       html2canvas: {
@@ -75,16 +78,22 @@ const ViewMedicalCertificate = () => {
             </div>
           </div>
         </div>
-        <div ref={pdfRef} className="mc-wrapper d-flex justify-content-center bg-light py-4">
-          <div className="mc-a4 bg-white position-relative">
+        <div className="mc-wrapper d-flex justify-content-center bg-light py-4">
+          <div ref={pdfRef} className="mc-a4 bg-white position-relative">
 
             {/* HEADER */}
             <div className="d-flex justify-content-between p-4 border-bottom">
-              <div>
-                <h5 className="fw-bold mb-1">Medical Certificate</h5>
-                <div className="text-muted small">{certificateData?.organization?.name}</div>
-                <div className="text-muted small">
-                  {certificateData?.address?.fullAddress + ',' + certificateData?.address?.city?.name + ',' + certificateData?.address?.state?.name + ',' + certificateData?.address?.pinCode}
+              <div className="d-flex">
+                <div style={{ width: '34px', height: '34px' }}>
+                  <img src={hospitalBasic?.logoFileId ?
+                    `${base_url}/api/file/${hospitalBasic?.logoFileId}` : "/logo.png"} alt="" />
+                </div>
+                <div style={{ marginLeft: 10 }}>
+                  <h5 className="fw-bold mb-1">Medical Certificate</h5>
+                  <div className="text-muted small">{certificateData?.organization?.name}</div>
+                  <div className="text-muted small">
+                    {certificateData?.address?.fullAddress + ',' + certificateData?.address?.city?.name + ',' + certificateData?.address?.state?.name + ',' + certificateData?.address?.pinCode}
+                  </div>
                 </div>
               </div>
 
@@ -104,7 +113,7 @@ const ViewMedicalCertificate = () => {
               <Meta title="Certificate ID" value={certificateData?.customId} />
               <Meta title="Issue Date" value={new Date(certificateData?.createdAt)?.toLocaleDateString('en-GB')} />
               <Meta title="Issued By" value={`Dr. ${certificateData?.doctorId?.name}`} />
-              <Meta title="Valid For" value={`${getDaysBetweenDates(certificateData?.rest?.from,certificateData?.rest?.to)} Days`} />
+              <Meta title="Valid For" value={`${getDaysBetweenDates(certificateData?.rest?.from, certificateData?.rest?.to)} Days`} />
               <Meta title="Status" value={`Verified · ${certificateData?.status}`} />
             </div>
 
@@ -136,15 +145,15 @@ const ViewMedicalCertificate = () => {
                 The patient was admitted on <strong>{new Date(certificateData?.admitDate)?.toLocaleDateString('en-GB')}</strong> and discharged on <strong>{new Date(certificateData?.dischargeDate)?.toLocaleDateString('en-GB')}</strong>.
               </p>
 
-              {certificateData?.rest?.from && certificateData?.rest?.to && 
-                
-                  <p className="description">
-                    The patient is advised rest and is unfit for duty for a period of
-                    <strong> {getDaysBetweenDates(certificateData?.rest?.from,certificateData?.rest?.to)} Days</strong> (
-                    {new Date(certificateData?.rest?.from)?.toLocaleDateString('en-GB')} to {new Date (certificateData?.rest?.to)?.toLocaleDateString('en-GB')}
-                    ).
-                  </p>
-                
+              {certificateData?.rest?.from && certificateData?.rest?.to &&
+
+                <p className="description">
+                  The patient is advised rest and is unfit for duty for a period of
+                  <strong> {getDaysBetweenDates(certificateData?.rest?.from, certificateData?.rest?.to)} Days</strong> (
+                  {new Date(certificateData?.rest?.from)?.toLocaleDateString('en-GB')} to {new Date(certificateData?.rest?.to)?.toLocaleDateString('en-GB')}
+                  ).
+                </p>
+
               }
 
               <p className="description">
@@ -155,7 +164,7 @@ const ViewMedicalCertificate = () => {
               <div className="qr-box">
                 <div className="qr-placeholder">
                   <QRCodeCanvas
-                     value={`https://www.neohealthcard.com/certificate/${certificateData?.customId}`}
+                    value={`https://www.neohealthcard.com/certificate/${certificateData?.customId}`}
                     size={256}
                     className="qr-code"
                     style={{ height: "auto", maxWidth: "100%", width: "100%" }}

@@ -8,7 +8,7 @@ import {
   faPen,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { FaPlusSquare } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import api from "../../api/api";
@@ -28,11 +28,12 @@ import HospitalTransfer from "./HospitalTransfer";
 function BedManagement() {
   const navigate = useNavigate();
   const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [selectedBed, setSelectedBed] = useState(null);
   const [floors, setFloors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDailyNotes, setOpenDailyNotes] = useState(false);
-  const { permissions,isOwner } = useSelector(state => state.user)
+  const { permissions, isOwner } = useSelector(state => state.user)
   const fetchBedManagement = async () => {
     try {
       const res = await api.get("/bed/management/list");
@@ -100,7 +101,11 @@ function BedManagement() {
   const handleallotmentAdd = () => {
     if (!selectedBed) return;
     closeAnyModal();
-    navigate(`/allotment/${selectedBed._id}`);
+    if (searchParams.get('patientId')) {
+      navigate(`/allotment/${selectedBed._id}?patientId=${searchParams.get('patientId')}`)
+    } else {
+      navigate(`/allotment/${selectedBed._id}`);
+    }
   };
 
   const handleEditAllotment = () => {
@@ -184,6 +189,12 @@ function BedManagement() {
     // Navigate after closing
     navigate(`/discharge/${selectedBed?.allotmentId}`);
   };
+  useEffect(() => {
+
+    return () => {
+      setSearchParams({});
+    };
+  }, []);
 
   return (
     <>
@@ -210,17 +221,17 @@ function BedManagement() {
               </div>
               <div className="d-flex gap-3 laboratory-card flex-wrap">
                 <NavLink to="/add-floor" className="nw-thm-btn w-auto">
-                  <FaPlusCircle className="me-1"/>
+                  <FaPlusCircle className="me-1" />
                   Add Floor
                 </NavLink>
-                {(!isOwner || permissions?.beds?.add) && (
+                {(isOwner || permissions?.beds?.add) && (
                   <NavLink to="/add-room" className="nw-thm-btn w-auto">
-                    <FaPlusCircle className="me-1"/>
+                    <FaPlusCircle className="me-1" />
                     Add Room
                   </NavLink>
                 )}
                 <NavLink to="/add-bed" className="nw-thm-btn w-auto">
-                  <FaPlusCircle className="me-1"/>
+                  <FaPlusCircle className="me-1" />
                   Add Bed
                 </NavLink>
               </div>
@@ -278,7 +289,14 @@ function BedManagement() {
                                 <div
                                   key={bed._id}
                                   role="button"
-                                  onClick={() => openBedModal(bed)}
+                                  onClick={() => {
+                                    if (searchParams.get('patientId') && bed.status !== "Booked") {
+                                      navigate(`/allotment/${bed._id}?patientId=${searchParams.get('patientId')}`)
+                                    } else { openBedModal(bed) 
+
+                                    }
+                                  }
+                                  }
                                   className={
                                     bed.status === "Booked"
                                       ? "booked-bed-bx"
@@ -296,6 +314,11 @@ function BedManagement() {
                               ))}
                               <div>
                                 <NavLink
+                                  onClick={() => localStorage.setItem('addBedData', JSON.stringify({
+                                    floorId: floor?._id,
+                                    departmentId: room?.departmentId,
+                                    roomId: room?._id
+                                  }))}
                                   to="/add-bed"
                                   className="nw-bed-added-btn"
                                 >
@@ -414,7 +437,7 @@ function BedManagement() {
                       </span>
                     </a>
                   </li>
-                  
+
                   <li className="bed-list-item">
                     <a
                       href="#"
@@ -548,51 +571,40 @@ function BedManagement() {
                       </span>
                     </button>
                   </li>}
-
-                  <li className="bed-list-item">
-                    <button
-                      type="button"
-                      className="bed-nav-link"
-                      onClick={handleEditBed}
-                    >
-                      Edit Bed
-                      <span className="nw-chevron-btn">
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </span>
-                    </button>
-                  </li>
-                  <li className="bed-list-item">
-                    <button className="bed-nav-link" onClick={handleNotesHistory}>
-                      Notes History
-                      <span className="nw-chevron-btn">
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </span>
-                    </button>
-                  </li>
-                  <li className="bed-list-item">
-                    <a
-                      href="#"
-                      className="bed-nav-link"
-                      onClick={() => handleBedMaintenance()}
-                    >
-                      {selectedBed?.underMaintenance ? 'Remove Maintenance' : 'Under Maintenance'}
-                      <span className="nw-chevron-btn">
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </span>
-                    </a>
-                  </li>
-                  {/* <li className="bed-list-item">
-                    <button
-                      type="button"
-                      className="bed-nav-link text-danger"
-                      onClick={handleDeleteBed}
-                    >
-                      Delete Bed
-                      <span className="nw-chevron-btn">
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </span>
-                    </button>
-                  </li> */}
+                  {!searchParams?.get('patientId') && <>
+                    <li className="bed-list-item">
+                      <button
+                        type="button"
+                        className="bed-nav-link"
+                        onClick={handleEditBed}
+                      >
+                        Edit Bed
+                        <span className="nw-chevron-btn">
+                          <FontAwesomeIcon icon={faChevronRight} />
+                        </span>
+                      </button>
+                    </li>
+                    <li className="bed-list-item">
+                      <button className="bed-nav-link" onClick={handleNotesHistory}>
+                        Notes History
+                        <span className="nw-chevron-btn">
+                          <FontAwesomeIcon icon={faChevronRight} />
+                        </span>
+                      </button>
+                    </li>
+                    <li className="bed-list-item">
+                      <a
+                        href="#"
+                        className="bed-nav-link"
+                        onClick={() => handleBedMaintenance()}
+                      >
+                        {selectedBed?.underMaintenance ? 'Remove Maintenance' : 'Under Maintenance'}
+                        <span className="nw-chevron-btn">
+                          <FontAwesomeIcon icon={faChevronRight} />
+                        </span>
+                      </a>
+                    </li>
+                  </>}
                 </ul>
               </div>
             </div>

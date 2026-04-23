@@ -612,7 +612,7 @@ function AllotmentDetails() {
 
                       <div className="col-lg-4 col-md-6 col-sm-12 mb-3">
                         <h6>Department</h6>
-                        <p>{data?.bedId?.departmentId?.departmentName}</p>
+                        <p>{data?.departmentId?.departmentName}</p>
                       </div>
 
                       <div className="col-lg-4 col-md-6 col-sm-12 mb-3">
