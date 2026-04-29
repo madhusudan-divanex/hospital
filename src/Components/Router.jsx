@@ -154,6 +154,8 @@ import DeathForm from "./Certificates/DeathForm";
 import ViewDeathCertificate from "../All Template file/Death Certificate";
 import DoctorAptBookingReceipt from "../All Template file/Booking receipt";
 import MedicalPrescription from "../All Template file/Medical Prescription";
+import PatientsHistory from "./Pages/PatientHistory";
+import PatientTransferLetter from "../All Template file/Patient transfer";
 
 function Router() {
  const { socket, startCall } = useGlobalSocket();
@@ -291,6 +293,7 @@ function Router() {
         { path: "/patient-opd", element: <PatientsOPD /> }, //d
         { path: "/patient-ipd", element: <PatientsIPD /> }, //d
         { path: "/patient-emergency", element: <PatientsEmergency /> }, //d
+        { path: "/patient-history", element: <PatientsHistory /> },
 
 
         // Appointments
@@ -373,6 +376,7 @@ function Router() {
         { path: "/death-certificate", element: <DeathCertificate /> },
         { path: "/death-form", element: <DeathForm /> },
         { path: "/certificate/death/:id", element: <ViewDeathCertificate /> },
+        { path: "/patient-transfer/:id", element: <PatientTransferLetter /> },
 
 
         // Permissions

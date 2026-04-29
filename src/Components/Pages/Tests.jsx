@@ -61,7 +61,7 @@ function Tests() {
             }
         } catch (err) {
             toast.error(err?.response?.data?.message || "Something went wrong");;
-        } finally{
+        } finally {
             setLoading(false)
         }
     }
@@ -159,11 +159,10 @@ function Tests() {
                                             <thead>
                                                 <tr>
                                                     <th>S.no.</th>
-                                                    <th>Department</th>
-                                                    <th>Short Name</th>
-                                                    <th>Package Type</th>
+                                                    <th>Test Categories Name</th>
+                                                    <th>Sub Category</th>
                                                     <th>Price</th>
-                                                    <th>Status</th>
+                                                    {/* <th>Status</th> */}
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -173,64 +172,16 @@ function Tests() {
                                                     allTest?.map((item, key) =>
                                                         <tr key={key}>
                                                             <td>{key + 1}.</td>
-                                                            <td className="text-capitalize">{item?.department?.departmentName}</td>
-                                                            <td>{item?.shortName}</td>
-                                                            <td className="text-capitalize">{item?.packageType}</td>
-                                                            <td>{item?.price}</td>
-                                                            <td>
-                                                                <span
-                                                                    className={`text-capitalize  text-capitalize ${item?.status == "active" ? "approved " : "approved inactive"}`}
-                                                                    style={{ cursor: 'pointer' }}
-                                                                    onClick={(e) =>
-                                                                        testAction(
-                                                                            e,
-                                                                            item?._id,
-                                                                            item?.status === 'inactive' ? 'active' : 'inactive'
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {item?.status}
-                                                                </span>
-                                                            </td>
+                                                            <td className="text-capitalize">{item?.category?.name}</td>
+                                                            <td>{item?.subCatData?.filter(item => item?.status == "active")?.length} / {item?.subCatData?.length} Active</td>
+                                                            {/* <td>{item?.packageType}</td> */}
+                                                            <td>₹{item?.totalAmount}</td>
+
 
                                                             <td>
-                                                                <div className="dropdown">
-                                                                    <a
-                                                                        href="javascript:void(0)"
-                                                                        className="grid-dots-btn"
-                                                                        id="acticonMenu1"
-                                                                        data-bs-toggle="dropdown"
-                                                                        aria-expanded="false"
-                                                                    >
-                                                                        <TbGridDots />
-                                                                    </a>
-                                                                    <ul
-                                                                        className="dropdown-menu dropdown-menu-end  tble-action-menu admin-dropdown-card"
-                                                                        aria-labelledby="acticonMenu1"
-                                                                    >
-                                                                        <li className="prescription-item">
-                                                                            <Link className="prescription-nav" to={`/edit-tests/${item?._id}`} >
-                                                                                View/Edit
-                                                                            </Link>
-                                                                        </li>
-                                                                        <li className="prescription-item">
-                                                                            <button onClick={(e) =>
-                                                                                testAction(
-                                                                                    e,
-                                                                                    item?._id,
-                                                                                    item?.status === 'inactive' ? 'active' : 'inactive'
-                                                                                )
-                                                                            } className="prescription-nav text-capitalize w-100" >
-                                                                                {item?.status == 'active' ? 'inactive' : 'active'}
-                                                                            </button>
-                                                                        </li>
-                                                                        {/* <li className="prescription-item">
-                                                                            <button onClick={() => deleteTest(item?._id)} className="prescription-nav w-100" data-bs-toggle="modal" data-bs-target="#edit-Supplier">
-                                                                                Delete
-                                                                            </button>
-                                                                        </li> */}
-                                                                    </ul>
-                                                                </div>
+                                                                <Link className="prescription-nav" to={`/edit-tests/${item?._id}`} >
+                                                                    View/Edit
+                                                                </Link>
                                                             </td>
                                                         </tr>) :
                                                     <tr>No Data</tr>}

@@ -87,13 +87,13 @@ function AddPatient() {
           if (res.success) {
             toast.success("Patient added successfully");
 
-            if(searchParams.get('type')=="IPD"){
+            if (searchParams.get('type') == "IPD") {
               navigate(`/bed-management?patientId=${patientId}`)
-            }else if(searchParams.get('type')=="OPD"){
+            } else if (searchParams.get('type') == "OPD") {
               navigate('/patient-opd')
-            }else if(searchParams.get('type')=="EMERGENCY"){
+            } else if (searchParams.get('type') == "EMERGENCY") {
               navigate('/patient-emergency')
-            }else{
+            } else {
               navigate('/dashboard')
             }
           } else {
@@ -102,15 +102,15 @@ function AddPatient() {
         } else {
           const res = await api.post("/patients/add", form);
           if (res.data.success) {
-            const dept=department?.find(item=>item?._id==form?.department)
+            const dept = department?.find(item => item?._id == form?.department)
             toast.success("Patient added successfully");
-            if(dept?.type=="IPD"){
+            if (dept?.type == "IPD") {
               navigate(`/bed-management?patientId=${patientId}`)
-            }else if(dept?.type=="OPD"){
+            } else if (dept?.type == "OPD") {
               navigate('/patient-opd')
-            }else if(dept?.type=="EMERGENCY"){
+            } else if (dept?.type == "EMERGENCY") {
               navigate('/patient-emergency')
-            }else{
+            } else {
               navigate('/dashboard')
             }
           } else {
@@ -179,7 +179,12 @@ function AddPatient() {
 
   useEffect(() => {
     api.get("/location/countries")
-      .then(res => setCountries(res.data))
+      .then(res => {
+        const data = res.find(item => item?.name == "India")
+        setForm({ ...form, countryId: data?._id })
+        fetchStates(data?.isoCode)
+        setCountries(res.data)
+      })
       .catch(err => console.error(err));
     fetchDepartments();
     if (isEdit) {
@@ -256,13 +261,13 @@ function AddPatient() {
     else if (!/^\S+@\S+\.\S+$/.test(form.email))
       newErrors.email = "Invalid email address";
 
-    if (!form.contact.emergencyContactName)
-      newErrors.emergencyContactName = "Emergency contact name is required";
+    // if (!form.contact.emergencyContactName)
+    //   newErrors.emergencyContactName = "Emergency contact name is required";
 
-    if (!form.contact.emergencyContactNumber)
-      newErrors.emergencyContactNumber = "Emergency contact number is required";
-    else if (!/^\d{10}$/.test(form.contact.emergencyContactNumber))
-      newErrors.emergencyContactNumber = "Emergency contact number must be 10 digits";
+    // if (!form.contact.emergencyContactNumber)
+    //   newErrors.emergencyContactNumber = "Emergency contact number is required";
+    // else if (!/^\d{10}$/.test(form.contact.emergencyContactNumber))
+    //   newErrors.emergencyContactNumber = "Emergency contact number must be 10 digits";
 
     if (!form.department)
       newErrors.department = "Department is required";
@@ -307,7 +312,8 @@ function AddPatient() {
         const general = result.user
         const demographic = result.demographic
         setPatientId(general?.userId)
-        setForm({...form,
+        setForm({
+          ...form,
           patientId,
           name: general.name,
           gender: general?.gender,
@@ -338,7 +344,7 @@ function AddPatient() {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message)
-    } finally{
+    } finally {
       // fetchDepartments()
     }
   }

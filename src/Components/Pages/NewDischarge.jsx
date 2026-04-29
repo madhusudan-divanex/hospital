@@ -38,7 +38,6 @@ function NewDischarge() {
     }
     const fetchPatientData = async () => {
         try {
-            setLoading(true)
             const response = await getSecureApiData(`patient/${allotmentData?.patientId?._id}`)
             if (response.success) {
                 setPatientData(response.data)
@@ -48,7 +47,7 @@ function NewDischarge() {
         } catch (error) {
             toast.error(error?.response?.data?.message || "Something went wrong")
         } finally {
-            setLoading(false)
+            // setLoading(false)
         }
     }
     const fetchPrescriptionData = async () => {

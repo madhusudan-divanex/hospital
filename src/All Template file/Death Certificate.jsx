@@ -199,6 +199,19 @@ export default function ViewDeathCertificate() {
                 </div>
 
                 {/* QR */}
+                <div style={{
+                  position: "absolute",
+                  width: 220,
+                  height: 220,
+                  background: "url('/CertWatermark2.png')",
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "contain",
+                  // opacity: 0.05,
+                  borderRadius: "50%",
+                  top: "40%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}></div>
                 <div style={{ marginTop: "28px" }}>
                   <div style={{
                     width: "80px",

@@ -120,4 +120,23 @@ const getDaysBetweenDates = (from, to) => {
 
   return diffDays > 0 ? diffDays : 0;
 };
-export { formatDateTime,calculateAge ,specialtyOptions,languageOptions,calculatePaymentDetails,saveFcmToken,getDaysBetweenDates}
+const handleCloseModal = (name) => {
+  console.log("click",name)
+    const modal = document.getElementById(name);
+    if (modal) {
+      modal.classList.remove("show");
+      modal.style.display = "none";
+    }
+
+    // remove backdrop
+    const backdrops = document.getElementsByClassName("modal-backdrop");
+    while (backdrops.length > 0) {
+      backdrops[0].parentNode.removeChild(backdrops[0]);
+    }
+
+    // remove body class
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+  };
+export { handleCloseModal,formatDateTime,calculateAge ,specialtyOptions,languageOptions,calculatePaymentDetails,saveFcmToken,getDaysBetweenDates}

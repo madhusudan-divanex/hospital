@@ -43,11 +43,11 @@ function Invoice() {
     }
   }, [appointmentId])
   // Calculate subtotal, GST and total
-  const subtotal = appointmentData?.testId
-    ?.reduce((acc, item) => acc + Number(item?.price || 0), 0) || 0;
+  const subtotal = appointmentData?.testData
+    ?.reduce((acc, item) => acc + Number(item?.fees || 0), 0) || 0;
 
   const gst = subtotal * 0.05;
-  const total = subtotal + gst;
+  const total = subtotal 
   const handleReportDownload = (appointmentId) => {
     setPdfLoading(true)
     // setSelectedReport({ appointmentId });
@@ -63,8 +63,8 @@ function Invoice() {
         })
       } else {
 
-        const sub = appointmentData?.testId
-          ?.reduce((acc, item) => acc + Number(item?.price || 0), 0) || 0;
+        const sub = appointmentData?.testData
+          ?.reduce((acc, item) => acc + Number(item?.fees || 0), 0) || 0;
         setFormData({ ...formData, subTotal: sub, total: sub })
       }
     }
@@ -187,8 +187,8 @@ function Invoice() {
                   <div className="laboratory-report-bx">
                     <ul className="laboratory-report-list">
                       <li className="laboratory-item"><span>Test</span> <span>Price</span></li>
-                      {appointmentData?.testId?.map((item, key) =>
-                        <li className="laboratory-item border-0" key={key}><span>{item?.shortName}</span> <span>₹{item?.price}</span></li>)}
+                      {appointmentData?.testData?.map((item, key) =>
+                        <li className="laboratory-item border-0" key={key}><span>{item?.name}</span> <span>₹{item?.fees}</span></li>)}
                     </ul>
 
                     <div className="">

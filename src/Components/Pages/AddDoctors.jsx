@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { getApiData, getSecureApiData, securePostData } from "../../Service/api";
 import api from "../../api/api";
-import { Link, NavLink, useParams } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { PiHandEye } from "react-icons/pi";
 import { specialtyOptions } from "../../Service/globalFunction";
 import Select from "react-select";
@@ -15,6 +15,7 @@ import base_url from "../../baseUrl";
 import { useSelector } from "react-redux";
 function AddDoctors() {
     const { id } = useParams();
+    const navigate=useNavigate()
     const isEdit = Boolean(id);
     const { user } = useSelector(state => state.user)
     const userId = user?._id
@@ -331,7 +332,7 @@ function AddDoctors() {
     const personalSubmit = async (e) => {
         e.preventDefault()
         if (isDefault) {
-            return  handleBack(e,"#profile-tab")
+            return handleBack(e, "#profile-tab")
         }
         if (!validate()) return;
         const formData = new FormData();
@@ -416,14 +417,16 @@ function AddDoctors() {
                     contractStart: result?.employmentDetails?.contractStart ? new Date(result?.employmentDetails?.contractStart)?.toISOString()?.split("T")[0] : null,
                     contractEnd: result?.employmentDetails?.contractEnd ? new Date(result?.employmentDetails?.contractEnd)?.toISOString()?.split("T")[0] : null,
                     joinDate: result?.employmentDetails?.contractEnd ? new Date(result?.employmentDetails?.joinDate)?.toISOString()?.split("T")[0] : null,
-                   
+
                 })
-                setAccessInfo({ ...accessInfo,email:result?.employmentDetails?.email,
-                    contactNumber:result?.employmentDetails?.contactNumber, permissionId: result?.employmentDetails?.permissionId?._id, password: '' })
+                setAccessInfo({
+                    ...accessInfo, email: result?.employmentDetails?.email,
+                    contactNumber: result?.employmentDetails?.contactNumber, permissionId: result?.employmentDetails?.permissionId?._id, password: ''
+                })
                 setFetchById(true)
                 fetchStates(doctorAbout?.countryId?.isoCode)
                 fetchCities(doctorAbout?.stateId?.isoCode)
-            }else{
+            } else {
                 toast.error(result.message)
             }
         } catch (error) {
@@ -524,7 +527,7 @@ function AddDoctors() {
     const professionalSubmit = async (e) => {
         e.preventDefault();
         if (isDefault) {
-            return handleBack(e,"#contact-tab");
+            return handleBack(e, "#contact-tab");
         }
         if (!validateProff()) return
         const formData = new FormData();
@@ -599,9 +602,9 @@ function AddDoctors() {
                 data
             );
             if (result.success) {
-                handleBack(e,"#upload-tab")
+                handleBack(e, "#upload-tab")
                 toast.success("Employment Details Saved");
-                
+
                 // Redirect or perform other actions as needed
             } else {
                 toast.error(result.message);
@@ -688,7 +691,7 @@ function AddDoctors() {
                 <div className="row ">
                     <div className="d-flex align-items-center justify-content-between">
                         <div>
-                            <h3 className="innr-title mb-2">{id?'Edit':'Add'} Doctors</h3>
+                            <h3 className="innr-title mb-2">{id ? 'Edit' : 'Add'} Doctors</h3>
                             <div className="admin-breadcrumb">
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb custom-breadcrumb">
@@ -793,7 +796,7 @@ function AddDoctors() {
                                                                         Choose a file or drag & drop here
                                                                     </label>
                                                                 </p>
-                                                               
+
 
                                                                 <small className="format-title">JPEG Format</small>
 
@@ -819,7 +822,7 @@ function AddDoctors() {
                                                                 </div>
 
 
-                                                                 {personal.previewProfile && (
+                                                                {personal.previewProfile && (
                                                                     <img
                                                                         src={personal.previewProfile}
                                                                         alt="Profile Preview"
@@ -1041,22 +1044,22 @@ function AddDoctors() {
                                                     <div className="custom-frm-bx">
                                                         <label htmlFor="">Treatment Areas</label>
                                                         <Select
-                                                                options={treatmentOptions}
-                                                                isMulti
-                                                                required
-                                                                 classNamePrefix="custom-select"   
-                                                                className="select-categories"    
-                                                                name="treatMent"
-                                                                isDisabled={isDefault}
-                                                                value={address.treatmentAreas ? treatmentValue : []}
-                                                                placeholder="Select areas(s)"
-                                                                onChange={(selectedOptions) => {
-                                                                    setAddress(prev => ({
-                                                                        ...prev,
-                                                                        treatmentAreas: selectedOptions ? selectedOptions.map(opt => opt.value) : []
-                                                                    }));
-                                                                }}
-                                                            />
+                                                            options={treatmentOptions}
+                                                            isMulti
+                                                            required
+                                                            classNamePrefix="custom-select"
+                                                            className="select-categories"
+                                                            name="treatMent"
+                                                            isDisabled={isDefault}
+                                                            value={address.treatmentAreas ? treatmentValue : []}
+                                                            placeholder="Select areas(s)"
+                                                            onChange={(selectedOptions) => {
+                                                                setAddress(prev => ({
+                                                                    ...prev,
+                                                                    treatmentAreas: selectedOptions ? selectedOptions.map(opt => opt.value) : []
+                                                                }));
+                                                            }}
+                                                        />
                                                     </div>
                                                 </div>
 
@@ -1101,9 +1104,9 @@ function AddDoctors() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                                {professionalInfo?.education?.map((item, index) => (
-                                            <div className="education-frm-bx mb-3" key={index}>
+
+                                            {professionalInfo?.education?.map((item, index) => (
+                                                <div className="education-frm-bx mb-3" key={index}>
                                                     <div className="row" >
 
                                                         <div className="col-lg-3 col-md-6 col-sm-12">
@@ -1184,8 +1187,8 @@ function AddDoctors() {
                                                         </div>
 
                                                     </div>
-                                            </div>
-                                                ))}
+                                                </div>
+                                            ))}
 
                                             <div className="text-end mt-3">
                                                 <button className="add-employee-btn" type="button" onClick={() => addEducation()}><FaPlusSquare /> Add More</button>
@@ -1196,8 +1199,8 @@ function AddDoctors() {
                                                 </div>
                                             </div>
 
-                                                {professionalInfo?.work?.map((item, index) => (
-                                            <div className="education-frm-bx mb-3" key={index}>
+                                            {professionalInfo?.work?.map((item, index) => (
+                                                <div className="education-frm-bx mb-3" key={index}>
                                                     <div className="row" >
 
                                                         <div className="col-lg-3 col-md-6 col-sm-12">
@@ -1288,8 +1291,8 @@ function AddDoctors() {
                                                         </div>
 
                                                     </div>
-                                            </div>
-                                                ))}
+                                                </div>
+                                            ))}
 
                                             <div className="text-end mt-3">
                                                 <button className="add-employee-btn" type="button" onClick={() => addWork()}><FaPlusSquare /> Add More</button>
@@ -1301,8 +1304,8 @@ function AddDoctors() {
                                                 </div>
                                             </div>
 
-                                                {license?.medicalLicense?.map((item, index) => (
-                                            <div className="education-frm-bx mt-3 mb-3" key={index}>
+                                            {license?.medicalLicense?.map((item, index) => (
+                                                <div className="education-frm-bx mt-3 mb-3" key={index}>
                                                     <div className="row">
                                                         <div className="col-lg-6 col-md-6 col-sm-12">
                                                             <div className="custom-frm-bx">
@@ -1352,8 +1355,8 @@ function AddDoctors() {
 
                                                         </div>
                                                     </div>
-                                            </div>
-                                                ))}
+                                                </div>
+                                            ))}
 
 
 
@@ -1586,7 +1589,7 @@ function AddDoctors() {
                                                     <div className="custom-frm-bx">
                                                         <label htmlFor="">Contact Number</label>
                                                         <input
-                                                            type="number"                                                          
+                                                            type="number"
                                                             className="form-control nw-frm-select"
                                                             placeholder="Enter Username"
                                                             value={accessInfo.contactNumber}
@@ -1690,7 +1693,13 @@ function AddDoctors() {
 
                                         <h5 className="py-4">Doctor Added Successfully</h5>
 
-                                        <Link to='/doctor' className="nw-thm-btn" data-bs-dismiss="modal" aria-label="Close">Go To List</Link>
+                                        <Link to='/doctor'
+                                            onClick={() => {
+                                                setTimeout(() => {
+                                                    navigate("/doctor")
+                                                }, 200);
+                                            }}
+                                            className="nw-thm-btn" data-bs-dismiss="modal" aria-label="Close">Go To List</Link>
                                     </div>
 
                                 </div>

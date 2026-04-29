@@ -415,7 +415,7 @@ function BedAllotmentHistory() {
                                                             <span className="approved approved-active discharge">Discharged</span>
                                                         }</td>
                                                         <td>
-                                                            <div className="dropdown">
+                                                            <div className="dropdown position-static">
                                                                 <a
                                                                     href="javascript:void(0)"
                                                                     className="grid-dots-btn"
@@ -455,7 +455,7 @@ function BedAllotmentHistory() {
                                                                             Add Payment
                                                                         </a>
                                                                     </li>
-                                                                    {item?.status=="Discharged" &&<li className="prescription-item">
+                                                                    {item?.status=="Discharged" && !item?.transferId && <li className="prescription-item">
                                                                         <a
                                                                             href="#"
                                                                             className="prescription-nav"
@@ -466,6 +466,12 @@ function BedAllotmentHistory() {
                                                                             Hospital Transfer
                                                                         </a>
                                                                     </li>}
+                                                                    {item?.transferId && 
+                                                                      <li className="prescription-item">
+                                                                            <NavLink to={`/patient-transfer/${item?.transferId}`} className="prescription-nav">
+                                                                                See Transfer
+                                                                            </NavLink>
+                                                                        </li>}
                                                                     {item?.status == "Active" && <>
                                                                         <li className="prescription-item">
                                                                             <NavLink to="/edit-allotment" className="prescription-nav">

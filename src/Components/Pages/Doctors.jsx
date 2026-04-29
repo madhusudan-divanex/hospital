@@ -400,7 +400,7 @@ function Doctors() {
                                                                 </span>
                                                             </td>
                                                             <td>
-                                                                <div className="dropdown">
+                                                                <div className="dropdown position-static">
                                                                     <a
                                                                         href="#"
                                                                         className="grid-dots-btn"

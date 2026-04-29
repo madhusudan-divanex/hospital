@@ -18,7 +18,7 @@ import Barcode from "react-barcode";
 import Loader from "../Common/Loader";
 import { getSecureApiData, securePostData } from "../../Service/api";
 import API from "../../api/api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function GenerateReport() {
@@ -27,6 +27,7 @@ function GenerateReport() {
     const invoiceRef = useRef();
     const [hasLRx, setHasLRx] = useState(false);
     const reportRef = useRef()
+    const navigate=useNavigate()
     const compenentRef = useRef()
     const [loading, setLoading] = useState(false)
     const user = JSON.parse(localStorage.getItem('user'))
@@ -56,7 +57,7 @@ function GenerateReport() {
                 } else {
                     toast.success("Appointment Fetched successfully")
 
-                    setTestId(response.data.testId)
+                    setTestId(response.data.subCatId)
                     setAppointmentData(response.data)
                 }
                 setDemoData(response.demographic)
@@ -93,8 +94,8 @@ function GenerateReport() {
 
     const fetchTestReport = async (testId) => {
         try {
-            const payload = { testId, appointmentId: appointmentData?._id };
-            const response = await securePostData('api/hospital/test-report-data', payload);
+            const payload = {subCatId: testId, appointmentId: appointmentData?._id };
+            const response = await securePostData('api/hospital/test-report', payload);
 
             if (response.success && response.data) {
                 setFullReportData(response.data)
@@ -125,7 +126,7 @@ function GenerateReport() {
 
             for (const id of testId) {
                 try {
-                    const response = await getSecureApiData(`api/hospital/test-data/${id?._id}`);
+                    const response = await getSecureApiData(`api/comman/sub-test-category-data/${id?._id}`);
                     if (response.success) {
                         const test = response.data;
 
@@ -226,7 +227,7 @@ function GenerateReport() {
             const formData = new FormData();
             formData.append('labId', userId)
             formData.append('patientId', appointmentData.patientId?._id)
-            formData.append('testId', testId)
+            formData.append('subCatId', testId)
             formData.append('appointmentId', appointmentData._id)
             formData.append('remark', remark)
             formData.append('component', JSON.stringify(components))
@@ -235,16 +236,16 @@ function GenerateReport() {
             formData.append('report', allReports?.[testId] || "")
 
             try {
-                const response = await securePostData("api/hospital/lab/test-report", formData);
+                const response = await securePostData("api/hospital/test-report", formData);
 
                 if (response.success) {
-                    toast.success(`Report saved for test ID: ${testId}`);
+                    toast.success(`Report saved for test `);
                 } else {
                     toast.error(response.message);
                 }
             } catch (err) {
                 console.error("Error saving report:", err);
-                toast.error("Failed to save report.");
+                toast.error(err?.response?.data?.message);
             } finally {
                 setLoading(false);
             }
@@ -595,6 +596,8 @@ function GenerateReport() {
                                         </div>
 
                                         <div className="text-end mt-3" >
+                                            <button type="button" onClick={()=>navigate('/test-report-appointment')} className="nw-thm-btn rounded-4">Go Back</button>
+
                                             <button type="submit" className="nw-thm-btn rounded-4">Submit</button>
                                         </div>
 

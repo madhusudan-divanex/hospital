@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar, faCheck, faChevronDown, faCircleXmark, faDownload, faDroplet, faEnvelope, faEye, faFilePdf, faLocationDot, faPerson, faPhone, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faCheck, faChevronDown, faChevronRight, faCircleXmark, faDownload, faDroplet, faEnvelope, faEye, faFilePdf, faLocationDot, faPerson, faPhone, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { TbGridDots } from "react-icons/tb";
 import { BsCapsule } from "react-icons/bs";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
@@ -14,6 +14,10 @@ import html2pdf from "html2pdf.js";
 import ReportDownload from "./ReportDownload";
 import Loader from "../Common/Loader";
 import MedicalPrescription from "../../All Template file/Medical Prescription";
+import DailyIPDNotes from "./DailyIPDNotes";
+import AddAllotmentTest from "./AddAllotmentTest";
+import AllotmentPayment from "./AllotmentPayment";
+import DepartmentTransfer from "./DepartmentTransfer";
 function PatientsView() {
   const navigate = useNavigate()
   const params = useParams()
@@ -44,6 +48,11 @@ function PatientsView() {
   const [selectedDepartment, setSelectedDepartment] = useState()
   const [activePres, setActivePres] = useState()
   const [pdfLoading, setPdfLoading] = useState(null)
+  const [selectedAllotment, setSelectedAllotment] = useState()
+  const [notesData, setNotesData] = useState({ allotmentId: null })
+  const [openDailyNotes, setOpenDailyNotes] = useState(false);
+  const [deptTransfer, setDepartmentTransfer] = useState({ _id: null, departmentId: null, allotmentId: null })
+
   async function fetchAppointmentData() {
     setLoading(true)
     try {
@@ -270,7 +279,6 @@ function PatientsView() {
   }
   const admitPatient = async (e) => {
     e.preventDefault()
-    console.log(selectedDepartment)
     const data = { patientId: params.id, departmentId: selectedDepartment }
     try {
       const res = await securePostData('api/patients/admit', data)
@@ -309,6 +317,23 @@ function PatientsView() {
       }
     }
   }, [pastPresData]);
+  const closeModal = () => {
+    const modalEl = document.getElementById("bed-Option");
+    const modal = window.bootstrap?.Modal.getInstance(modalEl);
+
+    if (modal) {
+      modal.hide();
+    }
+  };
+  const handleButtonClick = (path) => {
+    const modalEl = document.getElementById("bed-Option");
+    const modal = window.bootstrap?.Modal.getInstance(modalEl);
+
+    if (modal) {
+      modal.hide();
+    }
+    navigate(path)
+  }
   return (
     <>
       {loading ? <Loader />
@@ -351,6 +376,7 @@ function PatientsView() {
                 </div>
               </div>
               <div className="d-flex gap-2">
+                {allotmentData?.status !== "Active" && <Link className="nw-thm-btn" to={`/bed-management?patientId=${params.id}`}>Bed Allotment</Link>}
                 <button className="nw-thm-btn" data-bs-toggle="modal" data-bs-target="#admit-Patient" onClick={() => setSelectedType('IPD')}>IPD</button>
                 <button className="nw-thm-btn" data-bs-toggle="modal" data-bs-target="#admit-Patient" onClick={() => setSelectedType('OPD')}>OPD</button>
                 <button className="nw-danger-thm-btn" data-bs-toggle="modal" data-bs-target="#admit-Patient" onClick={() => setSelectedType('EMERGENCY')}>Emergency</button>
@@ -650,8 +676,8 @@ function PatientsView() {
                                             <td> #{item?.customId}</td>
                                             <td>
                                               <ul className="admin-test-list">
-                                                {item?.testId?.map((test, key) =>
-                                                  <li className="admin-test-item" key={key}>{test?.shortName}</li>)}
+                                                {item?.subCatId?.map((test, key) =>
+                                                  <li className="admin-test-item" key={key}>{test?.subCategory}</li>)}
                                                 {/* <li className="admin-test-item">Haemoglobin</li> */}
                                               </ul>
                                             </td>
@@ -847,7 +873,7 @@ function PatientsView() {
                                           <h4 className="mb-1">SP-{item?._id?.slice(-4)}</h4>
 
                                           <ul class="qrcode-list">
-                                            <li class="qrcode-item">Test  <span class="qrcode-title">: {item?.testId?.shortName}</span></li>
+                                            <li class="qrcode-item">Test  <span class="qrcode-title">: {item?.subCatId?.subCategory}</span></li>
                                             <li class="qrcode-item">Draw  <span class="qrcode-title"> : {new Date(item?.createdAt)?.toLocaleString('en-GB')}</span> </li>
                                           </ul>
                                           {/* <img src="/barcode.png" alt="" /> */}
@@ -952,13 +978,16 @@ function PatientsView() {
                                             <td>
 
 
-                                              <div className="dropdown">
+                                              <div className="dropdown position-static">
                                                 <a
                                                   href="javascript:void(0)"
                                                   className="grid-dots-btn"
                                                   id="acticonMenu1"
-                                                  data-bs-toggle="dropdown"
-                                                  aria-expanded="false"
+                                                  // data-bs-toggle="dropdown"
+                                                  data-bs-toggle="modal"
+                                                  onClick={() => setSelectedAllotment(item)}
+                                                  data-bs-target="#bed-Option"
+                                                // aria-expanded="false"
                                                 >
                                                   <TbGridDots />
                                                 </a>
@@ -971,23 +1000,6 @@ function PatientsView() {
                                                       View Details
                                                     </Link>
                                                   </li>
-                                                  {/* <li className="prescription-item">
-                                                                <a className="prescription-nav" href="#" >
-                                                                    Edit Allotment
-                                                                </a>
-                                                            </li> */}
-                                                  {/* <li className="prescription-item">
-                                                                <a className="prescription-nav" href="#" >
-                                                                    Add Payment
-                                                                </a>
-                                                            </li>
-
-                                                            <li className="prescription-item">
-                                                                <a className=" prescription-nav" href="#">
-
-                                                                    Discharge Patient
-                                                                </a>
-                                                            </li> */}
 
 
 
@@ -1237,6 +1249,161 @@ function PatientsView() {
           endLoading={() => setPdfLoading(false)}
           pdfLoading={pdfLoading} />}
       </div>
+      <div
+        className="modal step-modal fade"
+        id="bed-Option"
+        tabIndex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-sm">
+          <div className="modal-content rounded-4">
+            <div className="modal-body pb-2 px-4">
+              <div className="">
+                <ul className="bed-management-list">
+                  <li className="bed-list-item">
+                    <button
+                      type="button"
+                      onClick={() => handleButtonClick(`/allotment-details/${selectedAllotment?._id}`)}
+                      data-bs-dismiss="modal"
+                      className="bed-nav-link"
+                    >
+                      View Details
+                      <span className="nw-chevron-btn">
+
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </span>
+                    </button>
+                  </li>
+
+                  <li className="bed-list-item">
+                    <a
+                      href="#"
+                      className="bed-nav-link"
+                      data-bs-toggle="modal"
+                      onClick={closeModal}
+                      data-bs-target="#add-Payment"
+                    >
+                      Add Payment
+                      <span className="nw-chevron-btn">
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </span>
+                    </a>
+                  </li>
+                  {!selectedAllotment?.dischargeId &&
+                    <>
+                      <li className="bed-list-item">
+                        <button
+                          type="button"
+                          className="bed-nav-link"
+                          onClick={() => handleButtonClick(`/edit-allotment/${selectedAllotment?._id}`)}
+                          data-bs-dismiss="modal"
+                        >
+                          Edit Allotment
+                          <span className="nw-chevron-btn">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </span>
+                        </button>
+                      </li>
+                      <li className="bed-list-item">
+                        <button
+                          type="button"
+                          className="bed-nav-link"
+                          onClick={() => handleButtonClick(`/allotment/prescription-data/${selectedAllotment?._id}`)}
+                          data-bs-dismiss="modal"
+                        >
+                          Add Prescriptions
+                          <span className="nw-chevron-btn">
+
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </span>
+                        </button>
+
+                      </li>
+                      <li className="bed-list-item">
+                        <a
+                          href="#"
+                          className="bed-nav-link"
+                          data-bs-toggle="modal"
+                          data-bs-target="#department-Transfer"
+                          data-bs-dismiss="modal"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setDepartmentTransfer({
+                              _id: selectedAllotment?.bedId,
+                              allotmentId: selectedAllotment?._id,
+                              departmentId: selectedAllotment?.departmentId
+                            })
+                          }}
+                        >
+                          Department Transfer
+                          <span className="nw-chevron-btn">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </span>
+                        </a>
+                      </li>
+
+                      <li className="bed-list-item">
+                        <button
+                          className="bed-nav-link"
+                          data-bs-toggle="modal"
+                          data-bs-target="#add-LabTest"
+                          onClick={closeModal}
+                        >
+                          Add Lab Test
+                          <span className="nw-chevron-btn">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </span>
+                        </button>
+                      </li>
+                      <li className="bed-list-item">
+                        <a
+                          href="#"
+                          className="bed-nav-link"
+                          data-bs-toggle="modal"
+                          data-bs-dismiss="modal"
+                          data-bs-target="#add-IPD-Notes"
+                          onClick={() => {
+                            setNotesData({ allotmentId: selectedAllotment?._id })
+                            setOpenDailyNotes(true)
+                          }}
+                        >
+                          Add Daily Notes
+                          <span className="nw-chevron-btn">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </span>
+                        </a>
+                      </li>
+                      <li className="bed-list-item">
+                        <button onClick={() => handleButtonClick(`/discharge/${selectedAllotment?._id}`)}
+                          data-bs-dismiss="modal" className="bed-nav-link">
+                          Discharge Patient
+                          <span className="nw-chevron-btn">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </span>
+                        </button>
+                      </li>
+                    </>}
+                  <li className="bed-list-item">
+                    <button onClick={() => handleButtonClick(`/daily-ipd-history?allotment=${selectedAllotment?._id}`)}
+                      data-bs-dismiss="modal"
+                      className="bed-nav-link" >
+                      Notes History
+                      <span className="nw-chevron-btn">
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <DailyIPDNotes data={notesData} openTrigger={openDailyNotes} />
+      <AddAllotmentTest allotmentId={selectedAllotment?._id} />
+      <AllotmentPayment allotmentId={selectedAllotment?._id} getData={fetchAllotment} />
+      <DepartmentTransfer data={deptTransfer} getData={fetchAllotment} />
     </>
   )
 }

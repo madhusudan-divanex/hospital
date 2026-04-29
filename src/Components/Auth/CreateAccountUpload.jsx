@@ -8,14 +8,17 @@ import { FaPlusCircle } from "react-icons/fa";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import API from "../../api/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserDetail } from "../../redux/features/userSlice";
 
 function CreateAccountUpload() {
   const navigate = useNavigate();
-
+  const dispatch=useDispatch()
   // FIXED FIELDS
   const [licenseNumber, setLicenseNumber] = useState("");
   const [licenseFile, setLicenseFile] = useState(null);
-
+  const { hospitalBasic, hospitalAddress, paymentInfo,
+  } = useSelector(state => state.user)
   const [regNumber, setRegNumber] = useState("");
   const [regFile, setRegFile] = useState(null);
 
@@ -109,7 +112,9 @@ function CreateAccountUpload() {
       }
 
       // OPEN POPUP
-      document.getElementById("openModal").click();
+      if (hospitalBasic?.kycStatus !== "approved") {
+        document.getElementById("openModal").click();
+      }
     } catch (err) {
       console.error(err.response?.data || err);
     } finally {
@@ -157,6 +162,9 @@ function CreateAccountUpload() {
   const otherDragOver = (e) => {
     e.preventDefault();
   };
+  useEffect(() => {
+    dispatch(fetchUserDetail())
+  }, [dispatch])
 
   return (
     <>
@@ -625,12 +633,12 @@ function CreateAccountUpload() {
                   >
                     {loading ? "Submitting...." : "Submit"}
                   </button>
-                    <Link
-                      className="nw-thm-btn outline rounded-3 w-100"
-                      to={'/dashboard'}
-                    >
-                      Skip And Continue
-                    </Link>
+                  <Link
+                    className="nw-thm-btn outline rounded-3 w-100"
+                    to={'/dashboard'}
+                  >
+                    Skip And Continue
+                  </Link>
 
                   <button
                     id="openModal"

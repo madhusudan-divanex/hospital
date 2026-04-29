@@ -1,39 +1,47 @@
 import { TbGridDots } from "react-icons/tb";
-import { faDownload, faFilter, faSearch, } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faDownload, faFilter, faSearch, } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import API from "../../api/api";
 import { toast } from "react-toastify";
 import Loader from "../Common/Loader";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import base_url from "../../baseUrl";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-function PatientsEmergency() {
+import DailyIPDNotes from "./DailyIPDNotes";
+import AllotmentPayment from "./AllotmentPayment";
+import AddAllotmentTest from "./AddAllotmentTest";
+import DepartmentTransfer from "./DepartmentTransfer";
+function PatientsHistory() {
     const [patients, setPatients] = useState([]);
     const [page, setPage] = useState(1);
+    const navigate = useNavigate()
     const [totalPages, setTotalPages] = useState(1);
     const [limit, setLimit] = useState(10);
     const [search, setSearch] = useState("");
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('')
-
-
+    const [selectedAllotment, setSelectedAllotment] = useState()
+    const [notesData, setNotesData] = useState({ allotmentId: null })
+    const [openDailyNotes, setOpenDailyNotes] = useState(false);
+    const [deptType, setDeptType] = useState('')
+    const [deptTransfer, setDepartmentTransfer] = useState({ _id: null, departmentId: null, allotmentId: null })
     const fetchPatients = async (ptStatus = status) => {
         try {
             setLoading(true);
-            const res = await API.get(`/patients/list?deptType=EMERGENCY&status=Active`, {
+            const res = await API.get(`/patients/list?status=Inactive&deptType=${deptType}`, {
                 params: { page, limit, search }
             });
-            if (res.data?.success) {
-
+            if (res.data.success) {
                 setPatients(res.data.data);
                 setPagination(res.data.pagination);
                 setTotalPages(res.data.pagination.totalPages)
             } else {
                 toast.error(res.data.message)
+
             }
         } catch (err) {
             console.log(err)
@@ -45,7 +53,7 @@ function PatientsEmergency() {
 
     useEffect(() => {
         fetchPatients();
-    }, [page, limit,]);
+    }, [page, limit,deptType]);
 
 
     const deletePatient = async (id) => {
@@ -66,14 +74,13 @@ function PatientsEmergency() {
             await API.delete(`/patients/${id}`);
             toast.success("Patient deleted successfully");
             fetchPatients();
-        } catch (error) {
-            console.log(error)
+        } catch {
             toast.error("Delete failed");
         }
     };
 
 
-    const toggleStatus = async (patientId,id, status) => {
+    const toggleStatus = async (id, status) => {
         const result = await Swal.fire({
             title: "Inactivate Patient?",
             text: "Patient will be marked inactive",
@@ -83,22 +90,19 @@ function PatientsEmergency() {
         });
         if (!result.isConfirmed) return;
         try {
-            const res=await API.put(`/patients/${id}`, {
+            const res = await API.put(`/patients/${id}`, {
                 status: status === "Active" ? "Inactive" : "Active",
-                ptDeptId: id,
-                patientId
+                patientId: id
             });
-            if(!res.data.success){
+            if (!res.data.success) {
                 toast.error(res.data.message)
-            }else{
+            } else {
                 fetchPatients();
             }
         } catch {
             toast.error("Status update failed");
         }
     };
-
-
 
     const downloadPatients = () => {
 
@@ -125,9 +129,27 @@ function PatientsEmergency() {
             type: "application/octet-stream"
         });
 
-        saveAs(fileData, "OPD_Patients_List.xlsx");
+        saveAs(fileData, "IPD_Patients_List.xlsx");
     };
 
+    const closeModal = () => {
+        const modalEl = document.getElementById("bed-Option");
+        const modal = window.bootstrap?.Modal.getInstance(modalEl);
+
+        if (modal) {
+            modal.hide();
+        }
+    };
+    const handleButtonClick = (path) => {
+        const modalEl = document.getElementById("bed-Option");
+        const modal = window.bootstrap?.Modal.getInstance(modalEl);
+
+        if (modal) {
+            modal.hide();
+        }
+        navigate(path)
+    }
+   
     return (
         <>
             {loading ? <Loader />
@@ -135,7 +157,7 @@ function PatientsEmergency() {
                     <div className="row ">
                         <div className="d-flex align-items-center justify-content-between">
                             <div>
-                                <h3 className="innr-title mb-2 gradient-text">Patients</h3>
+                                <h3 className="innr-title mb-2 gradient-text">Patients History</h3>
                                 <div className="admin-breadcrumb">
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb custom-breadcrumb">
@@ -148,16 +170,11 @@ function PatientsEmergency() {
                                                 className="breadcrumb-item active"
                                                 aria-current="page"
                                             >
-                                                Patients
+                                                Patients History
                                             </li>
                                         </ol>
                                     </nav>
                                 </div>
-                            </div>
-                            <div className="add-nw-bx">
-                                <NavLink to="/add-patient?type=EMERGENCY" className="add-nw-btn nw-thm-btn">
-                                    <img src="/plus-icon.png" alt="" /> Add Patient
-                                </NavLink>
                             </div>
                         </div>
                     </div>
@@ -201,27 +218,26 @@ function PatientsEmergency() {
                                                     className="d-flex align-items-center justify-content-between drop-heading-bx px-3 pt-2 pb-2 border-bottom">
                                                     <h6 className="mb-0 fz-18">Filter</h6>
                                                     <button type="button" onClick={() => {
-                                                        setStatus('')
+                                                        setDeptType('')
                                                         fetchPatients('')
                                                     }} className="fz-16 clear-btn">Reset</button>
                                                 </div>
 
                                                 <div className="p-3">
                                                     <ul className="filtring-list mb-3" onClick={(e) => e.stopPropagation()}>
-                                                        <h6>Status</h6>
-
-                                                        <li>
+                                                        <h6>Department</h6>
+                                                         <li>
                                                             <div className="form-check new-custom-check">
                                                                 <input
                                                                     type="radio"
-                                                                    name="status"
-                                                                    id="active"
+                                                                    name="deptType"
+                                                                    id="all"
                                                                     className="form-check-input"
-                                                                    checked={status === "Active"}
-                                                                    onChange={() => setStatus("Active")}
+                                                                    checked={deptType === ""}
+                                                                    onChange={() => setDeptType("")}
                                                                 />
-                                                                <label className="form-check-label" htmlFor="active">
-                                                                    Active
+                                                                <label className="form-check-label" htmlFor="all">
+                                                                    All
                                                                 </label>
                                                             </div>
                                                         </li>
@@ -230,14 +246,45 @@ function PatientsEmergency() {
                                                             <div className="form-check new-custom-check">
                                                                 <input
                                                                     type="radio"
-                                                                    name="status"
+                                                                    name="deptType"
+                                                                    id="ipd"
                                                                     className="form-check-input"
-                                                                    id="inactive"
-                                                                    checked={status === "Inactive"}
-                                                                    onChange={() => setStatus("Inactive")}
+                                                                    checked={deptType === "IPD"}
+                                                                    onChange={() => setDeptType("IPD")}
                                                                 />
-                                                                <label className="form-check-label" htmlFor="inactive">
-                                                                    Inactive
+                                                                <label className="form-check-label" htmlFor="ipd">
+                                                                    IPD
+                                                                </label>
+                                                            </div>
+                                                        </li>
+
+                                                        <li>
+                                                            <div className="form-check new-custom-check">
+                                                                <input
+                                                                    type="radio"
+                                                                    name="deptType"
+                                                                    className="form-check-input"
+                                                                    id="opd"
+                                                                    checked={deptType === "OPD"}
+                                                                    onChange={() => setDeptType("OPD")}
+                                                                />
+                                                                <label className="form-check-label" htmlFor="opd">
+                                                                    OPD
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div className="form-check new-custom-check">
+                                                                <input
+                                                                    type="radio"
+                                                                    name="deptType"
+                                                                    className="form-check-input"
+                                                                    id="emergency"
+                                                                    checked={deptType === "EMERGENCY"}
+                                                                    onChange={() => setDeptType("EMERGENCY")}
+                                                                />
+                                                                <label className="form-check-label" htmlFor="emergency">
+                                                                    Emergency
                                                                 </label>
                                                             </div>
                                                         </li>
@@ -252,7 +299,7 @@ function PatientsEmergency() {
                                             </div>
                                         </div>
                                         <div>
-                                            <button className="nw-filtr-btn" onClick={downloadPatients}><FontAwesomeIcon icon={faDownload}  /></button>
+                                            <button className="nw-filtr-btn" onClick={downloadPatients} ><FontAwesomeIcon icon={faDownload} /></button>
                                         </div>
 
                                     </div>
@@ -282,11 +329,13 @@ function PatientsEmergency() {
                                                     <th>Patient Details</th>
                                                     <th>Contact</th>
                                                     <th>Status</th>
+                                                    <th>Visited At</th>
                                                     <th>Action</th>
+                                                    {/* <th>Allotment Action</th> */}
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {patients.length === 0 && (
+                                                {patients?.length === 0 && (
                                                     <tr>
                                                         <td colSpan="5" className="text-center">
                                                             No patients found
@@ -294,7 +343,7 @@ function PatientsEmergency() {
                                                     </tr>
                                                 )}
 
-                                                {patients.map((p, index) => (
+                                                {patients?.map((p, index) => (
                                                     <tr key={p._id}>
                                                         <td>{(page - 1) * limit + index + 1}.</td>
 
@@ -323,10 +372,11 @@ function PatientsEmergency() {
                                                         </td>
 
                                                         <td>
-                                                            <span className={`approved ${p?.departmentInfo?.status === "Active" ? "approved-active" : "approved-active inactive"}`}>
+                                                            <span style={{ cursor: 'pointer' }} onClick={() => toggleStatus(p._id, p?.departmentInfo?.status)} className={`approved ${p?.departmentInfo?.status === "Active" ? "approved-active" : " approved-active inactive"}`}>
                                                                 {p?.departmentInfo?.status}
                                                             </span>
                                                         </td>
+                                                        <td>{new Date(p?.departmentInfo?.createdAt)?.toLocaleDateString('en-GB')}</td>
 
                                                         <td>
                                                             <div className="dropdown position-static">
@@ -349,44 +399,40 @@ function PatientsEmergency() {
                                                                         <a
                                                                             className="prescription-nav"
                                                                             href="#"
-                                                                            onClick={() => toggleStatus(p?._id,p?.departmentInfo?._id, p?.departmentInfo?.status)}
+                                                                            onClick={() => toggleStatus(p._id, p?.departmentInfo?.status)}
                                                                         >
                                                                             {p?.departmentInfo?.status === "Active" ? "Inactivate" : "Activate"}
                                                                         </a>
                                                                     </li>
-                                                                    {/* <li>
-                                                                        <a
-                                                                            className="prescription-nav text-danger"
-                                                                            href="#"
-                                                                            onClick={() => deletePatient(p?.departmentInfo?._id)}
-                                                                        >
-                                                                            Delete
-                                                                        </a>
-                                                                    </li> */}
                                                                 </ul>
                                                             </div>
                                                         </td>
+
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                     </div>
 
-                                    
+
 
                                 </div>
                             </div>
                         </div>
                     </div>
-                      <div className="text-end mt-4">
-      <Link to={-1} className="nw-thm-btn outline" >
-                    Go Back
-                  </Link>
-    </div>
+                    <div className="text-end mt-4">
+                        <Link
+                            to={-1}
+                            className="nw-thm-btn outline"
+                        >
+                            Go Back
+                        </Link>
+                    </div>
                 </div>}
+
         </>
     )
 }
 
 
-export default PatientsEmergency
+export default PatientsHistory

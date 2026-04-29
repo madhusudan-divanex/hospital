@@ -25,7 +25,7 @@ function Labels() {
         try {
             const response = await getSecureApiData(`lab/appointment-data/${appointmentId}`)
             if (response.success) {
-                setTestId(response.data.testId)
+                setTestId(response.data.subCatId)
                 setAppointmentData(response.data)
             } else {
                 toast.error(response.message)
@@ -70,7 +70,7 @@ function Labels() {
 
             for (const id of testId) {
                 try {
-                    const response = await getSecureApiData(`lab/test-data/${id._id}`);
+                    const response = await getSecureApiData(`api/comman/sub-test-category-data/${id._id}`);
                     if (response.success) {
                         const test = response.data;
 

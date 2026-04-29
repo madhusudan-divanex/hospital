@@ -194,10 +194,9 @@ function Allotment() {
       const res = await api.get(`/bed/allotment/${allotmentId}`);
       const data = res.data.data;
       await fetchRooms(data.bedId.floorId._id);
-
       setForm({
         floorId: data.bedId.floorId._id,
-        departmentId: data.bedId.departmentId?._id,
+        departmentId: data.bedId.departmentId,
         roomId: data.bedId.roomId?._id,
         bedName: data.bedId.bedName,
         perDayFees: data.bedId.pricePerDay
@@ -226,6 +225,7 @@ function Allotment() {
       toast.error("Failed to load allotment");
     }
   };
+  console.log(form)
 
 
 
@@ -246,10 +246,15 @@ function Allotment() {
     }
   }, [id, isEdit]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+console.log( !form.floorId ,
+      !form.departmentId ,
+      !form.roomId ,
+      !form.bedName ,
+      !allotment.patientId ,
+      !allotment.doctorId ,
+      !allotment.allotmentDate)
     if (
       !form.floorId ||
       !form.departmentId ||

@@ -190,6 +190,16 @@ function LeftSidebar() {
                       EMERGENCY
                     </NavLink>
                   </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/patient-history"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
+                      }
+                    >
+                      History
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
               {/* <li className="nav-item">

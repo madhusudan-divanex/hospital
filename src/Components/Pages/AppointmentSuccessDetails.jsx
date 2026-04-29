@@ -35,6 +35,10 @@ function AppointmentSuccessDetails() {
     const [patientDemo, setPatientDemo] = useState()
     const [doctorAbout, setDoctorAbout] = useState()
     const { hospitalBasic } = useSelector(state => state.user)
+    const [selectedCategory, setSelectedCategory] = useState()
+    const [selectedSubCat, setSelectedSubCat] = useState([])
+    const [catAndSub, setCatAndSub] = useState([])
+    const [subCatOptions, setSubCatOptions] = useState([])
     async function fetchAppointmentData() {
         setLoading(true)
         try {
@@ -47,7 +51,7 @@ function AppointmentSuccessDetails() {
                 navigate(-1)
             }
         } catch (error) {
-
+            toast.error(error?.response?.data?.message)
         } finally {
             setLoading(false)
         }
@@ -181,7 +185,8 @@ function AppointmentSuccessDetails() {
 
         const data = {
             doctorId: appointmentData?.doctorId?._id, patientId: appointmentData?.patientId?._id, appointmentId: params.id,
-            labTest: { lab: userId, labTests: selectedTest }
+            // labTest: { lab: userId, labTests: selectedTest }
+            labTest: { testCat: selectedCategory, subCat: selectedSubCat }
         }
         try {
             const result = await updateApiData('appointment/doctor', data)
@@ -208,6 +213,34 @@ function AppointmentSuccessDetails() {
             toast.error(err?.response?.data?.message || "Something went wrong");;
         }
     }
+    async function fetchTestAndSub() {
+        try {
+            const res = await getApiData('api/comman/test-category')
+            if (res.success) {
+                setCatAndSub(res.data)
+            }
+        } catch (error) {
+
+        }
+    }
+    useEffect(() => {
+        fetchTestAndSub()
+    }, [])
+    async function fetchSubCategory(id) {
+        const res = await getApiData(`api/comman/sub-test-category/${id}`)
+        if (res.success) {
+            const data = res?.data?.map(sub => ({
+                label: sub?.subCategory,
+                value: sub?._id
+            })) || [];
+            setSubCatOptions(data)
+        }
+    }
+    useEffect(() => {
+        if (selectedCategory) {
+            fetchSubCategory(selectedCategory)
+        }
+    }, [selectedCategory])
     return (
         <>
             {loading ? <Loader />
@@ -243,7 +276,7 @@ function AppointmentSuccessDetails() {
                                 {appointmentData?.status == 'approved' &&
                                     <>
                                         <NavLink to={`/appointment-prescription/${appointmentData?._id}`} className="nw-thm-btn w-auto">{appointmentData?.prescriptionId ? 'Edit' : 'Add'} Prescriptions</NavLink>
-                                        <button className="nw-thm-btn w-auto" data-bs-toggle="modal" data-bs-target="#add-Lab">Add  Lab Test </button>
+                                        { !appointmentData?.labTest?.testCat &&<button className="nw-thm-btn w-auto" data-bs-toggle="modal" data-bs-target="#add-Lab">Add  Lab Test </button>}
                                         {appointmentData?.status !== 'approved' && <button className="progress-btn"> <FontAwesomeIcon icon={faCheck} onClick={() => appointmentAction('approved')} /> Mark as in progress</button>}
                                     </>}
                                 <button className="nw-exprt-btn"><FontAwesomeIcon icon={faPrint} /> Print </button>
@@ -457,7 +490,7 @@ function AppointmentSuccessDetails() {
                                     </div>
                                 </div>}
 
-                                {appointmentData?.labTest?.labTests?.length > 0 &&
+                                {/* {appointmentData?.labTest?.labTests?.length > 0 &&
                                     <div className="neo-health-patient-info-card mb-3">
                                         <h5>Lab tests prescribed by the doctor</h5>
 
@@ -480,7 +513,6 @@ function AppointmentSuccessDetails() {
                                                                             });
                                                                         }} type="checkbox" id={`available-${key}`} />
                                                                     <doctorel htmlFor={`available-${key}`}>{item?.shortName}</doctorel>
-                                                                    {/* <span class="price">${item?.price}</span> */}
                                                                 </div>
                                                             </li>)}
                                                     </ul>
@@ -512,13 +544,20 @@ function AppointmentSuccessDetails() {
                                                                     {pdfLoading == item?._id ? 'Downloading' : 'Download'}</button>
                                                             </div>
                                                         </div>
-
-                                                        {/* <div className="cbc-result-bx mt-2">
-                                                                    <p>Result CBC Report</p>
-                                                                    <h5>Negative</h5>
-                                                                </div> */}
                                                     </div>)
                                             }
+
+                                        </div>
+
+                                    </div>} */}
+                                {appointmentData?.labTest?.testCat &&
+                                    <div className="neo-health-patient-info-card mb-3">
+                                        <h5>Lab tests prescribed by the doctor</h5>
+
+
+                                        <div className="prescriptin-bx">
+                                            <h4 className="mb-2">{appointmentData?.labTest?.testCat?.name}</h4>
+                                            {appointmentData?.labTest?.subCat?.map(s => <p className="ms-2"> {s?.subCategory}</p>)}
 
                                         </div>
 
@@ -533,8 +572,6 @@ function AppointmentSuccessDetails() {
                                         </div>
 
                                     </div>}
-
-
 
 
                             </div>
@@ -571,9 +608,66 @@ function AppointmentSuccessDetails() {
                                     </div>
 
                                     <form onSubmit={handleTestSubmit}>
-
-
                                         <div className="custom-frm-bx">
+                                            <label htmlFor="">Test Category</label>
+                                            <select name="" id="" className="form-select" required value={selectedCategory}
+                                                onChange={(e) => setSelectedCategory(e.target.value)}>
+                                                <option value="">----Select----</option>
+                                                {catAndSub?.map((item, index) => (
+                                                    <option key={index} value={item._id} >{item.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        {subCatOptions?.length > 0 && <div className="row">
+                                            <h6>Sub Category</h6>
+                                            {subCatOptions?.map((item, key) => (
+                                                <div className="col-lg-6" key={key}>
+                                                    <div className="form-check custom-check">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="form-check-input"
+                                                            id={`sub-${key}`}
+                                                            value={item?.value}
+                                                            checked={selectedSubCat.includes(item.value)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setSelectedSubCat([...selectedSubCat, item.value]);
+                                                                } else {
+                                                                    setSelectedSubCat(
+                                                                        selectedSubCat.filter(id => id !== item.value)
+                                                                    );
+                                                                }
+                                                            }}
+                                                        />
+                                                        <label htmlFor={`sub-${key}`} className="form-check-label">
+                                                            {item?.label}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>}
+                                        {subCatOptions?.length > 1 && <div className="form-check custom-check justify-content-end">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                checked={
+                                                    subCatOptions.length > 0 &&
+                                                    selectedSubCat.length === subCatOptions.length
+                                                }
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        const allIds = subCatOptions.map(item => item.value);
+                                                        setSelectedSubCat(allIds);
+                                                    } else {
+                                                        setSelectedSubCat([]);
+                                                    }
+                                                }}
+                                            />
+                                            <label className="form-check-label">Select All</label>
+                                        </div>}
+
+
+                                        {/* <div className="custom-frm-bx">
                                             <label htmlFor="">Test Select</label>
                                             <div class="select-wrapper">
                                                 <Select
@@ -581,7 +675,6 @@ function AppointmentSuccessDetails() {
                                                     isMulti
                                                     required
                                                     name="testId"
-                                                    // value={se}
                                                     classNamePrefix="custom-select"
                                                     placeholder="Select areas(s)"
                                                     onChange={(options) => {
@@ -590,7 +683,7 @@ function AppointmentSuccessDetails() {
                                                 />
                                             </div>
 
-                                        </div>
+                                        </div> */}
 
                                         <div className="mt-3">
                                             <button type="submit" className="nw-thm-btn w-100"> Submit</button>

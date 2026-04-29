@@ -433,7 +433,7 @@ function Appointments() {
                                                                 </td>
 
                                                             <td>
-                                                                <div className="dropdown">
+                                                                <div className="dropdown position-static">
                                                                     <a
                                                                         href="javascript:void(0)"
                                                                         className="grid-dots-btn"

@@ -117,7 +117,7 @@ function AppointmentDetails() {
                 <ul className="nw-appointment-crd-list">
                   <li className="nw-appointment-crd-item">Appointment ID : <span className="nw-appointment-crd-title">#{appointmentData?.customId}</span></li>
                   <li className="nw-appointment-crd-item">Appointment Completed date  : <span className="nw-appointment-crd-title">{appointmentData?.status === 'deliver-report' ? new Date(appointmentData?.updatedAt)?.toLocaleDateString('en-GB') : '-'}</span></li>
-                  <li className="nw-appointment-crd-item">Amount : <span className="nw-appointment-crd-title"> ${appointmentData?.fees}</span></li>
+                  <li className="nw-appointment-crd-item">Amount : <span className="nw-appointment-crd-title"> ₹ {appointmentData?.fees}</span></li>
                   <li className="nw-appointment-crd-item">Payment Status : <span className="nw-appointment-due-title"> {appointmentData?.paymentStatus}</span></li>
                 </ul>
               </div>
@@ -167,8 +167,8 @@ function AppointmentDetails() {
 
               <div className="nw-laboratory-bill-bx mt-lg-5 mt-sm-3 mb-3">
                 <h6 className="my-0">Lab Doctor </h6>
-                <h4>Dr. Ravi Kumar</h4>
-                <p><span className="laboratory-phne"> ID :</span> DO-7668</p>
+                <h4>{appointmentData?.staff?.name}</h4>
+                <p><span className="laboratory-phne"> ID :</span> {appointmentData?.staff?.nh12}</p>
               </div>
               {appointmentData?.doctorId && <div className="nw-laboratory-bill-bx mb-3">
                 <h6 className="my-0">Lab tests prescribed by the doctor</h6>

@@ -31,7 +31,7 @@ function Departments() {
     const [form, setForm] = useState({
         departmentName: "",
         type: "OPD",
-        headOfDepartment: "",
+        headOfDepartment: null,
         employees: [],
         otherData: {
             floorId: null,
@@ -106,7 +106,7 @@ function Departments() {
                 setForm({
                     departmentName: "",
                     type: "OPD",
-                    headOfDepartment: "",
+                    headOfDepartment: null,
                     employees: [],
                 });
             }
@@ -121,7 +121,7 @@ function Departments() {
         setForm({
             departmentName: dept.departmentName,
             type: dept.type,
-            headOfDepartment: dept.headOfDepartment?._id || "",
+            headOfDepartment: dept.headOfDepartment?._id || null,
             otherData: {
                 floorId: dept?.otherData?.floorId || null,
                 roomId: dept?.otherData?.roomId || null,
@@ -216,7 +216,7 @@ function Departments() {
                                         setForm({
                                             departmentName: "",
                                             type: "OPD",
-                                            headOfDepartment: "",
+                                            headOfDepartment: null,
                                             employees: [],
                                             otherData: {
                                                 floorId: null,
@@ -378,7 +378,7 @@ function Departments() {
                                                 <select
                                                     className="form-select custom-select"
                                                     value={form.headOfDepartment}
-                                                    required
+                                                    
                                                     onChange={(e) =>
                                                         setForm({ ...form, headOfDepartment: e.target.value })
                                                     }
@@ -491,8 +491,8 @@ function Departments() {
                                             <div className="custom-frm-bx ">
                                                 <label htmlFor="">Type</label>
 
-                                                <div className="custom-radio-group">
-                                                    <div className="form-check form-check-inline">
+                                                <div className="custom-radio-group d-flex flex-wrap ">
+                                                    <div className=" form-check form-check-inline">
                                                         <input
                                                             type="radio"
                                                             name="type"
@@ -545,6 +545,19 @@ function Departments() {
                                                             LAB
                                                         </label>
                                                     </div>
+                                                    <div className="form-check form-check-inline">
+                                                        <input
+                                                            type="radio"
+                                                            name="type"
+                                                            value="PHARMACY"
+                                                            id="pharRadio"
+                                                            checked={form.type === "PHARMACY"}
+                                                            onChange={(e) => setForm({ ...form, type: e.target.value })}
+                                                        />
+                                                        <label className="form-check-label ms-1" htmlFor="pharRadio">
+                                                            PHARMACY
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -559,7 +572,6 @@ function Departments() {
                                                     <select
                                                         className="form-select custom-select"
                                                         value={form?.otherData?.floorId}
-                                                        required
                                                         onChange={(e) => {
                                                             const value = e.target.value;
 
@@ -590,7 +602,6 @@ function Departments() {
                                                         <select
                                                             className="form-select custom-select"
                                                             value={form?.otherData?.roomId}
-                                                            required
                                                             onChange={(e) => {
                                                                 const value = e.target.value;
 
@@ -673,7 +684,7 @@ function Departments() {
                                                 <select
                                                     className="form-select custom-select"
                                                     value={form.headOfDepartment}
-                                                    required
+                                                    
                                                     onChange={(e) =>
                                                         setForm({ ...form, headOfDepartment: e.target.value })
                                                     }
@@ -786,7 +797,7 @@ function Departments() {
                                             <div className="custom-frm-bx ">
                                                 <label htmlFor="">Type</label>
 
-                                                <div className="custom-radio-group">
+                                                <div className="custom-radio-group d-flex flex-wrap">
                                                     <div className="form-check form-check-inline">
                                                         <input
                                                             type="radio"
@@ -846,6 +857,19 @@ function Departments() {
                                                         />
                                                         <label className="form-check-label ms-1" htmlFor="labRadio">
                                                             LAB
+                                                        </label>
+                                                    </div>
+                                                    <div className="form-check form-check-inline">
+                                                        <input
+                                                            type="radio"
+                                                            name="type"
+                                                            value="PHARMACY"
+                                                            id="pharRadio"
+                                                            checked={form.type === "PHARMACY"}
+                                                            onChange={(e) => setForm({ ...form, type: e.target.value })}
+                                                        />
+                                                        <label className="form-check-label ms-1" htmlFor="pharRadio">
+                                                            PHARMACY
                                                         </label>
                                                     </div>
                                                 </div>

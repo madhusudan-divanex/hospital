@@ -22,7 +22,7 @@ function Dashboard() {
   const [selected, setSelected] = useState()
   const [departments, setDepartments] = useState([])
   const dispatch = useDispatch()
-  const { staffUser } = useSelector(state => state.user)
+  const { staffUser ,isOwner} = useSelector(state => state.user)
   const [nextStep, setNextStep] = useState()
   const [profileComlete, setProfileComplete] = useState(0)
   const [doctorId, setDoctorId] = useState('')
@@ -199,7 +199,7 @@ function Dashboard() {
               </div>
             </div>
           </div>
-          {nextStep && <div className="row mb-3">
+          {nextStep && isOwner && <div className="row mb-3">
             <div className="col-10">
               <div className="progress-container">
                 <span

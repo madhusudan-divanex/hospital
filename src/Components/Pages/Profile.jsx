@@ -17,6 +17,7 @@ import html2canvas from "html2canvas";
 import Loader from "../Common/Loader";
 import { securePostData } from "../../Service/api";
 import { QRCodeCanvas } from "qrcode.react";
+import { Hospital } from "lucide-react";
 function Profile() {
   const navigate = useNavigate();
 
@@ -32,11 +33,7 @@ function Profile() {
   useEffect(() => {
     loadProfile();
   }, []);
-  useEffect(() => {
-    if (localStorage.getItem('doctorId')) {
-      navigate('/dashboard')
-    }
-  }, [])
+
 
   async function loadProfile() {
     try {
@@ -379,11 +376,13 @@ function Profile() {
 
                                   <div className="d-flex align-items-center justify-content-center gap-2 carding-bx">
                                     <div ref={cardRef} className="add-patients-clients">
-                                      <div className="chip-card"></div>
-                                      <img src="/hospital-card.png" alt="" />
+                                      <div className="nw-chip-card">
+                                        {/* <Hospital color="#fff" size={50}/> */}
+                                      </div>
+                                      <img src="/NeoCard.png" alt="" />
                                       <div className="patient-card-details">
-                                        <h4>{basic.hospitalName}</h4>
-                                        <p>Hospital ID</p>
+                                        <h4>{basic.hospitalName?.length > 17 ? basic?.hospitalName(0, 14) + '...' : basic?.hospitalName}</h4>
+                                        {/* <p>Hospital ID</p> */}
                                         <h6>{user?.nh12}</h6>
                                       </div>
                                       <div className="qr-code-generate">
@@ -391,6 +390,8 @@ function Profile() {
                                           value={`https://www.neohealthcard.com/user/${user?.nh12}`}
                                           size={256}
                                           // className="qr-code"
+                                          bgColor="transparent"
+                                          fgColor="#ffffff"
                                           style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                                         />
                                       </div>

@@ -26,7 +26,7 @@ function LabCollection() {
         try {
             const response = await getSecureApiData(`lab/appointment-data/${appointmentId}`)
             if (response.success) {
-                setTestId(response.data.testId)
+                setTestId(response.data.subCatId)
                 setAppointmentData(response.data)
             } else {
                 toast.error(response.message)
@@ -42,7 +42,7 @@ function LabCollection() {
     }, [appointmentId])
     const fetchTestReport = async (testId) => {
         try {
-            const payload = { testId, appointmentId };
+            const payload = {subCatId: testId, appointmentId };
             const response = await securePostData('lab/test-report-data', payload);
 
             if (response.success && response.data) {
@@ -71,7 +71,7 @@ function LabCollection() {
 
             for (const id of testId) {
                 try {
-                    const response = await getSecureApiData(`lab/test-data/${id._id}`);
+                    const response = await getSecureApiData(`api/comman/sub-test-category-data/${id._id}`);
                     if (response.success) {
                         const test = response.data;
 
@@ -181,7 +181,7 @@ function LabCollection() {
                                                     <div className="laboratory-bill-bx">
                                                         <p><span className="laboratory-phne">Code :</span> {item?.code}</p>
                                                         <p><span className="laboratory-phne">Test :</span> {item?.shortName}</p>
-                                                        <p><span className="laboratory-phne text-capitalize">Category :</span> {item?.testCategory}</p>
+                                                        <p><span className="laboratory-phne text-capitalize">Category :</span> {item?.category?.name}</p>
                                                         <p><span className="laboratory-phne">Special Approval :</span> {item?.specialApproval ? 'Yes' : 'No'}</p>
                                                         <p><span className="laboratory-phne text-capitalize">Fasting :</span> {item?.fastingRequired ? 'Yes' : 'No'}</p>
                                                     </div>

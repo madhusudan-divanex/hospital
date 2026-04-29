@@ -24,7 +24,7 @@ function PatientsOPD() {
     const fetchPatients = async (ptStatus = status) => {
         try {
             setLoading(true);
-            const res = await API.get(`/patients/list?deptType=OPD&status=${ptStatus}`, {
+            const res = await API.get(`/patients/list?deptType=OPD&status=Active`, {
                 params: { page, limit, search }
             });
             if (res.data?.success) {
@@ -73,7 +73,7 @@ function PatientsOPD() {
     };
 
 
-    const toggleStatus = async (id, status) => {
+    const toggleStatus = async (patientId,id, status) => {
         const result = await Swal.fire({
             title: "Inactivate Patient?",
             text: "Patient will be marked inactive",
@@ -85,7 +85,8 @@ function PatientsOPD() {
         try {
             const res = await API.put(`/patients/${id}`, {
                 status: status === "Active" ? "Inactive" : "Active",
-                patientId: id
+                ptDeptId: id,
+                patientId
             });
             if (!res.data.success) {
                 toast.error(res.data.message)
@@ -188,7 +189,7 @@ function PatientsOPD() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="dropdown">
+                                        {/* <div className="dropdown">
                                             <a href="#" className="nw-filtr-btn" id="acticonMenus" data-bs-toggle="dropdown"
                                                 aria-expanded="false">
                                                 <FontAwesomeIcon icon={faFilter} />
@@ -249,7 +250,7 @@ function PatientsOPD() {
                                                 </div>
 
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div>
                                             <button className="nw-filtr-btn" onClick={downloadPatients}><FontAwesomeIcon icon={faDownload} /></button>
                                         </div>
@@ -298,7 +299,7 @@ function PatientsOPD() {
                                                         <td>{(page - 1) * limit + index + 1}.</td>
 
                                                         <td>
-                                                            <div className="admin-table-bx">
+                                                            <Link to={`/patient-view/${p?._id}`} className="admin-table-bx">
                                                                 <div className="admin-table-sub-bx">
                                                                     <img src={p?.patientUser?.profileImage ?
                                                                         `${base_url}/${p?.patientUser?.profileImage}` : "/profile.png"} alt=""
@@ -311,7 +312,7 @@ function PatientsOPD() {
                                                                         <p>{p?.nh12 || p?.unique_id}</p>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            </Link>
                                                         </td>
 
                                                         <td>
@@ -328,7 +329,7 @@ function PatientsOPD() {
                                                         </td>
 
                                                         <td>
-                                                            <div className="dropdown">
+                                                            <div className="dropdown position-static">
                                                                 <a className="grid-dots-btn" data-bs-toggle="dropdown">
                                                                     <TbGridDots />
                                                                 </a>
@@ -348,7 +349,7 @@ function PatientsOPD() {
                                                                         <a
                                                                             className="prescription-nav"
                                                                             href="#"
-                                                                            onClick={() => toggleStatus(p._id, p?.departmentInfo?.status)}
+                                                                            onClick={() => toggleStatus(p?._id,p?.departmentInfo?._id, p?.departmentInfo?.status)}
                                                                         >
                                                                             {p?.departmentInfo?.status === "Active" ? "Inactivate" : "Activate"}
                                                                         </a>

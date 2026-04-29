@@ -5,12 +5,12 @@ import api from "../../api/api";
 import Loader from '../Common/Loader';
 import { toast } from 'react-toastify';
 import { getSecureApiData, securePostData } from '../../Service/api';
-function DepartmentTransfer({ data,getData }) {
+function DepartmentTransfer({ data, getData }) {
     const [loading, setLoading] = useState()
     const [selectedDepartment, setSelectedDepartment] = useState()
     const [departments, setDepartments] = useState([])
     const [beds, setBeds] = useState([])
-    const [selectedBed, setSelectedBed] = useState([])
+    const [selectedBed, setSelectedBed] = useState()
     const [doctors, setDoctors] = useState([])
     const [reason, setReason] = useState('')
     const [doctorNh12, setDoctorNh12] = useState()
@@ -63,14 +63,14 @@ function DepartmentTransfer({ data,getData }) {
             reason,
             allotmentId: data?.allotmentId,
         }
-        if(!selectedBed || !selectedDepartment || !doctorNh12 || !reason){
+        if (!selectedBed || !selectedDepartment || !doctorNh12 || !reason) {
             return toast.error("Please fill all fileds")
         }
         setIsSaving(true)
         try {
             const res = await securePostData('api/bed/department-transfer', sendData)
             if (res.success) {
-                document?.getElementById?.("deptClose")?.click()
+                handleCloseDeptModal()
                 getData()
             }
             toast.success(res.message)
@@ -80,24 +80,51 @@ function DepartmentTransfer({ data,getData }) {
             setIsSaving(false)
         }
     }
+    const handleCloseDeptModal = () => {
+        const modalEl = document.getElementById("department-Transfer");
+        if (!modalEl) return;
+
+        // Bootstrap 5 ka instance lo, agar nahi hai toh naya banao
+        const modalInstance =
+            window.bootstrap?.Modal.getInstance(modalEl) ||
+            new window.bootstrap.Modal(modalEl);
+
+        modalInstance.hide();
+
+        // hide ke baad manually backdrop + body cleanup (static backdrop ke liye safety net)
+        modalEl.addEventListener(
+            "hidden.bs.modal",
+            () => {
+                document.body.classList.remove("modal-open");
+                document.body.style.overflow = "";
+                document.body.style.paddingRight = "";
+                document
+                    .querySelectorAll(".modal-backdrop")
+                    .forEach((el) => el.remove());
+            },
+            { once: true }
+        );
+    };
+    const filteredDepartments = departments?.filter(d => d?._id !== data?.departmentId);
     return (
         <>
-            {loading ? <Loader /> :
-                <div className="modal step-modal fade" id="department-Transfer" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
-                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div className="modal-dialog modal-dialog-centered modal-md">
-                        <div className="modal-content rounded-0">
-                            <div className="d-flex align-items-center justify-content-between border-bottom py-3 px-4">
-                                <div>
-                                    <h6 className="lg_title mb-0">Department transfer</h6>
-                                </div>
-                                <div>
-                                    <button type="button" className="" id="deptClose" data-bs-dismiss="modal" aria-label="Close" style={{ color: "rgba(239, 0, 0, 1)" }}>
-                                        <FontAwesomeIcon icon={faCircleXmark} />
-                                    </button>
-                                </div>
+            <div className="modal step-modal fade" id="department-Transfer" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-md">
+                    <div className="modal-content rounded-0">
+                        <div className="d-flex align-items-center justify-content-between border-bottom py-3 px-4">
+                            <div>
+                                <h6 className="lg_title mb-0">Department transfer</h6>
                             </div>
-                            <div className="modal-body pb-5 px-4 pb-5">
+                            <div>
+                                <button type="button" onClick={handleCloseDeptModal} className="" id="deptClose" aria-label="Close"
+                                    style={{ color: "rgba(239, 0, 0, 1)" }}>
+                                    <FontAwesomeIcon icon={faCircleXmark} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="modal-body pb-5 px-4 pb-5">
+                            {loading ? <Loader /> :
                                 <div className="row justify-content-center">
                                     <div className="col-lg-10">
                                         <div className="add-deprtment-pic">
@@ -108,46 +135,47 @@ function DepartmentTransfer({ data,getData }) {
                                         <form onSubmit={transferSubmit}>
                                             <div className="custom-frm-bx">
                                                 <label htmlFor="">Departments</label>
-                                                {departments?.filter(d => d?._id !== data?.departmentId)?.length > 0 ? <select name="" id="" className='form-select' value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
-                                                    <option value="">----Select Department----</option>
-                                                    {departments?.filter(d => d?._id !== data?.departmentId)?.map((item, key) =>
-                                                        <option value={item?._id} key={key}>{item?.departmentName}</option>)}
-                                                </select> :
-                                                    'No other department found'}
-                                            </div>
-                                            <div className="custom-frm-bx">
-                                                <label htmlFor="">Department Beds</label>
-                                                {(beds?.length > 0 && selectedDepartment) ?
-                                                    <select name="" id="" className='form-select' value={selectedBed} onChange={(e) => setSelectedBed(e.target.value)}>
+                                                {filteredDepartments?.length > 0 ?
+                                                    <select name="" id="" className='form-select' value={selectedDepartment}
+                                                        onChange={(e) => setSelectedDepartment(e.target.value)}>
                                                         <option value="">----Select Department----</option>
-                                                        {beds?.map((item, key) =>
-                                                            <option value={item?._id} key={key}>{item?.bedName}</option>)}
+                                                        {filteredDepartments?.map((item, key) =>
+                                                            <option value={item?._id} key={key}>{item?.departmentName}</option>)}
                                                     </select> :
-                                                    'No bed found in this department'}
+                                                    <h4 className='fz-14'> No other department found</h4>}
                                             </div>
-                                            <div className="custom-frm-bx">
-                                                <label htmlFor="">Attending Doctor</label>
-                                                <input type="number" className='form-control' value={doctorNh12} onChange={(e) => setDoctorNh12(e.target.value)} />
-
-                                            </div>
-                                            <div className="custom-frm-bx">
-                                                <label htmlFor="">Reson</label>
-                                                <textarea className='form-control' value={reason} onChange={(e) => setReason(e.target.value)} >
-                                                </textarea>
-
-                                            </div>
-
-                                            <div className="mt-3">
-                                                <button type="submit" disabled={isSaving} className="nw-thm-btn w-100"> {isSaving?'Submiting....':'Submit'}</button>
-                                            </div>
+                                            {filteredDepartments?.length > 0
+                                                && <>
+                                                    <div className="custom-frm-bx">
+                                                        <label htmlFor="">Department Beds</label>
+                                                        {(beds?.length > 0) ?
+                                                            <select name="" id="" className='form-select' value={selectedBed} onChange={(e) => setSelectedBed(e.target.value)}>
+                                                                <option value="">----Select Bed----</option>
+                                                                {beds?.map((item, key) =>
+                                                                    <option value={item?._id} key={key}>{item?.bedName}</option>)}
+                                                            </select> :
+                                                            <h4 className='fz-14'>No bed found in this department</h4>}
+                                                    </div>
+                                                    <div className="custom-frm-bx">
+                                                        <label htmlFor="">Attending Doctor</label>
+                                                        <input type="number" className='form-control' value={doctorNh12} onChange={(e) => setDoctorNh12(e.target.value)} />
+                                                    </div>
+                                                    <div className="custom-frm-bx">
+                                                        <label htmlFor="">Reson</label>
+                                                        <textarea className='form-control' value={reason} onChange={(e) => setReason(e.target.value)}>
+                                                        </textarea>
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <button type="submit" disabled={isSaving} className="nw-thm-btn w-100"> {isSaving ? 'Submiting....' : 'Submit'}</button>
+                                                    </div>
+                                                </>}
                                         </form>
-
                                     </div>
-                                </div>
-                            </div>
+                                </div>}
                         </div>
                     </div>
-                </div>}
+                </div>
+            </div>
         </>
     )
 }

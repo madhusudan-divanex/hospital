@@ -394,8 +394,8 @@ function TestReportsAppointment() {
                                                             </td>
                                                             <td>
                                                                 <ul className="admin-test-list">
-                                                                    {item?.testId?.map((test, key) =>
-                                                                        <li className="admin-test-item" key={key}>{test?.shortName}</li>)}
+                                                                    {item?.subCatId?.map((test, key) =>
+                                                                        <li className="admin-test-item" key={key}>{test?.subCategory}</li>)}
                                                                     {/* <li className="admin-test-item">Haemoglobin</li> */}
                                                                 </ul>
                                                             </td>
@@ -446,7 +446,7 @@ function TestReportsAppointment() {
                                                                     <FontAwesomeIcon icon={faGear} /> Action
                                                                 </a>
 
-                                                                <div className="dropdown">
+                                                                <div className="dropdown position-static">
                                                                     <a
                                                                         href="javascript:void(0)"
                                                                         className="attendence-edit-btn"

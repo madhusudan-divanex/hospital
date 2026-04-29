@@ -12,7 +12,7 @@ function AddAllotmentTest({ allotmentId }) {
   const [testOptions, setTestOptions] = useState([])
   const user = JSON.parse(localStorage.getItem('user'))
   const [selectedTest, setSelectedTest] = useState([])
-  const [isSaving,setIsSaving]=useState()
+  const [isSaving, setIsSaving] = useState()
   const userId = user.id
   const fetchDetails = async () => {
     if (!allotmentId) {
@@ -32,7 +32,6 @@ function AddAllotmentTest({ allotmentId }) {
       setLoading(false);
     }
   };
-  console.log(allotmentDetail)
   useEffect(() => {
     if (allotmentId) {
       fetchDetails()
@@ -47,7 +46,7 @@ function AddAllotmentTest({ allotmentId }) {
       if (res.success) {
         document.getElementById("closeTest")?.click()
         toast.success("Test added successfully")
-      }else{
+      } else {
         toast.error(res.message)
       }
     } catch (error) {
@@ -74,11 +73,33 @@ function AddAllotmentTest({ allotmentId }) {
     }
   }
   useEffect(() => {
-    fetchSelectedLabData()
+    if(allotmentId){
+      fetchSelectedLabData()
+    }
   }, [allotmentId])
+  const handleCloseModal = () => {
+    const modal = document.getElementById("add-LabTest");
+
+    if (modal) {
+      modal.classList.remove("show");
+      modal.style.display = "none";
+    }
+
+    // remove backdrop
+    const backdrops = document.getElementsByClassName("modal-backdrop");
+    while (backdrops.length > 0) {
+      backdrops[0].parentNode.removeChild(backdrops[0]);
+    }
+
+    // remove body class
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+  };
   return (
     <>
-      {loading ? <Loader /> : <div className="modal step-modal fade" id="add-LabTest" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
+      {loading ? <Loader /> : 
+      <div className="modal step-modal fade" id="add-LabTest" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content rounded-0">
@@ -87,7 +108,7 @@ function AddAllotmentTest({ allotmentId }) {
                 <h6 className="lg_title mb-0">{allotmentDetail?.labAppointment ? 'View' : 'Add'}  Lab Test </h6>
               </div>
               <div>
-                <button type="button" className="" id="closeTest" data-bs-dismiss="modal" aria-label="Close" style={{ color: "rgba(239, 0, 0, 1)" }}>
+                <button type="button" className="" id="closeTest" onClick={handleCloseModal} aria-label="Close" style={{ color: "rgba(239, 0, 0, 1)" }}>
                   <FontAwesomeIcon icon={faCircleXmark} />
                 </button>
               </div>
@@ -122,7 +143,7 @@ function AddAllotmentTest({ allotmentId }) {
                     </div>
 
                     <div className="mt-3">
-                      <button type="submit" className="nw-thm-btn w-100" disabled={isSaving}> {isSaving?'Submiting...':'Submit'}</button>
+                      <button type="submit" className="nw-thm-btn w-100" disabled={isSaving}> {isSaving ? 'Submiting...' : 'Submit'}</button>
                     </div>
                   </form>
 

@@ -147,7 +147,7 @@ function TestReport() {
 
     const fetchTestReport = async (testId) => {
         try {
-            const payload = { testId, appointmentId: appointMentId };
+            const payload = {subCatId: testId, appointmentId: appointMentId };
             const response = await securePostData('lab/test-report-data', payload);
 
             if (response.success && response.data) {
@@ -203,7 +203,7 @@ function TestReport() {
 
             for (const id of testId) {
                 try {
-                    const response = await getSecureApiData(`lab/test-data/${id._id}`);
+                    const response = await getSecureApiData(`api/comman/sub-test-category-data/${id._id}`);
                     if (response.success) {
                         const test = response.data;
 

@@ -261,7 +261,7 @@ function AppointmentRequest() {
                                                         <td>{item?.status == 'pending' ? <span className="approved approved-active leaved">Pending </span>
                                                             : <span className="approved approved-active inactive text-capitalize">{item?.status} </span>}</td>
                                                         <td>
-                                                            <div className="dropdown">
+                                                            <div className="dropdown position-static">
                                                                 <a
                                                                     href="javascript:void(0)"
                                                                     className="grid-dots-btn"

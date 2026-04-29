@@ -1,29 +1,37 @@
 import { TbGridDots } from "react-icons/tb";
-import { faDownload, faFilter, faSearch, } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faDownload, faFilter, faSearch, } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import API from "../../api/api";
 import { toast } from "react-toastify";
 import Loader from "../Common/Loader";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import base_url from "../../baseUrl";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import DailyIPDNotes from "./DailyIPDNotes";
+import AllotmentPayment from "./AllotmentPayment";
+import AddAllotmentTest from "./AddAllotmentTest";
+import DepartmentTransfer from "./DepartmentTransfer";
 function PatientsIPD() {
     const [patients, setPatients] = useState([]);
     const [page, setPage] = useState(1);
+    const navigate = useNavigate()
     const [totalPages, setTotalPages] = useState(1);
     const [limit, setLimit] = useState(10);
     const [search, setSearch] = useState("");
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('')
-
+    const [selectedAllotment, setSelectedAllotment] = useState()
+    const [notesData, setNotesData] = useState({ allotmentId: null })
+    const [openDailyNotes, setOpenDailyNotes] = useState(false);
+    const [deptTransfer,setDepartmentTransfer]=useState({_id:null,departmentId:null,allotmentId:null})
     const fetchPatients = async (ptStatus = status) => {
         try {
             setLoading(true);
-            const res = await API.get(`/patients/list?deptType=IPD&status=${ptStatus}`, {
+            const res = await API.get(`/hospital/ipd-patient?deptType=IPD&status=Active`, {
                 params: { page, limit, search }
             });
             if (res.data.success) {
@@ -71,7 +79,7 @@ function PatientsIPD() {
     };
 
 
-    const toggleStatus = async (id, status) => {
+    const toggleStatus = async (patientId,id, status) => {
         const result = await Swal.fire({
             title: "Inactivate Patient?",
             text: "Patient will be marked inactive",
@@ -81,13 +89,14 @@ function PatientsIPD() {
         });
         if (!result.isConfirmed) return;
         try {
-            const res=await API.put(`/patients/${id}`, {
+            const res = await API.put(`/patients/${id}`, {
                 status: status === "Active" ? "Inactive" : "Active",
-                patientId: id
+                ptDeptId: id,
+                patientId
             });
-            if(!res.data.success){
+            if (!res.data.success) {
                 toast.error(res.data.message)
-            }else{
+            } else {
                 fetchPatients();
             }
         } catch {
@@ -123,8 +132,23 @@ function PatientsIPD() {
         saveAs(fileData, "IPD_Patients_List.xlsx");
     };
 
+    const closeModal = () => {
+        const modalEl = document.getElementById("bed-Option");
+        const modal = window.bootstrap?.Modal.getInstance(modalEl);
 
+        if (modal) {
+            modal.hide();
+        }
+    };
+    const handleButtonClick = (path) => {
+        const modalEl = document.getElementById("bed-Option");
+        const modal = window.bootstrap?.Modal.getInstance(modalEl);
 
+        if (modal) {
+            modal.hide();
+        }
+        navigate(path)
+    }
     return (
         <>
             {loading ? <Loader />
@@ -186,7 +210,7 @@ function PatientsIPD() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="dropdown">
+                                        {/* <div className="dropdown">
                                             <a href="#" className="nw-filtr-btn" id="acticonMenus" data-bs-toggle="dropdown"
                                                 aria-expanded="false">
                                                 <FontAwesomeIcon icon={faFilter} />
@@ -247,7 +271,7 @@ function PatientsIPD() {
                                                 </div>
 
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div>
                                             <button className="nw-filtr-btn" onClick={downloadPatients} ><FontAwesomeIcon icon={faDownload} /></button>
                                         </div>
@@ -280,6 +304,7 @@ function PatientsIPD() {
                                                     <th>Contact</th>
                                                     <th>Status</th>
                                                     <th>Action</th>
+                                                    {/* <th>Allotment Action</th> */}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -296,7 +321,7 @@ function PatientsIPD() {
                                                         <td>{(page - 1) * limit + index + 1}.</td>
 
                                                         <td>
-                                                            <div className="admin-table-bx">
+                                                            <Link to={`/patient-view/${p?._id}`} className="admin-table-bx">
                                                                 <div className="admin-table-sub-bx">
                                                                     <img src={p?.patientUser?.profileImage ?
                                                                         `${base_url}/${p?.patientUser?.profileImage}` : "/profile.png"} alt=""
@@ -309,7 +334,7 @@ function PatientsIPD() {
                                                                         <p>{p?.nh12 || p?.unique_id}</p>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            </Link>
                                                         </td>
 
                                                         <td>
@@ -320,13 +345,13 @@ function PatientsIPD() {
                                                         </td>
 
                                                         <td>
-                                                            <span className={`approved ${p?.departmentInfo?.status === "Active" ? "approved-active" : " approved-active inactive"}`}>
+                                                            <span style={{ cursor: 'pointer' }} onClick={() => toggleStatus(p?._id,p?.departmentInfo?._id, p?.departmentInfo?.status)} className={`approved ${p?.departmentInfo?.status === "Active" ? "approved-active" : " approved-active inactive"}`}>
                                                                 {p?.departmentInfo?.status}
                                                             </span>
                                                         </td>
 
-                                                        <td>
-                                                            <div className="dropdown">
+                                                        {/* <td>
+                                                            <div className="dropdown position-static">
                                                                 <a className="grid-dots-btn" data-bs-toggle="dropdown">
                                                                     <TbGridDots />
                                                                 </a>
@@ -351,17 +376,15 @@ function PatientsIPD() {
                                                                             {p?.departmentInfo?.status === "Active" ? "Inactivate" : "Activate"}
                                                                         </a>
                                                                     </li>
-                                                                    {/* <li>
-                                                                        <a
-                                                                            className="prescription-nav text-danger"
-                                                                            href="#"
-                                                                            onClick={() => deletePatient(p?.departmentInfo?._id)}
-                                                                        >
-                                                                            Delete
-                                                                        </a>
-                                                                    </li> */}
                                                                 </ul>
                                                             </div>
+                                                        </td> */}
+                                                        <td>
+                                                            {p?.departmentInfo?.allotmentId ?
+                                                                <a className="grid-dots-btn" onClick={() => setSelectedAllotment(p?.allotmentInfo)} href="#"
+                                                                    data-bs-toggle="modal" data-bs-target="#bed-Option">
+                                                                    <TbGridDots />
+                                                                </a> : <Link to={`/bed-management?patientId=${p?._id}`} className="nw-thm-btn">Allot Bed</Link>}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -384,6 +407,160 @@ function PatientsIPD() {
                         </Link>
                     </div>
                 </div>}
+            <div
+                className="modal step-modal fade"
+                id="bed-Option"
+                tabIndex="-1"
+                aria-labelledby="staticBackdropLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered modal-sm">
+                    <div className="modal-content rounded-4">
+                        <div className="modal-body pb-2 px-4">
+                            <div className="">
+                                <ul className="bed-management-list">
+                                    <li className="bed-list-item">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleButtonClick(`/allotment-details/${selectedAllotment?._id}`)}
+                                            data-bs-dismiss="modal"
+                                            className="bed-nav-link"
+                                        >
+                                            View Details
+                                            <span className="nw-chevron-btn">
+
+                                                <FontAwesomeIcon icon={faChevronRight} />
+                                            </span>
+                                        </button>
+                                    </li>
+
+                                    <li className="bed-list-item">
+                                        <a
+                                            href="#"
+                                            className="bed-nav-link"
+                                            data-bs-toggle="modal"
+                                            onClick={closeModal}
+                                            data-bs-target="#add-Payment"
+                                        >
+                                            Add Payment
+                                            <span className="nw-chevron-btn">
+                                                <FontAwesomeIcon icon={faChevronRight} />
+                                            </span>
+                                        </a>
+                                    </li>
+                                    {!selectedAllotment?.dischargeId &&
+                                        <>
+                                            <li className="bed-list-item">
+                                                <button
+                                                    type="button"
+                                                    className="bed-nav-link"
+                                                    onClick={() => handleButtonClick(`/edit-allotment/${selectedAllotment?._id}`)}
+                                                    data-bs-dismiss="modal"
+                                                >
+                                                    Edit Allotment
+                                                    <span className="nw-chevron-btn">
+                                                        <FontAwesomeIcon icon={faChevronRight} />
+                                                    </span>
+                                                </button>
+                                            </li>
+                                            <li className="bed-list-item">
+                                                <button
+                                                    type="button"
+                                                    className="bed-nav-link"
+                                                    onClick={() => handleButtonClick(`/allotment/prescription-data/${selectedAllotment?._id}`)}
+                                                    data-bs-dismiss="modal"
+                                                >
+                                                    Add Prescriptions
+                                                    <span className="nw-chevron-btn">
+
+                                                        <FontAwesomeIcon icon={faChevronRight} />
+                                                    </span>
+                                                </button>
+                                               
+                                            </li>
+                                            <li className="bed-list-item">
+                                                <a
+                                                    href="#"
+                                                    className="bed-nav-link"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#department-Transfer"
+                                                    data-bs-dismiss="modal"
+                                                    onClick={(e)=>{
+                                                        e.preventDefault()
+                                                        setDepartmentTransfer({_id:selectedAllotment?.bedId,
+                                                            allotmentId:selectedAllotment?._id,
+                                                            departmentId:selectedAllotment?.departmentId
+                                                        })
+                                                    }}
+                                                >
+                                                    Department Transfer
+                                                    <span className="nw-chevron-btn">
+                                                        <FontAwesomeIcon icon={faChevronRight} />
+                                                    </span>
+                                                </a>
+                                            </li>
+
+                                            <li className="bed-list-item">
+                                                <button
+                                                    className="bed-nav-link"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#add-LabTest"
+                                                    onClick={closeModal}
+                                                >
+                                                    Add Lab Test
+                                                    <span className="nw-chevron-btn">
+                                                        <FontAwesomeIcon icon={faChevronRight} />
+                                                    </span>
+                                                </button>
+                                            </li>
+                                            <li className="bed-list-item">
+                                                <a
+                                                    href="#"
+                                                    className="bed-nav-link"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-dismiss="modal"
+                                                    data-bs-target="#add-IPD-Notes"
+                                                    onClick={() => {
+                                                        setNotesData({ allotmentId: selectedAllotment?._id })
+                                                        setOpenDailyNotes(true)
+                                                    }}
+                                                >
+                                                    Add Daily Notes
+                                                    <span className="nw-chevron-btn">
+                                                        <FontAwesomeIcon icon={faChevronRight} />
+                                                    </span>
+                                                </a>
+                                            </li>
+                                            <li className="bed-list-item">
+                                                <button onClick={() => handleButtonClick(`/discharge/${selectedAllotment?._id}`)}
+                                                    data-bs-dismiss="modal" className="bed-nav-link">
+                                                    Discharge Patient
+                                                    <span className="nw-chevron-btn">
+                                                        <FontAwesomeIcon icon={faChevronRight} />
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        </>}
+                                    <li className="bed-list-item">
+                                        <button onClick={() => handleButtonClick(`/daily-ipd-history?allotment=${selectedAllotment?._id}`)}
+                                            data-bs-dismiss="modal"
+                                            className="bed-nav-link" >
+                                            Notes History
+                                            <span className="nw-chevron-btn">
+                                                <FontAwesomeIcon icon={faChevronRight} />
+                                            </span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <DailyIPDNotes data={notesData} openTrigger={openDailyNotes} />
+            <AddAllotmentTest allotmentId={selectedAllotment?._id} />
+            <AllotmentPayment allotmentId={selectedAllotment?._id} getData={fetchPatients} />
+            <DepartmentTransfer data={deptTransfer} getData={fetchPatients} />
         </>
     )
 }

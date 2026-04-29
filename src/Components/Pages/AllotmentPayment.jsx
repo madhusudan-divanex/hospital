@@ -20,11 +20,11 @@ function AllotmentPayment({ allotmentId, getData }) {
     const [pdfLoading, setPdfLoading] = useState(null)
     const [isDiscount, setIsDiscount] = useState(false)
     const [discountValue, setDiscountValue] = useState(null)
-    const [havePayment,setHavePayment]=useState(false)
+    const [havePayment, setHavePayment] = useState(false)
     const [discountType, setDiscountType] = useState('')
     const userId = user?.id
     const [showDownload, setShowDownload] = useState(false);
-    const [isSaving,setIsSaving]=useState(false)
+    const [isSaving, setIsSaving] = useState(false)
     const [formData, setFormData] = useState({
         services: [{ name: "", amount: "" }],
         ipdPayment: [],
@@ -180,7 +180,7 @@ function AllotmentPayment({ allotmentId, getData }) {
 
         // 🚨 FINAL CHECK
         if (!validateAmounts()) return;
-        
+
         try {
             setIsSaving(true)
             let data = {
@@ -219,7 +219,7 @@ function AllotmentPayment({ allotmentId, getData }) {
             document.getElementById('closeModal')?.click();
         } catch (error) {
             toast.error(error?.response?.data?.messsage || "Something went wrong");
-        } finally{
+        } finally {
             setIsSaving(false)
         }
     };
@@ -239,8 +239,8 @@ function AllotmentPayment({ allotmentId, getData }) {
             0
         );
 
-        return serviceTotal + ipdTotal +bedTotal;
-    }, [formData.services, formData.ipdPayment,formData?.bedCharges]);
+        return serviceTotal + ipdTotal + bedTotal;
+    }, [formData.services, formData.ipdPayment, formData?.bedCharges]);
     useEffect(() => {
         setTotalAmount(totalAm)
         setFinalAmount(totalAm)
@@ -300,6 +300,25 @@ function AllotmentPayment({ allotmentId, getData }) {
         // setSelectedReport({ appointmentId });
         setShowDownload(true);
     };
+    const handleCloseModal = () => {
+        const modal = document.getElementById("add-Payment");
+
+        if (modal) {
+            modal.classList.remove("show");
+            modal.style.display = "none";
+        }
+
+        // remove backdrop
+        const backdrops = document.getElementsByClassName("modal-backdrop");
+        while (backdrops.length > 0) {
+            backdrops[0].parentNode.removeChild(backdrops[0]);
+        }
+
+        // remove body class
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+    };
     return (
         <>
             {loading ? <Loader />
@@ -313,8 +332,8 @@ function AllotmentPayment({ allotmentId, getData }) {
                                 </div>
                                 <div>
                                     {/* {havePayment && <button className="print-btn no-print" onClick={handleReportDownload}> <FontAwesomeIcon icon={faDownload} /> Download PDF</button>} */}
-                                
-                                    <button type="button" className="" data-bs-dismiss="modal" aria-label="Close" style={{ color: "#00000040" }}>
+
+                                    <button type="button" className="" onClick={handleCloseModal} aria-label="Close" style={{ color: "#00000040" }}>
                                         <FontAwesomeIcon icon={faCircleXmark} />
                                     </button>
                                 </div>
@@ -418,7 +437,7 @@ function AllotmentPayment({ allotmentId, getData }) {
                                             </div>)}
 
                                     </div>
-                                    {formData?.bedCharges?.length>0 &&  <div className="my-3">
+                                    {formData?.bedCharges?.length > 0 && <div className="my-3">
                                         <h5 className="add-contact-title text-black mb-3">Bed Charges</h5>
 
 
@@ -639,7 +658,7 @@ function AllotmentPayment({ allotmentId, getData }) {
 
                                     <div className="d-flex gap-3 justify-content-end">
                                         <button className="nw-thm-btn outline" type='button' id='closeModal' data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                                        <button className="nw-thm-btn w-auto" type='submit' disabled={isSaving}>{isSaving?'Saving...':'Save'} Payment</button>
+                                        <button className="nw-thm-btn w-auto" type='submit' disabled={isSaving}>{isSaving ? 'Saving...' : 'Save'} Payment</button>
                                     </div>
 
                                 </form>
