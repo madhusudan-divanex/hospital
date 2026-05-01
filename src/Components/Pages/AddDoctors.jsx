@@ -15,7 +15,7 @@ import base_url from "../../baseUrl";
 import { useSelector } from "react-redux";
 function AddDoctors() {
     const { id } = useParams();
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const isEdit = Boolean(id);
     const { user } = useSelector(state => state.user)
     const userId = user?._id
@@ -1675,6 +1675,11 @@ function AddDoctors() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="text-end mt-3">
+                    <Link to={-1} className="nw-thm-btn outline" >
+                        Go Back
+                    </Link>
                 </div>
             </div>
 

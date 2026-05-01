@@ -2,7 +2,7 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaPlusSquare } from "react-icons/fa";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useParams, useNavigate, NavLink, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { toast } from "react-toastify";
@@ -335,7 +335,10 @@ function AddPrescriptions() {
 
 
 
-              <div className="mt-5 d-flex align-items-center justify-content-end gap-3">
+              <div className="mt-5 d-flex align-items-center justify-content-between gap-3">
+                <Link to={-1} className="nw-thm-btn outline" >
+                  Go Back
+                </Link>
                 <button type="submit" className="nw-thm-btn " >Submit</button>
               </div>
 

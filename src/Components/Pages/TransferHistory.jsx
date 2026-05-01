@@ -1,7 +1,7 @@
 import { TbGridDots } from "react-icons/tb";
 import { faCircleXmark, faDownload, faFilter, faSearch, } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { data, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { data, Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
@@ -11,13 +11,13 @@ import { useSelector } from "react-redux";
 import { getSecureApiData } from "../../Service/api";
 
 function TransferHistory() {
-    const {id} = useParams()
+    const { id } = useParams()
     const [history, setHistory] = useState([]);
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalPages, setTotalPages] = useState(0)
     const [loading, setLoading] = useState(false)
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     const fetchHistory = async () => {
         try {
@@ -35,17 +35,17 @@ function TransferHistory() {
             setLoading(false)
         }
     };
-    
+
     useEffect(() => {
         fetchHistory();
     }, [page, id]);
 
- 
-    useEffect(()=>{
-        if(!id ){
+
+    useEffect(() => {
+        if (!id) {
             navigate('/bed-allotment-history')
         }
-    },[id])
+    }, [id])
 
 
     return (
@@ -74,7 +74,7 @@ function TransferHistory() {
                                     </nav>
                                 </div>
                             </div>
-                            {totalPages> 1 &&<div className="row">
+                            {totalPages > 1 && <div className="row">
                                 <div className="d-flex align-items-center justify-content-between mb-3 gap-2 nw-box ">
 
                                     {<div className="page-selector">
@@ -125,7 +125,7 @@ function TransferHistory() {
                                                         <tr key={item._id}>
                                                             <td>{(page - 1) * limit + index + 1}.</td>
                                                             <td>
-                                                                {item?.bedFrom?.bedName ||'-'}
+                                                                {item?.bedFrom?.bedName || '-'}
                                                             </td>
 
                                                             <td>{item?.bedTo?.bedName || "-"}</td>
@@ -133,10 +133,10 @@ function TransferHistory() {
                                                             <td>{item?.departmentTo?.departmentName || "-"}</td>
                                                             <td>{item?.doctorFrom?.name || "-"}</td>
                                                             <td>{item?.doctorTo?.name || "-"}</td>
-                        
-                                                            <td>{item?.createdAt ? new Date(item?.createdAt)?.toLocaleString('en-GB'):'-'}
+
+                                                            <td>{item?.createdAt ? new Date(item?.createdAt)?.toLocaleString('en-GB') : '-'}
                                                             </td>
-                                                           
+
                                                         </tr>
                                                     ))
                                                 )}
@@ -147,8 +147,13 @@ function TransferHistory() {
                             </div>
                         </div>
                     </div>
+                    <div className="text-end mt-3">
+                        <Link to={-1} className="nw-thm-btn outline" >
+                            Go Back
+                        </Link>
+                    </div>
                 </div>}
-            
+
         </>
     )
 }

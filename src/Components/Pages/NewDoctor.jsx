@@ -1,5 +1,5 @@
 import { FaPlusCircle } from "react-icons/fa";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
@@ -30,22 +30,22 @@ function NewDoctor() {
   };
 
   // Add doctor
-const handleAddDoctor = async () => {
-  if (!doctorData) return;
-  try {
-    await api.post("/comman/add-existing-doctor", {
-      userId: doctorData._id
-    });
-    toast.success("Doctor added successfully");
-    setDoctorId("");
-    setDoctorData(null);
-  } catch (err) {
-    console.log(err)
-    toast.error(
-      err?.response?.data?.message || "Failed to add doctor"
-    );
-  }
-};
+  const handleAddDoctor = async () => {
+    if (!doctorData) return;
+    try {
+      await api.post("/comman/add-existing-doctor", {
+        userId: doctorData._id
+      });
+      toast.success("Doctor added successfully");
+      setDoctorId("");
+      setDoctorData(null);
+    } catch (err) {
+      console.log(err)
+      toast.error(
+        err?.response?.data?.message || "Failed to add doctor"
+      );
+    }
+  };
 
 
   return (
@@ -61,8 +61,8 @@ const handleAddDoctor = async () => {
 
           <div>
             <NavLink to="/add-doctor" className="nw-exprt-btn">
-            <FaPlusCircle /> Add Doctor/Nurse Manually
-          </NavLink>
+              <FaPlusCircle /> Add Doctor/Nurse Manually
+            </NavLink>
           </div>
         </div>
 
@@ -116,6 +116,11 @@ const handleAddDoctor = async () => {
             {doctorData ? "Add" : "Submit"}
           </button>
         </div>
+      </div>
+      <div className="text-end mt-3">
+        <Link to={-1} className="nw-thm-btn outline" >
+          Go Back
+        </Link>
       </div>
     </div>
   );

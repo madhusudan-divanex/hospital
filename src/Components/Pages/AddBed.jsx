@@ -12,6 +12,7 @@ function AddBed() {
   const [departments, setDepartments] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [myDoctors, setMyDoctors] = useState([])
   const [doctorData, setDoctorData] = useState()
   const [addData, setAddData] = useState(JSON.parse(localStorage.getItem('addBedData')))
   const [form, setForm] = useState({
@@ -19,7 +20,7 @@ function AddBed() {
     departmentId: "",
     roomId: "",
     bedName: "",
-    perDayFees: "", doctorNh12: ""
+    perDayFees: "", doctorId: ""
   });
 
   /* ---------------- FETCH FLOORS ---------------- */
@@ -29,6 +30,14 @@ function AddBed() {
       setFloors(res.data.data);
     } catch {
       toast.error("Failed to load floors");
+    }
+  };
+  const fetchDoctors = async () => {
+    try {
+      const res = await api.get("/hospital-doctor/list?limit=1000&status=active");
+      setMyDoctors(res.data.data);
+    } catch {
+      toast.error("Failed to load doctors");
     }
   };
 
@@ -81,7 +90,7 @@ function AddBed() {
   /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(form?.doctorNh12?.length<12){
+    if (form?.doctorId?.length < 12) {
       return toast.error("Please enter a valid doctor id   ")
     }
 
@@ -89,7 +98,7 @@ function AddBed() {
       !form.floorId ||
       !form.departmentId ||
       !form.roomId ||
-      !form.doctorNh12.trim() ||
+      !form.doctorId.trim() ||
       !form.bedName.trim() ||
       form.perDayFees === "" || form.perDayFees === null
     ) {
@@ -141,7 +150,7 @@ function AddBed() {
         floorId: bed.floorId,
         departmentId: bed.departmentId?._id || bed.departmentId,
         roomId: bed.roomId?._id || bed.roomId,
-        bedName: bed.bedName, doctorNh12: bed.doctorId?.nh12 || "",
+        bedName: bed.bedName, doctorId: bed.doctorId?._id || "",
         perDayFees: bed.pricePerDay
       });
 
@@ -160,6 +169,9 @@ function AddBed() {
   }, [addData])
 
   useEffect(() => {
+    fetchDoctors()
+  }, [])
+  useEffect(() => {
     fetchFloors();
     fetchDepartments();
 
@@ -167,25 +179,8 @@ function AddBed() {
       fetchBedById();
     }
   }, [id]);
-  async function fetchDoctorData() {
-    try {
-      const res = await api.get(`/comman/check-doctor-id/${form.doctorNh12}`);
-      if (res.data.success) {
-        setDoctorData(res.data.data)
-      } else {
-        toast.error("Doctor id not found")
-      }
-
-    } catch (error) {
-      toast.error("Doctor ID not found")
-    }
-  }
-  useEffect(() => {
-    setDoctorData()
-    if (form.doctorNh12?.length == 12) {
-      fetchDoctorData()
-    }
-  }, [form.doctorNh12])
+  
+  
 
   return (
     <>
@@ -320,35 +315,37 @@ function AddBed() {
               <div className="col-lg-4 col-md-6 col-sm-12">
                 <div className="custom-frm-bx">
                   <label>Doctor NHC (Id)</label>
-                  <input
+                  <select
+                      className="form-select custom-select"
+                      name="doctorId"
+                      value={form.doctorId}
+                    onChange={handleChange}
+                    >
+                      <option value="">---Select Attending Doctor---</option>
+                      {myDoctors.map(d => (
+                        <option key={d._id} value={d?._id}>
+                           {d.name}
+                        </option>
+                      ))}
+                    </select>
+                  {/* <input
                     type="number"
                     className="form-control nw-frm-select"
-                    name="doctorNh12"
-                    value={form.doctorNh12}
+                    name="doctorId"
+                    value={form.doctorId}
                     onChange={handleChange}
-                  />
+                  /> */}
                 </div>
               </div>
-              {doctorData?.name && form?.doctorNh12?.length==12 && <div className="row">
-                <div className="col-lg-4 col-md-6 col-sm-12">
-                  <div className="custom-frm-bx">
-                    <label>Doctor Name</label>
-                    <input
-                      type="text"
-                      className="form-control nw-frm-select"
-                      value={doctorData?.name}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </div>}
+          
 
 
               {/* SUBMIT */}
               <div className="d-flex justify-content-between mt-3">
-                <button  type="button" className="nw-thm-btn outline" onClick={() =>{
-                   localStorage.removeItem('addBedData')
-                   navigate("/bed-management")}}>
+                <button type="button" className="nw-thm-btn outline" onClick={() => {
+                  localStorage.removeItem('addBedData')
+                  navigate("/bed-management")
+                }}>
                   Go Back
                 </button>
                 <button

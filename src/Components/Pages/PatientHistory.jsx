@@ -395,7 +395,7 @@ function PatientsHistory() {
                                                                             Edit details
                                                                         </NavLink>
                                                                     </li>
-                                                                    <li className="prescription-item">
+                                                                    {/* <li className="prescription-item">
                                                                         <a
                                                                             className="prescription-nav"
                                                                             href="#"
@@ -403,7 +403,7 @@ function PatientsHistory() {
                                                                         >
                                                                             {p?.departmentInfo?.status === "Active" ? "Inactivate" : "Activate"}
                                                                         </a>
-                                                                    </li>
+                                                                    </li> */}
                                                                 </ul>
                                                             </div>
                                                         </td>

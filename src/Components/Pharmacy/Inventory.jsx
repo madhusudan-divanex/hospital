@@ -576,6 +576,7 @@ function Inventory() {
                                                     <th>Purchase Price</th>
                                                     <th>Sale Price</th>
                                                     <th>Margin</th>
+                                                    <th>Storage</th>
                                                     <th>Bar Code </th>
                                                     <th>Action</th>
 
@@ -622,7 +623,7 @@ function Inventory() {
                                                                 {item?.sellCount}/ <span className="stock-title">{item?.quantity}</span>
                                                             </td>
                                                             <td>
-                                                                ${item?.purchasePrice}
+                                                                ₹ {item?.purchasePrice}
                                                             </td>
                                                             <td>
                                                                 {item?.salePrice}
@@ -630,6 +631,7 @@ function Inventory() {
                                                             <td>
                                                                 {item?.margin} %
                                                             </td>
+                                                            <td> {item?.storageType?.map(item=>item)}<br/> {item?.storage?.map(item=>item)}</td>
                                                             <td>
                                                                 {/* <a href="javascript:void(0)" className="thm-btn rounded-3">Generate</a> */}
                                                                 {showBarcode == key ?

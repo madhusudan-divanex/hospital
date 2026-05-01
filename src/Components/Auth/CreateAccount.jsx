@@ -141,10 +141,13 @@ function CreateAccount() {
 
                 // NEXT STEP
                 navigate("/create-account-image", { replace: true });
+            }else{
+                toast.error(basic.data.message)
             }
 
         } catch (err) {
             console.error(err.response?.data || err);
+            toast.error(err?.response?.data?.message)
         } finally{
             setLoading(false)
         }

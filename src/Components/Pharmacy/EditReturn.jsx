@@ -199,7 +199,7 @@ function EditReturn() {
                                         name="status"
                                         required
                                         value={formData.status}
-                                        readOnly
+                                        onChange={handleChange}
                                     >
                                         <option value="">Select Status</option>
                                         <option value="Pending">Pending</option>
@@ -278,13 +278,13 @@ function EditReturn() {
                             </div>
                         </div>
 
-                        <div className="mt-3 text-end">
+                        <div className="mt-3 d-flex justify-content-between">
                             <Link to={-1} className="nw-thm-btn outline rounded-3" type="submit">
                                 Go Back
                             </Link>
-                            {/* <button className="nw-thm-btn rounded-3" type="submit">
+                            <button className="nw-thm-btn rounded-3" type="submit">
                                 Submit
-                            </button> */}
+                            </button>
                         </div>
                     </form>
 

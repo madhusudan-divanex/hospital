@@ -13,7 +13,7 @@ function MedicineRequest() {
     const userId = user.id
     const [loading, setLoading] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
-    const [status, setStatus] = useState('all')
+    const [status, setStatus] = useState('')
     const [name, setName] = useState('')
     const [totalPage, setTotalPage] = useState(1)
     const [medicineList, setMedicineList] = useState([])
@@ -29,10 +29,12 @@ function MedicineRequest() {
         type: "hospital"
     })
     const fetchInventory = async () => {
+        if(!schedule) return
         setLoading(true)
         try {
             const response = await getSecureApiData(`api/hospital/inventory/${userId}?schedule=${schedule?._id}&limit=10&status=${status}&type=hospital`);
             if (response.success) {
+                setFormData({...formData,schedule:schedule?._id})
                 setMedicineList(response.data)
 
             } else {
@@ -44,6 +46,7 @@ function MedicineRequest() {
             setLoading(false)
         }
     }
+   
     const fetchSchedules = async () => {
         setLoading(true)
         try {
@@ -82,7 +85,7 @@ function MedicineRequest() {
     useEffect(() => {
         fetchInventory()
         fetchMedicineRequest()
-    }, [userId])
+    }, [userId,schedule])
     const handleChange = (e) => {
         const { name, value } = e.target
         setFormData(prev => ({
@@ -148,6 +151,10 @@ function MedicineRequest() {
 
         saveAs(fileData, "Medicine_Requests.xlsx");
     };
+    useEffect(()=>{
+        const quantity=medicineList.find(item=>item?._id==formData?.medicineId)?.quantity || 0
+        setFormData({...formData,quantity})
+    },[formData.medicineId])
     return (
         <>
             {loading ? <Loader />
@@ -220,8 +227,8 @@ function MedicineRequest() {
                                                     className="d-flex align-items-center justify-content-between drop-heading-bx px-3 pt-2 pb-2 border-bottom">
                                                     <h6 className="mb-0 fz-18">Filter</h6>
                                                     <a href="#" className="fz-16 clear-btn" onClick={() => {
-                                                        setStatus("all")
-                                                        fetchMedicineRequest("all")
+                                                        setStatus("")
+                                                        fetchMedicineRequest("")
                                                     }}>Reset</a>
                                                 </div>
 
@@ -237,7 +244,7 @@ function MedicineRequest() {
                                                                         name="status"
                                                                         id={item}
                                                                         checked={status === item}
-                                                                        onChange={() => setStatus(item)}
+                                                                        onChange={(e) => setStatus(e.target.checked ?item:'')}
                                                                     />
                                                                     <label className="form-check-label" htmlFor={item}>
                                                                         {item}
@@ -381,8 +388,9 @@ function MedicineRequest() {
                                         <div className="custom-frm-bx">
                                             <label htmlFor="">Quantity</label>
                                             <input type="number"
-                                                value={formData?.quantity}
-                                                onChange={handleChange}
+                                                value={formData?.quantity} 
+                                                readOnly
+                                                
                                                 name="quantity"
                                                 className="form-control nw-frm-select " placeholder="Enter Quantity" />
                                         </div>

@@ -165,11 +165,11 @@ function AppointmentDetails() {
 
               </div>
 
-              <div className="nw-laboratory-bill-bx mt-lg-5 mt-sm-3 mb-3">
+              {appointmentData?.staff && <div className="nw-laboratory-bill-bx mt-lg-5 mt-sm-3 mb-3">
                 <h6 className="my-0">Lab Doctor </h6>
                 <h4>{appointmentData?.staff?.name}</h4>
                 <p><span className="laboratory-phne"> ID :</span> {appointmentData?.staff?.nh12}</p>
-              </div>
+              </div>}
               {appointmentData?.doctorId && <div className="nw-laboratory-bill-bx mb-3">
                 <h6 className="my-0">Lab tests prescribed by the doctor</h6>
                 <h4>Dr.James Harris</h4>

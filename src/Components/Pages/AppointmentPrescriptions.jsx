@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import { FiPlusSquare } from "react-icons/fi";
 import { faCalendar, faClock, faClose, faKitMedical, faPerson, faStar } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Loader from "../Common/Loader";
@@ -369,7 +369,10 @@ function AppointmentPrescriptions() {
                                 required
                             />
                         </div>
-                        <div className="mt-5 d-flex justify-content-end gap-3">
+                        <div className="mt-5 d-flex justify-content-between gap-3">
+                            <Link to={-1} className="nw-thm-btn outline" >
+                                Go Back
+                            </Link>
                             <button type="submit" className="nw-thm-btn">
                                 Submit
                             </button>

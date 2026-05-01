@@ -1,7 +1,7 @@
 import { TbGridDots } from "react-icons/tb";
 import { faCircleXmark, faDownload, faFilter, faSearch, } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { data, NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import { data, Link, NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
@@ -26,7 +26,7 @@ function DailyNotesHistory() {
     const [assessment, setAssessment] = useState({})
     const [todayPlan, setTodayPlan] = useState({})
     const [signOff, setSignOff] = useState({})
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     const fetchHistory = async () => {
         try {
@@ -62,7 +62,7 @@ function DailyNotesHistory() {
             }
         } catch (error) {
             toast.error(error?.response?.data?.message)
-        } finally{
+        } finally {
             setLoading(false)
         }
     }
@@ -81,11 +81,11 @@ function DailyNotesHistory() {
         const tab = new window.bootstrap.Tab(tabEl);
         tab.show();
     };
-    useEffect(()=>{
-        if(!allotmentId){
+    useEffect(() => {
+        if (!allotmentId) {
             navigate('/bed-allotment-history')
         }
-    },[allotmentId])
+    }, [allotmentId])
     return (
         <>
             {loading ? <Loader />
@@ -112,7 +112,7 @@ function DailyNotesHistory() {
                                     </nav>
                                 </div>
                             </div>
-                            {totalPages> 1 &&<div className="row">
+                            {totalPages > 1 && <div className="row">
                                 <div className="d-flex align-items-center justify-content-between mb-3 gap-2 nw-box ">
 
                                     {<div className="page-selector">
@@ -190,6 +190,11 @@ function DailyNotesHistory() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div className="text-end mt-3">
+                        <Link to={-1} className="nw-thm-btn outline" >
+                            Go Back
+                        </Link>
                     </div>
                 </div>}
             <div className="modal step-modal fade" id="viewNotes" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"

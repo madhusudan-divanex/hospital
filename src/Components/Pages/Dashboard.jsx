@@ -283,10 +283,8 @@ function Dashboard() {
                               </td>
 
                               <td >{item?.status == 'completed' ? <span className="approved approved-active ">Completed </span>
-                                : <span className="approved approved-active leaved">Pending </span>}</td>
+                                : <span className="approved approved-active leaved text-capitalize">{item?.status} </span>}</td>
                               <td>
-
-
                                 <div className="dropdown">
                                   <a
                                     href="javascript:void(0)"
@@ -316,7 +314,6 @@ function Dashboard() {
                                   Delete
                                 </a>
                               </li> */}
-
 
                                   </ul>
                                 </div>
@@ -382,7 +379,7 @@ function Dashboard() {
                                   <li className="ad-info-item"> Room Number :<span className="add-info-title">{item?.bedId?.roomId?.roomName}</span></li>
                                   <li className="ad-info-item"> <b>Floor :</b><span className="add-info-title"> {item?.bedId?.floorId?.floorName}</span></li>
                                   <li className="ad-info-item"> <b>Bed :</b><span className="add-info-title"> {item?.bedId?.bedName}</span></li>
-                                  <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ${item?.bedId?.pricePerDay}</span></li>
+                                  <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ₹ {item?.bedId?.pricePerDay}</span></li>
                                   <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.departmentId?.departmentName}</span></li>
                                   <li className="ad-info-item"> Day:<span className="add-info-title"> 5</span></li>
                                 </ul>
@@ -534,6 +531,11 @@ function Dashboard() {
                   <span className="text-black">No appointment request found</span>}
               </div>
             </div>
+          </div>
+          <div className="text-end mt-3">
+            <Link to={-1} className="nw-thm-btn outline" >
+              Go Back
+            </Link>
           </div>
 
         </div>}

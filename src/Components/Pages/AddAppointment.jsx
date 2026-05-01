@@ -82,7 +82,7 @@ function AddAppointment() {
                 patientId: userData?._id,
                 doctorId,
                 hospitalId: userId,
-                date: appointmentDate,
+                date: appointmentDate,status:"approved",
                 fees
             };
             const response = await securePostData("appointment/hospital/doctor", data);
@@ -94,7 +94,7 @@ function AddAppointment() {
                 setNh12("")
                 setDate("");
                 setTime("");
-                navigate('/appointment-request')
+                navigate(-1)
             } else {
                 toast.error(response?.message || "Booking failed");
             }

@@ -376,7 +376,7 @@ function PatientsView() {
                 </div>
               </div>
               <div className="d-flex gap-2">
-                {allotmentData?.status !== "Active" && <Link className="nw-thm-btn" to={`/bed-management?patientId=${params.id}`}>Bed Allotment</Link>}
+                {allotmentData[0]?.status !== "Active" && <Link className="nw-thm-btn" to={`/bed-management?patientId=${params.id}`}>Bed Allotment</Link>}
                 <button className="nw-thm-btn" data-bs-toggle="modal" data-bs-target="#admit-Patient" onClick={() => setSelectedType('IPD')}>IPD</button>
                 <button className="nw-thm-btn" data-bs-toggle="modal" data-bs-target="#admit-Patient" onClick={() => setSelectedType('OPD')}>OPD</button>
                 <button className="nw-danger-thm-btn" data-bs-toggle="modal" data-bs-target="#admit-Patient" onClick={() => setSelectedType('EMERGENCY')}>Emergency</button>

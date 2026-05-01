@@ -171,7 +171,7 @@ function LeftSidebar() {
 
                   <li className="nav-item">
                     <NavLink
-                      to="/patient-opd"
+                      to="/patient-opd-data"
                       className={({ isActive }) =>
                         isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
                       }
@@ -182,7 +182,7 @@ function LeftSidebar() {
 
                   <li className="nav-item">
                     <NavLink
-                      to="/patient-emergency"
+                      to="/patient-emergency-data"
                       className={({ isActive }) =>
                         isActive ? "nav-link submenu-link active-menu" : "nav-link submenu-link"
                       }

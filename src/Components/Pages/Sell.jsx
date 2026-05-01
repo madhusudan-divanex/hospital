@@ -249,7 +249,7 @@ function Sell() {
                                                                         aria-labelledby="acticonMenu1"
                                                                     >
                                                                         <li className="prescription-item">
-                                                                            <NavLink to={`/edit-sales/${item?._id}`} className="prescription-nav" href="#" >
+                                                                            <NavLink to={`/edit-sell/${item?._id}`} className="prescription-nav" href="#" >
                                                                                 View/Edit
                                                                             </NavLink>
                                                                         </li>

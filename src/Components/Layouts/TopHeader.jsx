@@ -140,6 +140,9 @@ function TopHeader() {
           <div className="d-flex top-header-icon-sec align-items-center">
             <div className="tp-right-admin-bx d-flex align-items-center">
               <div>
+                {hospitalBasic?.kycStatus !== 'approved' && <span className="approved approved-active leaved">{hospitalBasic?.kycStatus} </span>}
+              </div>
+              <div>
                 <button className="rq-scan-btn" data-bs-toggle="modal" data-bs-target="#scanner-Request" ><IoMdQrScanner className="fz-18" /> SCAN</button>
               </div>
 

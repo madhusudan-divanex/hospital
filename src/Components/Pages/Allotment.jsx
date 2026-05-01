@@ -170,7 +170,7 @@ function Allotment() {
 
   const fetchDoctors = async () => {
     try {
-      const res = await api.get("/hospital-doctor/list?limit=1000");
+      const res = await api.get("/hospital-doctor/list?limit=1000&status=active");
       setDoctor(res.data.data);
     } catch {
       toast.error("Failed to load doctors");
@@ -504,7 +504,7 @@ console.log( !form.floorId ,
                       <option value="">---Select Attending Doctor---</option>
                       {doctor.map(d => (
                         <option key={d._id} value={d._id}>
-                          Dr. {d.name}
+                           {d.name}
                         </option>
                       ))}
                     </select>

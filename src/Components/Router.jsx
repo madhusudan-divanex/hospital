@@ -156,6 +156,8 @@ import DoctorAptBookingReceipt from "../All Template file/Booking receipt";
 import MedicalPrescription from "../All Template file/Medical Prescription";
 import PatientsHistory from "./Pages/PatientHistory";
 import PatientTransferLetter from "../All Template file/Patient transfer";
+import PatientsOptData from "./Pages/PatientOptData";
+import PatientEmergencyData from "./Pages/PatientEmergencyData";
 
 function Router() {
  const { socket, startCall } = useGlobalSocket();
@@ -248,7 +250,7 @@ function Router() {
         // { index: true, element: <Dashboard /> },
         { path: "/dashboard", element: <Dashboard /> }, //d
         { path: "/notifcation", element: <Notification /> }, //d
-        { path: "/daily-notes", element: <DailyIPDNotes /> },
+        // { path: "/daily-notes", element: <DailyIPDNotes /> },
 
         // Doctors
         { path: "/doctor", element: <Doctors /> },  //d
@@ -262,7 +264,7 @@ function Router() {
         { path: "/edit-doctor/:id", element: <EditDoctors /> }, //n
 
         // Patients
-        { path: "/patient", element: <Patients /> },
+        // { path: "/patient", element: <Patients /> },
         { path: "/add-patient", element: <AddPatient /> }, //d
         { path: "/patient-view/:id", element: <PatientsView /> }, //p
         { path: "/patients/edit/:id", element: <AddPatient /> },  //d
@@ -291,8 +293,10 @@ function Router() {
 
 
         { path: "/patient-opd", element: <PatientsOPD /> }, //d
+        { path: "/patient-opd-data", element: <PatientsOptData /> }, //d
         { path: "/patient-ipd", element: <PatientsIPD /> }, //d
         { path: "/patient-emergency", element: <PatientsEmergency /> }, //d
+        { path: "/patient-emergency-data", element: <PatientEmergencyData /> }, //d
         { path: "/patient-history", element: <PatientsHistory /> },
 
 
@@ -318,7 +322,7 @@ function Router() {
         { path: "/add-manually", element: <AddManually /> },
         { path: "/generate-purchase-order", element: <NewGeneratePo /> },
         { path: "/edit-purchase-order", element: <EditGeneratePo /> },
-        { path: "/edit-sales/:id", element: <AddManually /> },
+        { path: "/edit-sell/:id", element: <AddManually /> },
         { path: "/customer-return/:id", element: <CustomerReturn /> },
 
         // Tests

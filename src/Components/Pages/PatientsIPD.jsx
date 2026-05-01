@@ -14,6 +14,7 @@ import DailyIPDNotes from "./DailyIPDNotes";
 import AllotmentPayment from "./AllotmentPayment";
 import AddAllotmentTest from "./AddAllotmentTest";
 import DepartmentTransfer from "./DepartmentTransfer";
+import HospitalConsentLetter from "../../All Template file/ConsentLetter";
 function PatientsIPD() {
     const [patients, setPatients] = useState([]);
     const [page, setPage] = useState(1);
@@ -27,6 +28,7 @@ function PatientsIPD() {
     const [selectedAllotment, setSelectedAllotment] = useState()
     const [notesData, setNotesData] = useState({ allotmentId: null })
     const [openDailyNotes, setOpenDailyNotes] = useState(false);
+    const [consentData,setConsentData]=useState()
     const [deptTransfer,setDepartmentTransfer]=useState({_id:null,departmentId:null,allotmentId:null})
     const fetchPatients = async (ptStatus = status) => {
         try {
@@ -551,6 +553,16 @@ function PatientsIPD() {
                                             </span>
                                         </button>
                                     </li>
+                                    <li className="bed-list-item">
+                                        <button onClick={() =>setConsentData(selectedAllotment?.patientId)}
+                                            data-bs-dismiss="modal"
+                                            className="bed-nav-link" >
+                                            {consentData?"Downloading...":"Consent Letter"}
+                                            <span className="nw-chevron-btn">
+                                                <FontAwesomeIcon icon={faChevronRight} />
+                                            </span>
+                                        </button>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -561,6 +573,10 @@ function PatientsIPD() {
             <AddAllotmentTest allotmentId={selectedAllotment?._id} />
             <AllotmentPayment allotmentId={selectedAllotment?._id} getData={fetchPatients} />
             <DepartmentTransfer data={deptTransfer} getData={fetchPatients} />
+            <div className="d-none">
+
+            <HospitalConsentLetter patientId={consentData} handleConsent={()=>setConsentData()}/>
+            </div>
         </>
     )
 }

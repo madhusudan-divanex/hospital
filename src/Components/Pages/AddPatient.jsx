@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
-import { useParams, useNavigate, NavLink, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, NavLink, useSearchParams, Link } from "react-router-dom";
 import { FaPlusCircle } from "react-icons/fa";
 import { getApiData, getSecureApiData, securePostData } from "../../Service/api";
 function AddPatient() {
@@ -394,6 +394,11 @@ function AddPatient() {
               </button>
             </div>
           </div>
+          <div className="text-end mt-3">
+            <Link to={-1} className="nw-thm-btn outline" >
+              Go Back
+            </Link>
+          </div>
         </div> :
         <div className="main-content flex-grow-1 p-3 overflow-auto">
           <div className="row ">
@@ -702,6 +707,11 @@ function AddPatient() {
 
             </form>
 
+          </div>
+          <div className="text-end mt-3">
+            <Link to={-1} className="nw-thm-btn outline" >
+              Go Back
+            </Link>
           </div>
 
 

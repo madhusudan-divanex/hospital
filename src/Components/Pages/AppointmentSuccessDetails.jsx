@@ -192,10 +192,11 @@ function AppointmentSuccessDetails() {
             const result = await updateApiData('appointment/doctor', data)
             if (result.success) {
                 toast.success("Test added to the prescriptions")
+                fetchAppointmentData()
                 document.getElementById('closeTest')?.click()
             }
         } catch (error) {
-
+            toast.error(error?.response?.data?.message)
         }
     }
     const appointmentAction = async (status) => {
@@ -353,7 +354,7 @@ function AppointmentSuccessDetails() {
                                         <div className="d-flex align-items-center justify-content-between mb-3">
                                             <div>
                                                 <h6>Fees</h6>
-                                                <p>${doctorAbout?.fees}</p>
+                                                <p>₹ {doctorAbout?.fees}</p>
                                             </div>
                                             <div>
                                                 <h6>Specialization </h6>
@@ -409,7 +410,7 @@ function AppointmentSuccessDetails() {
                                             </div>
                                             <div>
 
-                                                <p>${appointmentData?.fees}</p>
+                                                <p>₹ {appointmentData?.fees}</p>
                                             </div>
                                         </div>
 

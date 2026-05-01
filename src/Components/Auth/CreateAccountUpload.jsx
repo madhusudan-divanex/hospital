@@ -6,14 +6,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FaPlusCircle } from "react-icons/fa";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../../api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserDetail } from "../../redux/features/userSlice";
 
 function CreateAccountUpload() {
   const navigate = useNavigate();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
   // FIXED FIELDS
   const [licenseNumber, setLicenseNumber] = useState("");
   const [licenseFile, setLicenseFile] = useState(null);

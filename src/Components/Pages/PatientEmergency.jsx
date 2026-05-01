@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import base_url from "../../baseUrl";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import HospitalConsentLetter from "../../All Template file/ConsentLetter";
 function PatientsEmergency() {
     const [patients, setPatients] = useState([]);
     const [page, setPage] = useState(1);
@@ -19,7 +20,7 @@ function PatientsEmergency() {
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('')
-
+    const [consentData,setConsentData]=useState()
 
     const fetchPatients = async (ptStatus = status) => {
         try {
@@ -354,15 +355,15 @@ function PatientsEmergency() {
                                                                             {p?.departmentInfo?.status === "Active" ? "Inactivate" : "Activate"}
                                                                         </a>
                                                                     </li>
-                                                                    {/* <li>
+                                                                    <li>
                                                                         <a
-                                                                            className="prescription-nav text-danger"
+                                                                            className="prescription-nav "
                                                                             href="#"
-                                                                            onClick={() => deletePatient(p?.departmentInfo?._id)}
+                                                                            onClick={() => setConsentData(p?.nh12)}
                                                                         >
-                                                                            Delete
+                                                                            {consentData?"Downloading":'Consent letter'}
                                                                         </a>
-                                                                    </li> */}
+                                                                    </li>
                                                                 </ul>
                                                             </div>
                                                         </td>
@@ -377,6 +378,9 @@ function PatientsEmergency() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div className="d-none">
+                    <HospitalConsentLetter patientId={consentData} handleConsent={()=>setConsentData()}/>
                     </div>
                       <div className="text-end mt-4">
       <Link to={-1} className="nw-thm-btn outline" >

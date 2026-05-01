@@ -4,7 +4,7 @@ import { deleteApiData, getSecureApiData } from "../../Service/api"
 import { useEffect, useState } from "react"
 import { formatDistanceToNow } from 'date-fns';
 import Loader from "../Common/Loader";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 function Notification() {
     const user = JSON.parse(localStorage.getItem('user'))
     const userId = user.id
@@ -110,6 +110,11 @@ function Notification() {
 
                             </div>
                         </div>
+                    </div>
+                    <div className="text-end mt-3">
+                        <Link to={-1} className="nw-thm-btn outline" >
+                            Go Back
+                        </Link>
                     </div>
 
 

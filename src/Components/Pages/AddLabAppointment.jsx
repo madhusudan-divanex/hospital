@@ -21,7 +21,8 @@ function AddLabAppointment() {
     const [date, setDate] = useState()
     const [time, setTime] = useState()
     const [testOptions, setTestOptions] = useState([])
-    const [selectedTests, setSelectedTests] = useState([])
+    const [selectedSubCats, setSelectedSubCats] = useState([])
+    const [selectedCatId, setSelectedCatId] = useState()
     const [nh12, setNh12] = useState('')
     async function fetchPatient() {
         if (nh12?.length < 12) {
@@ -65,7 +66,8 @@ function AddLabAppointment() {
                 patientId: userData?._id,
                 labId: userId,
                 date: appointmentDate,
-                testId: selectedTests.map(test => test.value),
+                testId:[selectedCatId],
+                subCatId: selectedSubCats,
                 fees
             };
             const response = await securePostData("api/hospital/lab-appointment", data);
@@ -92,19 +94,33 @@ function AddLabAppointment() {
         try {
             const result = await getSecureApiData(`lab/test/${userId}?limit=1000&type=hospital`)
             if (result.success) {
-                const options = result.data
-                    ?.filter(item => item?.status === 'active')
-                    ?.map(lab => ({
-                        value: lab._id,
-                        label: lab.shortName,
-                        fees: lab.price   // 👈 IMPORTANT
-                    }));
-                setTestOptions(options);
+
+                setTestOptions(result.data);
             }
         } catch (error) {
 
         } finally {
             setLoading(false)
+        }
+    }
+    const selectedLabTest = testOptions.find(t => t._id === selectedCatId)
+
+    // Sirf active subCats dikhao
+    const activeSubCats = selectedLabTest?.subCatData?.filter(
+        s => s.status === 'active'
+    ) || []
+    const allSelected =
+        activeSubCats.length > 0 &&
+        activeSubCats.every(s => selectedSubCats.includes(s.subCat._id))
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            // Is category ke sabhi active subCat IDs add karo
+            const ids = activeSubCats.map(s => s.subCat._id)
+            setSelectedSubCats(prev => [...new Set([...prev, ...ids])])
+        } else {
+            // Is category ke sabhi active subCat IDs hata do
+            const ids = activeSubCats.map(s => s.subCat._id)
+            setSelectedSubCats(prev => prev.filter(id => !ids.includes(id)))
         }
     }
 
@@ -201,32 +217,83 @@ function AddLabAppointment() {
                                     </NavLink>
                                 </div>
                             </div>
-                            <div className="custom-frm-bx">
-                                <label htmlFor="">Test</label>
-                                <div class="select-wrapper">
-                                    <Select
-                                        options={testOptions}
-                                        isMulti
-                                        classNamePrefix="custom-select"
-                                        placeholder="Select test"
-                                        value={selectedTests}
-                                        onChange={(selectedOptions) => {
-                                            const tests = selectedOptions || [];
-
-                                            setSelectedTests(tests);
-
-                                            // ✅ total fees of all selected tests
-                                            const totalFees = tests.reduce(
-                                                (sum, test) => sum + Number(test.fees || 0),
-                                                0
-                                            );
-
-                                            setFees(totalFees);
-                                        }}
-                                    />
-
-                                </div>
+                            <div className="custom-frm-bx mb-3">
+                                <label htmlFor="catSelect">Select Category</label>
+                                <select
+                                    id="catSelect"
+                                    className="form-select nw-control-frm"
+                                    value={selectedCatId}
+                                    onChange={(e) => {
+                                        setSelectedCatId(e.target.value)
+                                        setSelectedSubCats([])
+                                    }}
+                                >
+                                    <option value="">--- Select Category ---</option>
+                                    {testOptions.map(test => (
+                                        <option key={test._id} value={test._id}>
+                                            {test.category?.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
+
+                            {selectedLabTest && (
+                                <div className="custom-frm-bx mb-3">
+                                    <label>Select Tests</label>
+
+                                    {activeSubCats.length > 0 ? (
+                                        <div className="border rounded p-3"
+                                            style={{ maxHeight: '260px', overflowY: 'auto' }}>
+
+                                            {/* Select All */}
+                                            <div className="form-check custom-check mb-2 border-bottom pb-2">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="selectAll"
+                                                    checked={allSelected}
+                                                    onChange={handleSelectAll}
+                                                />
+                                                <label className="form-check-label fw-semibold d-flex justify-content-between" htmlFor="selectAll">
+                                                   <span> Select All </span>
+                                                    {allSelected && <span className="text-muted">₹ {selectedLabTest?.totalAmount} </span>}
+                                                </label>
+                                            </div>
+
+                                            {/* Individual SubCats */}
+                                            {activeSubCats.map(s => (
+                                                <div className="form-check custom-check mb-2" key={s.subCat._id}>
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id={`sub-${s.subCat._id}`}
+                                                        checked={selectedSubCats.includes(s.subCat._id)}
+                                                        onChange={() => handleCheckbox(s.subCat._id)}
+                                                    />
+                                                    <label
+                                                        className="form-check-label d-flex justify-content-between"
+                                                        htmlFor={`sub-${s.subCat._id}`}
+                                                    >
+                                                        <span>{s.subCat.subCategory}</span>
+                                                        <span className="text-muted">₹{s.price}</span>
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-muted text-center py-2">
+                                            No active test found in this category
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Selected count */}
+                            {selectedSubCats.length > 0 && (
+                                <p className="text-muted small mb-2">
+                                    {selectedSubCats.length} test(s) selected
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

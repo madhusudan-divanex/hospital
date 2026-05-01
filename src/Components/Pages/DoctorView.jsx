@@ -15,7 +15,7 @@ import {
   faPhone,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { toast } from "react-toastify";
@@ -59,7 +59,7 @@ function DoctorView() {
         setCustomId(result?.customId);
         setDoctorEduWork(prev => ({
           ...prev,
-          education: result?.aboutDoctorEduWork?.education ||[],
+          education: result?.aboutDoctorEduWork?.education || [],
           work: result?.aboutDoctorEduWork?.work || []
         }))
       } else {
@@ -698,6 +698,11 @@ function DoctorView() {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="text-end mt-3">
+            <Link to={-1} className="nw-thm-btn outline" >
+              Go Back
+            </Link>
           </div>
         </div>}
     </>
