@@ -1,32 +1,35 @@
 function formatDateTime(dateValue) {
-    const date = new Date(dateValue);
+  const date = new Date(dateValue);
 
-    const day = date.getDate();
-    const month = date.toLocaleString("en-US", { month: "long" });
-    const year = date.getFullYear();
+  const day = date.getDate();
+  const month = date.toLocaleString("en-US", { month: "long" });
+  const year = date.getFullYear();
 
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "pm" : "am";
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "pm" : "am";
 
-    hours = hours % 12 || 12;
+  hours = hours % 12 || 12;
 
-    return `${day} ${month} ${year}, at ${hours}:${minutes}${ampm}`;
+  return `${day} ${month} ${year}, at ${hours}:${minutes}${ampm}`;
 }
-const calculateAge = (dob) => {
-        if (!dob) return "";
+const calculateAge = (dob, asOfDate = new Date()) => {
+  if (!dob) return "";
 
-        const birthDate = new Date(dob);
-        const today = new Date();
+  const birthDate = new Date(dob);
+  const refDate = new Date(asOfDate);
 
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        const dayDiff = today.getDate() - birthDate.getDate();
-        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-            age--; // haven't had birthday yet this year
-        }
-        return age;
-    };
+  let age = refDate.getFullYear() - birthDate.getFullYear();
+
+  const monthDiff = refDate.getMonth() - birthDate.getMonth();
+  const dayDiff = refDate.getDate() - birthDate.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age;
+};
 const languageOptions = [
   { value: "English", label: "English" },
   { value: "Hindi", label: "Hindi" },
@@ -79,7 +82,7 @@ const calculatePaymentDetails = (item) => {
 
   const totalAmount = days * pricePerDay;
 
-  const paidAmount =item?.payments?.reduce((sum, p) => sum + Number(p.amount || 0), 0) || 0;
+  const paidAmount = item?.payments?.reduce((sum, p) => sum + Number(p.amount || 0), 0) || 0;
 
   const pendingAmount = Math.max(totalAmount - paidAmount, 0);
 
@@ -92,21 +95,21 @@ const calculatePaymentDetails = (item) => {
   };
 };
 const saveFcmToken = async () => {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") return;
-            const token = await getToken(messaging, {
-                vapidKey: "BBhhJGO7sE7RgSoez4GqQoRlK04U-P-Mem9V6DHypsgNbCcIKWUrnL3nN9SzxUL0zxIsQ06LlVsrEYr8dHaqpVc"
-            });
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
+    const token = await getToken(messaging, {
+      vapidKey: "BBhhJGO7sE7RgSoez4GqQoRlK04U-P-Mem9V6DHypsgNbCcIKWUrnL3nN9SzxUL0zxIsQ06LlVsrEYr8dHaqpVc"
+    });
 
-            if (token) {
-                await API.post("/comman/save-fcm-token", { fcmToken: token });
-                console.log("✅ FCM Token Saved");
-            }
-        } catch (err) {
-            console.error("FCM error", err);
-        }
-    };
+    if (token) {
+      await API.post("/comman/save-fcm-token", { fcmToken: token });
+      console.log("✅ FCM Token Saved");
+    }
+  } catch (err) {
+    console.error("FCM error", err);
+  }
+};
 const getDaysBetweenDates = (from, to) => {
   if (!from || !to) return 0;
 
@@ -121,22 +124,28 @@ const getDaysBetweenDates = (from, to) => {
   return diffDays > 0 ? diffDays : 0;
 };
 const handleCloseModal = (name) => {
-  console.log("click",name)
-    const modal = document.getElementById(name);
-    if (modal) {
-      modal.classList.remove("show");
-      modal.style.display = "none";
-    }
+  console.log("click", name)
+  const modal = document.getElementById(name);
+  if (modal) {
+    modal.classList.remove("show");
+    modal.style.display = "none";
+  }
 
-    // remove backdrop
-    const backdrops = document.getElementsByClassName("modal-backdrop");
-    while (backdrops.length > 0) {
-      backdrops[0].parentNode.removeChild(backdrops[0]);
-    }
+  // remove backdrop
+  const backdrops = document.getElementsByClassName("modal-backdrop");
+  while (backdrops.length > 0) {
+    backdrops[0].parentNode.removeChild(backdrops[0]);
+  }
 
-    // remove body class
-    document.body.classList.remove("modal-open");
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
-  };
-export { handleCloseModal,formatDateTime,calculateAge ,specialtyOptions,languageOptions,calculatePaymentDetails,saveFcmToken,getDaysBetweenDates}
+  // remove body class
+  document.body.classList.remove("modal-open");
+  document.body.style.overflow = "";
+  document.body.style.paddingRight = "";
+};
+const stripHtml = (html) => {
+  if (!html) return "";
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
+export { handleCloseModal, formatDateTime, stripHtml, calculateAge, specialtyOptions, languageOptions, calculatePaymentDetails, saveFcmToken, getDaysBetweenDates }

@@ -27,6 +27,7 @@ import Select from "react-select";
 import DischargePatient from "./DischargePatient";
 import Loader from "../Common/Loader";
 import { useSelector } from "react-redux";
+import BedInvoice from "../../All Template file/Bed invoice";
 function AllotmentDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ function AllotmentDetails() {
   const [reports, setReports] = useState([])
   const [prescriptionData, setPrescriptionData] = useState()
   const { hospitalCustomId } = useSelector(state => state.user)
+  const [pdfLoading,setPdfLoading]=useState(false)
   const [dischargeData, setDischargeData] = useState({
     paymentId: "",
     allotmentId: id,
@@ -194,7 +196,7 @@ function AllotmentDetails() {
       return
     }
     try {
-      const res = await getSecureApiData(`api/bed/test-reports/${data?.labAppointment}`)
+      const res = await getSecureApiData(`api/bed/test-reports/${data?.labAppointment?._id}`)
       if (res.success) {
         setReports(res.testReports);
       }
@@ -368,17 +370,17 @@ function AllotmentDetails() {
                     Edit
                   </NavLink>
                 </>}
-                <button className="nw-exprt-btn" onClick={allotmentPrint}>
-                  <FontAwesomeIcon icon={faPrint} /> Print{" "}
+                <button className="nw-exprt-btn" onClick={()=>setPdfLoading(true)}>
+                  <FontAwesomeIcon icon={faFileExport} /> {pdfLoading?'Downloading...':'Download'}{" "}
                 </button>
-                <button className="nw-exprt-btn">
+                {/* <button className="nw-exprt-btn">
                   <FontAwesomeIcon icon={faFileExport} /> Export{" "}
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
 
-          <div className="new-panel-card" ref={allotmentRef}>
+          <div className="new-panel-card" >
             <div className="row">
               <div className="col-lg-6 col-md-6 col-sm-12">
                 <div className="neo-health-patient-info-card mb-3">
@@ -869,6 +871,9 @@ function AllotmentDetails() {
       {/* <!--  data-bs-toggle="modal" data-bs-target="#discharge-Patient" --> */}
       <DischargePatient allotmentId={data?._id} fetchData={() => fetchDetails()} />
       {/* <!-- Discharge Patient Popup End --> */}
+       <div className="d-none" >
+      <BedInvoice allotmentId={id} pdfLoading={pdfLoading} endLoading={()=>setPdfLoading(false)}/>
+        </div>           
 
       {/* <!-- add-Department Alert Popup Start --> */}
       {/* <!--  data-bs-toggle="modal" data-bs-target="#add-Prescription" --> */}

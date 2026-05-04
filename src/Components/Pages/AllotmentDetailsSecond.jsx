@@ -396,7 +396,7 @@ function AllotmentDetailsSecond() {
 
             {/* <!-- Payment Add Popup Start --> */}
             {/* <!--  data-bs-toggle="modal" data-bs-target="#add-Payment" --> */}
-            <div className="modal step-modal" id="add-Payment" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
+            <div className="modal step-modal" id="add-Payments" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                     <div className="modal-content rounded-0">

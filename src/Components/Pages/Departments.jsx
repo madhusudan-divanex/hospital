@@ -280,7 +280,7 @@ function Departments() {
                                                     <th>IPD/OPD</th>
                                                     <th>Department Name</th>
                                                     <th>Head of Department</th>
-                                                    <th>Doctors/Employee</th>
+                                                    <th>Employee</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>

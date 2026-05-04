@@ -375,7 +375,7 @@ const NeoHealthCardLabTemplates = ({ appointmentId, pdfLoading, endLoading }) =>
                                                         {cmp?.unit}
                                                     </td>
                                                     <td className="px-5 py-3 text-slate-600">
-                                                        {cmp?.referenceRange}
+                                                        {cmp?.minRange}-{cmp?.maxRange}
                                                     </td>
                                                     <td className="px-5 py-3">
                                                         <span

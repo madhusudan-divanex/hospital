@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Barcode from "react-barcode"
 import API from "../../api/api"
+import LabReportPdf from "../../All Template file/Lab report file/Lab report"
 
 function ReportView() {
     const params = useParams()
@@ -23,7 +24,7 @@ function ReportView() {
     const [reportMeta, setReportMeta] = useState({});
     const [fullReportData, setFullReportData] = useState()
     const [hospitalBasic, setHospitalBasic] = useState()
-
+    const [pdfLoading,setPdfLoading]=useState(false)
     const [appointmentData, setAppointmentData] = useState({})
     const fetchAppointmentData = async () => {
         try {
@@ -63,7 +64,7 @@ function ReportView() {
     }, [appointmentData])
     const fetchTestReport = async (testId) => {
         try {
-            const payload = {subCatId: testId, appointmentId };
+            const payload = { subCatId: testId, appointmentId };
             const response = await securePostData('lab/test-report-data', payload);
 
             if (response.success && response.data) {
@@ -223,7 +224,8 @@ function ReportView() {
                                         <h5 className="first_para fw-700 fz-20 mb-0">Final Diagnostic Report</h5>
                                     </div>
                                     <div>
-                                        <button className="print-btn" onClick={handleDownload}> <FontAwesomeIcon icon={faDownload} /> Download PDF</button>
+                                        <button className="print-btn" disabled={pdfLoading} onClick={()=>setPdfLoading(true)}> 
+                                            <FontAwesomeIcon icon={faDownload} /> {pdfLoading?'Downloading...':'Download'} PDF</button>
                                     </div>
                                 </div>
                                 <div className="laboratory-header mb-4">
@@ -269,7 +271,6 @@ function ReportView() {
                                                     <th>Unit</th>
                                                     <th>Reference</th>
                                                     <th>Result</th>
-                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -277,11 +278,6 @@ function ReportView() {
                                                     test.component.map((cmp, index) => {
                                                         const resultObj = allComponentResults[test._id]?.[index] || {};
 
-                                                        const selectedValue = resultObj.result;
-                                                        const selectedNote =
-                                                            cmp.optionType === "select"
-                                                                ? cmp.result?.find(r => r.value === selectedValue)?.note
-                                                                : cmp.textResult;
 
                                                         return (
                                                             <React.Fragment key={test._id + index}>
@@ -289,23 +285,14 @@ function ReportView() {
                                                                 <tr>
                                                                     <td>{test.shortName} - {cmp.name}</td>
                                                                     <td>{cmp.unit || "-"}</td>
-                                                                    <td>{cmp.referenceRange || "-"}</td>
+                                                                    <td>{cmp?.optionType === 'text' ? `${cmp?.minRange} - ${cmp?.maxRange}` : 'Positive-Negative'}</td>
                                                                     <td>
                                                                         {resultObj.result}
-                                                                    </td>
-                                                                    <td className="text-capitalize">
-                                                                        {resultObj.status || "-"}
                                                                     </td>
                                                                 </tr>
 
                                                                 {/* NOTE FULL ROW */}
-                                                                {selectedNote && (
-                                                                    <tr className="note-row">
-                                                                        <td colSpan={5}>
-                                                                            <strong>Note:</strong> {selectedNote}
-                                                                        </td>
-                                                                    </tr>
-                                                                )}
+                                                               
                                                             </React.Fragment>
                                                         );
                                                     })
@@ -350,7 +337,17 @@ function ReportView() {
 
                     </div>
                 </div>
-
+                <div className="text-end mt-4">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="nw-thm-btn outline"
+                    >
+                        Go Back
+                    </button>
+                </div>
+                <div className="d-none">
+                    <LabReportPdf appointmentId={appointmentId} pdfLoading={pdfLoading} endLoading={()=>setPdfLoading(false)}/>
+                </div>
 
             </div>
         </>

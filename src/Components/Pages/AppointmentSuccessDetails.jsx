@@ -39,12 +39,14 @@ function AppointmentSuccessDetails() {
     const [selectedSubCat, setSelectedSubCat] = useState([])
     const [catAndSub, setCatAndSub] = useState([])
     const [subCatOptions, setSubCatOptions] = useState([])
+    const [doctorLabAppointment, setDoctorLabAppointment] = useState()
     async function fetchAppointmentData() {
         setLoading(true)
         try {
             const result = await getSecureApiData(`api/hospital/appointment-data/${params.id}`)
             if (result.success) {
                 setAppointmentData(result.data)
+                setDoctorLabAppointment(result.labAppointment)
                 setDoctorAddress(result.doctorAddress)
             } else {
                 toast.error(result.message)
@@ -191,9 +193,10 @@ function AppointmentSuccessDetails() {
         try {
             const result = await updateApiData('appointment/doctor', data)
             if (result.success) {
+                document.getElementById('closeTest')?.click()
+                document.getElementById('closeEditTest')?.click()
                 toast.success("Test added to the prescriptions")
                 fetchAppointmentData()
-                document.getElementById('closeTest')?.click()
             }
         } catch (error) {
             toast.error(error?.response?.data?.message)
@@ -277,7 +280,12 @@ function AppointmentSuccessDetails() {
                                 {appointmentData?.status == 'approved' &&
                                     <>
                                         <NavLink to={`/appointment-prescription/${appointmentData?._id}`} className="nw-thm-btn w-auto">{appointmentData?.prescriptionId ? 'Edit' : 'Add'} Prescriptions</NavLink>
-                                        { !appointmentData?.labTest?.testCat &&<button className="nw-thm-btn w-auto" data-bs-toggle="modal" data-bs-target="#add-Lab">Add  Lab Test </button>}
+                                        {!appointmentData?.labTest?.testCat ? <button className="nw-thm-btn w-auto" data-bs-toggle="modal" data-bs-target="#add-Lab">Add  Lab Test </button>
+                                            : (!doctorLabAppointment || doctorLabAppointment?.status == "pending") && <button className="nw-thm-btn" onClick={() => {
+                                                setSelectedCategory(appointmentData?.labTest?.testCat?._id)
+                                                const data=appointmentData?.labTest?.subCat?.map(item=>item?._id)
+                                                setSelectedSubCat(data)
+                                            }} data-bs-toggle="modal" data-bs-target="#edit-Lab">  Edit Lab Test </button>}
                                         {appointmentData?.status !== 'approved' && <button className="progress-btn"> <FontAwesomeIcon icon={faCheck} onClick={() => appointmentAction('approved')} /> Mark as in progress</button>}
                                     </>}
                                 <button className="nw-exprt-btn"><FontAwesomeIcon icon={faPrint} /> Print </button>
@@ -393,7 +401,7 @@ function AppointmentSuccessDetails() {
                                                 <h6>Status</h6>
                                                 <p>{appointmentData?.status == 'completed' ? <span className="approved rounded-5">Completed</span>
                                                     : appointmentData?.status == 'cancel' ? <span className="approved inactive rounded-5">Canceled</span>
-                                                        : <span className="approved nw-pending ">Pending </span>}</p>
+                                                        : <span className="approved nw-pending text-capitalize ">{appointmentData?.status} </span>}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -406,22 +414,16 @@ function AppointmentSuccessDetails() {
                                         <div className="d-flex align-items-center justify-content-between mb-3">
                                             <div>
                                                 <h6>Fees</h6>
-
                                             </div>
                                             <div>
-
                                                 <p>₹ {appointmentData?.fees}</p>
                                             </div>
                                         </div>
-
                                         <div className="d-flex align-items-center justify-content-between">
                                             <div>
                                                 <h6>Payment Status</h6>
-
                                             </div>
-
                                             <div>
-
                                                 <p>{appointmentData?.paymentStatus == 'paid' ? <span className="approved rounded-5">Payment Complete</span> :
                                                     <span className="approved nw-pending ">Pending </span>}</p>
                                             </div>
@@ -612,7 +614,124 @@ function AppointmentSuccessDetails() {
                                         <div className="custom-frm-bx">
                                             <label htmlFor="">Test Category</label>
                                             <select name="" id="" className="form-select" required value={selectedCategory}
-                                                onChange={(e) => setSelectedCategory(e.target.value)}>
+                                                onChange={(e) => {setSelectedCategory(e.target.value)
+                                                    setSelectedSubCat([])
+                                                    setSubCatOptions([])
+                                                }}>
+                                                <option value="">----Select----</option>
+                                                {catAndSub?.map((item, index) => (
+                                                    <option key={index} value={item._id} >{item.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        {subCatOptions?.length > 0 && <div className="row">
+                                            <h6>Sub Category</h6>
+                                            {subCatOptions?.map((item, key) => (
+                                                <div className="col-lg-6" key={key}>
+                                                    <div className="form-check custom-check">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="form-check-input"
+                                                            id={`sub-${key}`}
+                                                            value={item?.value}
+                                                            checked={selectedSubCat.includes(item.value)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setSelectedSubCat([...selectedSubCat, item.value]);
+                                                                } else {
+                                                                    setSelectedSubCat(
+                                                                        selectedSubCat.filter(id => id !== item.value)
+                                                                    );
+                                                                }
+                                                            }}
+                                                        />
+                                                        <label htmlFor={`sub-${key}`} className="form-check-label">
+                                                            {item?.label}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>}
+                                        {subCatOptions?.length > 1 && <div className="form-check custom-check justify-content-end">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                checked={
+                                                    subCatOptions.length > 0 &&
+                                                    selectedSubCat.length === subCatOptions.length
+                                                }
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        const allIds = subCatOptions.map(item => item.value);
+                                                        setSelectedSubCat(allIds);
+                                                    } else {
+                                                        setSelectedSubCat([]);
+                                                    }
+                                                }}
+                                            />
+                                            <label className="form-check-label">Select All</label>
+                                        </div>}
+
+
+                                        {/* <div className="custom-frm-bx">
+                                            <label htmlFor="">Test Select</label>
+                                            <div class="select-wrapper">
+                                                <Select
+                                                    options={testOptions}
+                                                    isMulti
+                                                    required
+                                                    name="testId"
+                                                    classNamePrefix="custom-select"
+                                                    placeholder="Select areas(s)"
+                                                    onChange={(options) => {
+                                                        setSelectedTest(options.map(opt => opt.value)); // ✅ array of IDs
+                                                    }}
+                                                />
+                                            </div>
+
+                                        </div> */}
+
+                                        <div className="mt-3">
+                                            <button type="submit" className="nw-thm-btn w-100"> Submit</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="modal step-modal fade" id="edit-Lab" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-md">
+                    <div className="modal-content rounded-0">
+                        <div className="d-flex align-items-center justify-content-between border-bottom py-3 px-4">
+                            <div>
+                                <h6 className="lg_title mb-0">Edit  Lab Test </h6>
+                            </div>
+                            <div>
+                                <button type="button" className="" id="closeEditTest" data-bs-dismiss="modal" aria-label="Close" style={{ color: "rgba(239, 0, 0, 1)" }}>
+                                    <FontAwesomeIcon icon={faCircleXmark} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="modal-body pb-5 px-4 pb-5">
+                            <div className="row justify-content-center">
+                                <div className="col-lg-10">
+                                    <div className="add-deprtment-pic">
+                                        <img src="/add-lab.png" alt="" />
+                                        <p className="pt-2">Please add new lab test assign to patient</p>
+                                    </div>
+
+                                    <form onSubmit={handleTestSubmit}>
+                                        <div className="custom-frm-bx">
+                                            <label htmlFor="">Test Category</label>
+                                            <select name="" id="" className="form-select" required value={selectedCategory}
+                                                onChange={(e) =>{ setSelectedCategory(e.target.value)
+                                                    setSelectedSubCat([])
+                                                    setSubCatOptions([])
+                                                }}>
                                                 <option value="">----Select----</option>
                                                 {catAndSub?.map((item, index) => (
                                                     <option key={index} value={item._id} >{item.name}</option>

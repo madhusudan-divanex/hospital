@@ -357,9 +357,9 @@ function BedAllotmentHistory() {
                                                                     <li className="ad-info-item"> Room Number :<span className="add-info-title">{item?.bedId?.roomId?.roomName}</span></li>
                                                                     <li className="ad-info-item"> <b>Floor :</b><span className="add-info-title"> {item?.bedId?.floorId?.floorName}</span></li>
                                                                     <li className="ad-info-item"> <b>Bed :</b><span className="add-info-title"> {item?.bedId?.bedName}</span></li>
-                                                                    <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ${item?.bedId?.pricePerDay}</span></li>
+                                                                    <li className="ad-info-item"> Daily Rate :<span className="add-info-title"> ₹ {item?.bedId?.pricePerDay}</span></li>
                                                                     <li className="ad-info-item"> Department :<span className="add-info-title"> {item?.departmentId?.departmentName}</span></li>
-                                                                    <li className="ad-info-item"> Day:<span className="add-info-title"> 5</span></li>
+                                                                    {/* <li className="ad-info-item"> Day:<span className="add-info-title"> 5</span></li> */}
 
                                                                 </ul>
                                                             </div>
@@ -451,9 +451,9 @@ function BedAllotmentHistory() {
                                                                         </Link>
                                                                     </li> */}
                                                                     <li className="prescription-item">
-                                                                        <a className="prescription-nav" onClick={() => setSelected(item)} href="#" data-bs-toggle="modal" data-bs-target="#add-Payment">
+                                                                        <button className="prescription-nav" onClick={() => setSelected(item)} data-bs-toggle="modal" data-bs-target="#add-Payment">
                                                                             Add Payment
-                                                                        </a>
+                                                                        </button>
                                                                     </li>
                                                                     {item?.status=="Discharged" && !item?.transferId && <li className="prescription-item">
                                                                         <a
@@ -518,7 +518,7 @@ function BedAllotmentHistory() {
 
             {/* <!-- Payment Add Popup Start --> */}
             {/* <!--  data-bs-toggle="modal" data-bs-target="#add-Payment" --> */}
-            <AllotmentPayment allotmentId={selected?._id} patientId={selected?.patientId?._id} getData={fetchAllotments} />
+            <AllotmentPayment allotmentId={selected?._id}  getData={fetchAllotments} />
             {/* <!-- Payment Add Popup End --> */}
 
 

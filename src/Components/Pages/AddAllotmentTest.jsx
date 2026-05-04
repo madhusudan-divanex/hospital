@@ -36,7 +36,8 @@ function AddAllotmentTest({ allotmentId }) {
       const ids = data?.labAppointment?.subCatId?.map(item =>
         item._id 
       ) || []
-      setSelectedCatId(data?.labAppointment?.testId)
+      setSelectedCatId(data?.labAppointment?.testId[0])
+      console.log(ids)
       setSelectedSubCats(ids)
     } finally {
       setLoading(false)
@@ -62,15 +63,17 @@ function AddAllotmentTest({ allotmentId }) {
       setLoading(false)
     }
   }
-
+console.log(labTests)
   useEffect(() => {
-    if (allotmentId) fetchSelectedLabData()
+    if (allotmentId) {
+      fetchSelectedLabData()
+    }
   }, [allotmentId])
 
   // ─── Derived: selected category ka test object ────────────────
 
   const selectedLabTest = labTests.find(t => t._id === selectedCatId)
-
+console.log(selectedLabTest,labTests,selectedCatId)
   // Sirf active subCats dikhao
   const activeSubCats = selectedLabTest?.subCatData?.filter(
     s => s.status === 'active'

@@ -388,7 +388,7 @@ function TestReportsAppointment() {
                                                                         }) : '-'}
                                                                     </li>
                                                                     <li className="admin-appoint-item">
-                                                                        Total Amount : ${item?.fees}
+                                                                        Total Amount : ₹{item?.fees}
                                                                     </li>
                                                                 </ul>
                                                             </td>

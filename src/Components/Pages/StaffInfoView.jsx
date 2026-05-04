@@ -139,13 +139,13 @@ function StaffInfoView() {
                                                     <p className="vw-info-value">{staffData?.gender}</p>
                                                 </div>
                                             </li>
-                                            <li className="vw-info-item">
+                                            {/* <li className="vw-info-item">
                                                 <span className="vw-info-icon"><FontAwesomeIcon icon={faBuilding} /></span>
                                                 <div>
                                                     <p className="vw-info-title">Department </p>
                                                     <p className="vw-info-value">{employmentData?.department?.departmentName} </p>
                                                 </div>
-                                            </li>
+                                            </li> */}
                                             <li className="vw-info-item">
                                                 <span className="vw-info-icon"><FontAwesomeIcon icon={faHome} /></span>
                                                 <div>

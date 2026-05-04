@@ -211,8 +211,7 @@ function GenerateReport() {
             // Build components array for API
             const components = testItem.component.map((comp, index) => ({
                 cmpId: comp._id,
-                result: allComponentResults[testId]?.[index]?.result || "",
-                status: allComponentResults[testId]?.[index]?.status || ""
+                result: allComponentResults[testId]?.[index]?.result || ""
             }));
             // const payload = {
             //     labId: userId,
@@ -444,7 +443,6 @@ function GenerateReport() {
                                                                             <th>Unit</th>
                                                                             <th>Reference</th>
                                                                             <th>Result</th>
-                                                                            <th>Status</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -459,7 +457,7 @@ function GenerateReport() {
                                                                                         <tr key={i}>
                                                                                             <td>{item?.shortName} - {c?.title}</td>
                                                                                             <td>{c?.unit}</td>
-                                                                                            <td>{c?.referenceRange}</td>
+                                                                                            <td>{c?.optionType === 'text' ? `${c?.minRange}-${c?.maxRange}` : 'Positive-Negative'}</td>
                                                                                             <td>
                                                                                                 <div className="custom-frm-bx mb-0">
                                                                                                     {c?.optionType === 'text' ? (
@@ -500,42 +498,19 @@ function GenerateReport() {
                                                                                                                 }))
                                                                                                             }
                                                                                                         >
-                                                                                                            <option value="">Select</option>
-                                                                                                            {c?.result?.map((r) => (
-                                                                                                                <option key={r.value} value={r.value}>{r.value}</option>
-                                                                                                            ))}
+                                                                                                            <option value="">---Select status---</option>
+                                                                                                            <option value="Positive">Positive</option>
+                                                                                                            <option value="Negative">Negative</option>
                                                                                                         </select>
                                                                                                     )}
                                                                                                 </div>
                                                                                             </td>
-                                                                                            {/* New note column */}
-
-                                                                                            <td>
-                                                                                                <div className="custom-frm-bx ms-2 mb-0">
-                                                                                                    <select
-                                                                                                        className="form-select"
-                                                                                                        value={allComponentResults[item?._id]?.[i]?.status || ""}
-                                                                                                        onChange={(e) =>
-                                                                                                            setAllComponentResults(prev => ({
-                                                                                                                ...prev,
-                                                                                                                [item?._id]: {
-                                                                                                                    ...prev[item?._id],
-                                                                                                                    [i]: {
-                                                                                                                        ...prev[item?._id]?.[i],
-                                                                                                                        status: e.target.value
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            }))
-                                                                                                        }
-                                                                                                    >
-                                                                                                        <option value="">Select</option>
-                                                                                                        <option value="Positive">Positive</option>
-                                                                                                        <option value="Negative">Negative</option>
-                                                                                                    </select>
-                                                                                                </div>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td colSpan="4">
+                                                                                                <span className="fw-600">Note: </span>{selectedOption || "-"}
                                                                                             </td>
                                                                                         </tr>
-                                                                                        <tr><span className="fw-600">Note</span>{selectedOption || "-"}</tr>
 
                                                                                     </>
                                                                                 );
@@ -595,8 +570,9 @@ function GenerateReport() {
                                             </div>
                                         </div>
 
-                                        <div className="text-end mt-3" >
-                                            <button type="button" onClick={()=>navigate('/test-report-appointment')} className="nw-thm-btn rounded-4">Go Back</button>
+                                        <div className="d-flex justify-content-between mt-3" >
+                                            <button type="button" onClick={()=>navigate('/test-report-appointment')}
+                                             className="nw-thm-btn outine rounded-4">Go Back</button>
 
                                             <button type="submit" className="nw-thm-btn rounded-4">Submit</button>
                                         </div>

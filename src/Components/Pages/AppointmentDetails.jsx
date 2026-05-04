@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { getSecureApiData, updateApiData } from "../../Service/api"
 import { toast } from "react-toastify"
 import { useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import Loader from "../Common/Loader"
 
 function AppointmentDetails() {
@@ -14,7 +14,7 @@ function AppointmentDetails() {
   const [appointmentData, setAppointmentData] = useState({})
   const [payData, setPayData] = useState({ appointmentId, paymentStatus: 'due' })
   const [actData, setActData] = useState({ appointmentId, status: '' })
-  const [loading,setLoading] =useState(false)
+  const [loading, setLoading] = useState(false)
   const fetchAppointmentData = async () => {
     setLoading(true)
     try {
@@ -26,7 +26,7 @@ function AppointmentDetails() {
       }
     } catch (error) {
 
-    } finally{
+    } finally {
       setLoading(false)
     }
   }
@@ -45,9 +45,9 @@ function AppointmentDetails() {
     try {
       const response = await updateApiData(`api/hospital/lab-action`, data);
       if (response.success) {
-        if(type=='status'){
+        if (type == 'status') {
           document.getElementById('aptStatus').click()
-        }else{
+        } else {
           document.getElementById('pytStatus').click()
         }
         fetchAppointmentData()
@@ -60,127 +60,130 @@ function AppointmentDetails() {
   }
   return (
     <>
-      {loading?<Loader/>
-      :<div className="main-content flex-grow-1 p-3 overflow-auto">
-        <form action="">
-          <div className="row mb-3">
-            <div className="d-flex align-items-center justify-content-between">
-              <div>
-                <h3 className="innr-title mb-2">Appointment Details</h3>
-                <div className="admin-breadcrumb">
-                  <nav aria-label="breadcrumb">
-                    <ol className="breadcrumb custom-breadcrumb">
-                      <li className="breadcrumb-item">
-                        <a href="#" className="breadcrumb-link">
-                          Dashboard
-                        </a>
-                      </li>
-                      <li className="breadcrumb-item">
-                        <a href="#" className="breadcrumb-link">
-                          Test  Request
-                        </a>
-                      </li>
-                      <li
-                        className="breadcrumb-item active"
-                        aria-current="page"
-                      >
-                        Appointment  Details
-                      </li>
-                    </ol>
-                  </nav>
+      {loading ? <Loader />
+        : <div className="main-content flex-grow-1 p-3 overflow-auto">
+          <form action="">
+            <div className="row mb-3">
+              <div className="d-flex align-items-center justify-content-between">
+                <div>
+                  <h3 className="innr-title mb-2">Appointment Details</h3>
+                  <div className="admin-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                      <ol className="breadcrumb custom-breadcrumb">
+                        <li className="breadcrumb-item">
+                          <a href="#" className="breadcrumb-link">
+                            Dashboard
+                          </a>
+                        </li>
+                        <li className="breadcrumb-item">
+                          <a href="#" className="breadcrumb-link">
+                            Test  Request
+                          </a>
+                        </li>
+                        <li
+                          className="breadcrumb-item active"
+                          aria-current="page"
+                        >
+                          Appointment  Details
+                        </li>
+                      </ol>
+                    </nav>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </form>
+
+          <div className="submega-main-bx sub-tab-brd">
+            <div className="row">
+              <div className="col-lg-6 mb-3">
+                <div className="patient-main-bx">
+                  <h5>Appointment  Details</h5>
+                  <div>
+                    <ul className="vw-info-list">
+                      <li className="vw-info-item">
+                        <span className="vw-info-icon"><img src="/schedule.svg" alt="" /></span>
+                        <div>
+                          <p className="vw-info-value mb-2">Appointment Date</p>
+                          <p className="vw-info-title">{new Date(appointmentData?.date)?.toLocaleString('en-GB')}</p>
+                        </div>
+                      </li>
+
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="nw-appointment-crd-details">
+                  <ul className="nw-appointment-crd-list">
+                    <li className="nw-appointment-crd-item">Appointment ID : <span className="nw-appointment-crd-title">#{appointmentData?.customId}</span></li>
+                    <li className="nw-appointment-crd-item">Appointment Completed date  : <span className="nw-appointment-crd-title">{appointmentData?.status === 'deliver-report' ? new Date(appointmentData?.updatedAt)?.toLocaleDateString('en-GB') : '-'}</span></li>
+                    <li className="nw-appointment-crd-item">Amount : <span className="nw-appointment-crd-title"> ₹ {appointmentData?.fees}</span></li>
+                    <li className="nw-appointment-crd-item">Payment Status : <span className="nw-appointment-due-title"> {appointmentData?.paymentStatus}</span></li>
+                  </ul>
+                </div>
+
+              </div>
+
+              <div className="col-lg-6">
+                <div className="d-flex gap-3 justify-content-end mb-3">
+                  <div>
+                    <h6 className="subtitle mb-2">Payment Status</h6>
+                    <ul className="admin-paid-list justify-content-center">
+                      <li>
+                        <span className={`text-capitalize paid ${appointmentData?.paymentStatus == 'due' && 'due'}`}>{appointmentData?.paymentStatus}</span>
+                      </li>
+                      <li>
+                        <a
+                          href="javascript:void(0)"
+                          className="edit-btn" data-bs-toggle="modal" data-bs-target="#payment-Status"
+                        >
+                          <FontAwesomeIcon icon={faPen} />
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h6 className="subtitle mb-2">Appointment Status</h6>
+                    <ul className="admin-paid-list justify-content-center">
+                      <li>
+
+                        <span className={`text-capitalize paid ${appointmentData?.status == 'pending' && 'pending'}`}>
+                          {appointmentData?.status}
+                        </span>
+                      </li>
+                      <li>
+                        <a
+                          href="javascript:void(0)"
+                          className="edit-btn" data-bs-toggle="modal" data-bs-target="#appointment-Status"
+                        >
+                          <FontAwesomeIcon icon={faPen} />
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+
+                </div>
+
+                {appointmentData?.staff && <div className="nw-laboratory-bill-bx mt-lg-5 mt-sm-3 mb-3">
+                  <h6 className="my-0">Lab Doctor </h6>
+                  <h4>{appointmentData?.staff?.name}</h4>
+                  <p><span className="laboratory-phne"> ID :</span> {appointmentData?.staff?.nh12}</p>
+                </div>}
+                {appointmentData?.doctorId && <div className="nw-laboratory-bill-bx mb-3">
+                  <h6 className="my-0">Lab tests prescribed by the doctor</h6>
+                  <h4>Dr.James Harris</h4>
+                  <p><span className="laboratory-phne"> ID :</span> DO-7668</p>
+                </div>}
               </div>
             </div>
           </div>
-        </form>
-
-        <div className="submega-main-bx sub-tab-brd">
-          <div className="row">
-            <div className="col-lg-6 mb-3">
-              <div className="patient-main-bx">
-                <h5>Appointment  Details</h5>
-                <div>
-                  <ul className="vw-info-list">
-                    <li className="vw-info-item">
-                      <span className="vw-info-icon"><img src="/schedule.svg" alt="" /></span>
-                      <div>
-                        <p className="vw-info-value mb-2">Appointment Date</p>
-                        <p className="vw-info-title">{new Date(appointmentData?.date)?.toLocaleString('en-GB')}</p>
-                      </div>
-                    </li>
-
-                  </ul>
-                </div>
-              </div>
-
-              <div className="nw-appointment-crd-details">
-                <ul className="nw-appointment-crd-list">
-                  <li className="nw-appointment-crd-item">Appointment ID : <span className="nw-appointment-crd-title">#{appointmentData?.customId}</span></li>
-                  <li className="nw-appointment-crd-item">Appointment Completed date  : <span className="nw-appointment-crd-title">{appointmentData?.status === 'deliver-report' ? new Date(appointmentData?.updatedAt)?.toLocaleDateString('en-GB') : '-'}</span></li>
-                  <li className="nw-appointment-crd-item">Amount : <span className="nw-appointment-crd-title"> ₹ {appointmentData?.fees}</span></li>
-                  <li className="nw-appointment-crd-item">Payment Status : <span className="nw-appointment-due-title"> {appointmentData?.paymentStatus}</span></li>
-                </ul>
-              </div>
-
-            </div>
-
-            <div className="col-lg-6">
-              <div className="d-flex gap-3 justify-content-end mb-3">
-                <div>
-                  <h6 className="subtitle mb-2">Payment Status</h6>
-                  <ul className="admin-paid-list justify-content-center">
-                    <li>
-                      <span className={`text-capitalize paid ${appointmentData?.paymentStatus=='due'&& 'due'}`}>{appointmentData?.paymentStatus}</span>
-                    </li>
-                    <li>
-                      <a
-                        href="javascript:void(0)"
-                        className="edit-btn" data-bs-toggle="modal" data-bs-target="#payment-Status"
-                      >
-                        <FontAwesomeIcon icon={faPen} />
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h6 className="subtitle mb-2">Appointment Status</h6>
-                  <ul className="admin-paid-list justify-content-center">
-                    <li>
-
-                      <span className={`text-capitalize paid ${appointmentData?.status=='pending'&& 'pending'}`}>
-                        {appointmentData?.status}
-                      </span>
-                    </li>
-                    <li>
-                      <a
-                        href="javascript:void(0)"
-                        className="edit-btn" data-bs-toggle="modal" data-bs-target="#appointment-Status"
-                      >
-                        <FontAwesomeIcon icon={faPen} />
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-              </div>
-
-              {appointmentData?.staff && <div className="nw-laboratory-bill-bx mt-lg-5 mt-sm-3 mb-3">
-                <h6 className="my-0">Lab Doctor </h6>
-                <h4>{appointmentData?.staff?.name}</h4>
-                <p><span className="laboratory-phne"> ID :</span> {appointmentData?.staff?.nh12}</p>
-              </div>}
-              {appointmentData?.doctorId && <div className="nw-laboratory-bill-bx mb-3">
-                <h6 className="my-0">Lab tests prescribed by the doctor</h6>
-                <h4>Dr.James Harris</h4>
-                <p><span className="laboratory-phne"> ID :</span> DO-7668</p>
-              </div>}
-            </div>
+          <div className="text-end mt-3">
+            <Link to={-1} className="nw-thm-btn outline">Go Back</Link>
           </div>
-        </div>
 
 
-      </div>}
+        </div>}
 
       {/*Payment Status Popup Start  */}
       {/* data-bs-toggle="modal" data-bs-target="#payment-Status" */}

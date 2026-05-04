@@ -42,12 +42,7 @@ function Invoice() {
       fetchAppointmentData()
     }
   }, [appointmentId])
-  // Calculate subtotal, GST and total
-  const subtotal = appointmentData?.testData
-    ?.reduce((acc, item) => acc + Number(item?.fees || 0), 0) || 0;
-
-  const gst = subtotal * 0.05;
-  const total = subtotal 
+  
   const handleReportDownload = (appointmentId) => {
     setPdfLoading(true)
     // setSelectedReport({ appointmentId });
@@ -71,30 +66,61 @@ function Invoice() {
   }, [appointmentData])
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData({ ...formData, [name]: value })
+    const updatedData = { ...formData, [name]: value }
+
+    if (name === 'discount' || name === 'taxes') {
+      const subTotal = Number(updatedData.subTotal || 0)
+      const discount = Number(updatedData.discount || 0)
+      const taxes = Number(updatedData.taxes || 0)
+
+      const discountAmount = (subTotal * discount) / 100
+      const afterDiscount = subTotal - discountAmount
+      const taxAmount = (afterDiscount * taxes) / 100
+      const total = afterDiscount + taxAmount
+
+      // Round to 2 decimal places to prevent precision issues
+      updatedData.total = Math.round((total + Number.EPSILON) * 100) / 100
+    }
+
+    setFormData(updatedData)
   }
   useEffect(() => {
-    const subTotal = Number(formData.subTotal || 0);
-    const discount = Number(formData.discount || 0);
-    const tax = Number(formData.taxes || 0);
+    if (!appointmentData?.testId?.length) return
 
-    // Calculate discount amount
-    const discountAmount = (subTotal * discount) / 100;
+    const sub = appointmentData.testId.reduce((acc, test) => {
+      const totalSubCats = appointmentData?.subCatId?.filter(
+        s => s?.category?.toString() === test?.category?._id?.toString()
+      )?.length
 
-    // Price after discount
-    const discountedPrice = subTotal - discountAmount;
+      const selectedSubCats = test?.subCatData?.length
+      const isAllSelected = totalSubCats === selectedSubCats
 
-    // GST amount
-    const taxAmount = (discountedPrice * tax) / 100;
+      if (isAllSelected) {
+        // Sari subcategories select hain — totalAmount use karo
+        return acc + Number(test?.totalAmount || 0)
+      } else {
+        // Sirf selected subcategories ka price add karo
+        const partial = test?.subCatData?.reduce(
+          (sum, sub) => sum + Number(sub?.price || 0), 0
+        )
+        return acc + partial
+      }
+    }, 0)
 
-    // Final total
-    const total = discountedPrice + taxAmount;
-
-    setFormData((prev) => ({
-      ...prev,
-      total: total.toFixed(2), // optional rounding
-    }));
-  }, [formData.subTotal, formData.discount, formData.taxes]);
+    if (appointmentData?.invoiceId) {
+      const data = appointmentData.invoiceId
+      setFormData({
+        ...formData,
+        subTotal: data?.subTotal,
+        discount: data?.discount,
+        total: data?.total,
+        taxes: data?.taxes,
+        paymentType: data?.paymentType
+      })
+    } else {
+      setFormData(prev => ({ ...prev, subTotal: sub, total: sub }))
+    }
+  }, [appointmentData])
 
   const billSubmit = async () => {
     if (!formData?.paymentType) {
@@ -187,8 +213,47 @@ function Invoice() {
                   <div className="laboratory-report-bx">
                     <ul className="laboratory-report-list">
                       <li className="laboratory-item"><span>Test</span> <span>Price</span></li>
-                      {appointmentData?.testData?.map((item, key) =>
-                        <li className="laboratory-item border-0" key={key}><span>{item?.name}</span> <span>₹{item?.fees}</span></li>)}
+                      {appointmentData?.testId?.map((test, key) => {
+
+                        // 👉 total available subcategories (from master list)
+                        const totalSubCats = appointmentData?.subCatId?.filter(
+                          s => s?.category?.toString() === test?.category?._id?.toString()
+                        )?.length;
+
+                        // 👉 selected subcategories (from test data)
+                        const selectedSubCats = test?.subCatData?.length;
+                        const isAllSelected = totalSubCats === selectedSubCats;
+
+                        return (
+                          <div key={key}>
+
+                            {/* ✅ Category */}
+                            <li className="laboratory-item border-0">
+                              <strong>{test?.category?.name}</strong>
+
+                              {/* 👉 condition */}
+                              {isAllSelected && (
+                                <span>₹ {test?.totalAmount}</span>
+                              )}
+                            </li>
+
+                            {/* ✅ Subcategories */}
+                            {test?.subCatData?.map((sub, i) => {
+                              const subCategoryData = appointmentData?.subCatId?.find(
+                                s => s?._id?.toString() === sub?.subCat?.toString()
+                              );
+
+                              return (
+                                <li className="laboratory-item border-0 ps-3" key={i}>
+                                  <span>{subCategoryData?.subCategory}</span>
+                                  {!isAllSelected && <span>₹ {sub?.price}</span>}
+                                </li>
+                              );
+                            })}
+
+                          </div>
+                        );
+                      })}
                     </ul>
 
                     <div className="">
@@ -204,7 +269,7 @@ function Invoice() {
                           <label className="form-label">Discount (%) :  </label>
                         </div>
                         <div className="col-lg-6  mt-2">
-                          <input type="number" min={0} className="form-control"
+                          <input type="number" min={0} max={99} className="form-control"
                             readOnly={appointmentData?.invoiceId} value={formData?.discount}
                             onChange={handleChange} name="discount" />
                         </div>

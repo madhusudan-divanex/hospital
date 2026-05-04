@@ -162,6 +162,7 @@ function AllotmentPayment({ allotmentId, getData }) {
 
         }
     }
+    console.log(formData)
     useEffect(() => {
         if (allotmentId) {
             fetchAllotmentPayment()
@@ -333,9 +334,9 @@ function AllotmentPayment({ allotmentId, getData }) {
                                 <div>
                                     {/* {havePayment && <button className="print-btn no-print" onClick={handleReportDownload}> <FontAwesomeIcon icon={faDownload} /> Download PDF</button>} */}
 
-                                    <button type="button" className="" onClick={handleCloseModal} aria-label="Close" style={{ color: "#00000040" }}>
+                                    {/* <button type="button" className="" onClick={handleCloseModal} aria-label="Close" style={{ color: "#00000040" }}>
                                         <FontAwesomeIcon icon={faCircleXmark} />
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
                             <div className="modal-body pb-5 px-4 pb-5">
@@ -358,11 +359,11 @@ function AllotmentPayment({ allotmentId, getData }) {
 
                                         </div>
                                     </div>
-                                    <div className="my-3">
+                                    {formData?.ipdPayment?.length > 0 && <div className="my-3">
                                         <h5 className="add-contact-title text-black mb-3">IPD Payment</h5>
 
 
-                                        {formData?.ipdPayment?.length > 0 && formData?.ipdPayment?.map((item, key) =>
+                                        {formData?.ipdPayment?.map((item, key) =>
                                             <div className="education-frm-bx mb-3 py-2 bg-transparent" key={key}>
                                                 <div action="">
                                                     {item?.role == "doctor" ? <div className="row">
@@ -436,13 +437,13 @@ function AllotmentPayment({ allotmentId, getData }) {
                                                 </div>
                                             </div>)}
 
-                                    </div>
+                                    </div>}
                                     {formData?.bedCharges?.length > 0 && <div className="my-3">
                                         <h5 className="add-contact-title text-black mb-3">Bed Charges</h5>
 
-
                                         {formData?.bedCharges?.map((item, key) =>
                                             <div className="education-frm-bx mb-3 py-2 bg-transparent" key={key}>
+                                                
                                                 <div action="">
                                                     <div className="row">
                                                         <div className="col-lg-6 col-md-6 col-sm-12">

@@ -19,14 +19,17 @@ function PrescriptionsBar() {
     const [prescriptionData, setPrescriptionData] = useState([])
     const [presData,setPresData]=useState()
     const [patientPrescription, setPatientPrescription] = useState([])
+    const [currentPage,setCurrentPage]=useState(1)
+    const [totalPage,setTotalPage]=useState()
     async function fetchPrescriptionDetails() {
         try {
-            const response = await getSecureApiData(`pharmacy/patient-prescription/${patientId}`);
+            const response = await getSecureApiData(`pharmacy/patient-prescription/${patientId}?page=${currentPage}`);
             if (response.success) {
                 setPtData(response.user)
                 setMedicalHistory(response.medicalHistory)
                 setDemographicData(response.demographic)
                 setPrescriptionData(response.prescription)
+                setTotalPage(response.pagination.totalPages)
                 setPatientPrescription(response.patientPrescription.prescriptions)
             } else {
                 toast.error("Failed to fetch sell details");
@@ -38,7 +41,7 @@ function PrescriptionsBar() {
     }
     useEffect(() => {
         fetchPrescriptionDetails();
-    }, [patientId]);
+    }, [patientId,currentPage]);
     const calculateAge = (dob) => {
         if (!dob) return "";
 
@@ -205,7 +208,7 @@ function PrescriptionsBar() {
                                                         prescriptionData?.map((item, key) =>
                                                             <div className="col-lg-12 mb-3" key={key}>
                                                                 <div className="new-pharmacy-detail-card">
-                                                                    <div className="admin-table-bx d-flex align-items-center justify-content-between new-prescription-bars">
+                                                                    <div className="admin-table-bx w-100 d-flex align-items-center justify-content-between new-prescription-bars">
                                                                         <div className="">
                                                                             <div className="admin-table-sub-details d-flex align-items-center gap-2">
                                                                                 <img src={item?.status!=='Inactive' ? "/prescriptions.png" : "/in-active.png"} alt="" />

@@ -158,6 +158,9 @@ import PatientsHistory from "./Pages/PatientHistory";
 import PatientTransferLetter from "../All Template file/Patient transfer";
 import PatientsOptData from "./Pages/PatientOptData";
 import PatientEmergencyData from "./Pages/PatientEmergencyData";
+import BedInvoice from "../All Template file/Bed invoice";
+import LabTestOrder from "../All Template file/Lab Test Order";
+import LabReportPdf from "../All Template file/Lab report file/Lab report";
 
 function Router() {
  const { socket, startCall } = useGlobalSocket();
@@ -216,6 +219,10 @@ function Router() {
         {        
           path:"/prescription-template/:id",
           element: <MedicalPrescription />
+        },
+        {        
+          path:"/bed-invoice/:id",
+          element: <LabReportPdf />
         }
       ]
     },
