@@ -9,6 +9,7 @@ import Loader from '../Common/Loader'
 import { QRCodeCanvas } from "qrcode.react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCropAlt, faCross, faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons'
+import DischargeSummary from '../../All Template file/Discharge summary'
 function NewDischarge() {
     const params = useParams()
     const allotmentId = params.id
@@ -21,6 +22,7 @@ function NewDischarge() {
     const [dischargeData, setDischargeData] = useState()
     const [loading, setLoading] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [pdfLoading, setPdfLoading] = useState(false)
     const fetchAllotmentData = async () => {
         try {
             setLoading(true)
@@ -84,8 +86,10 @@ function NewDischarge() {
                     followUpPlan: data?.followUpPlan || "",
                     redFlag: data?.redFlag || "",
                     dischargeNote: data?.dischargeNote || "",
-                    doctorSignature: data?.doctorSignature || "",
+                    doctorSignature: data?.doctorSignature?.nh12 || "",
+                    nurseSignature: data?.nurseSignature?.nh12 || ""
                 })
+                setVitals({ ...data?.vitals })
             } else {
                 toast.error(response.message)
             }
@@ -159,12 +163,32 @@ function NewDischarge() {
         redFlag: "",
         dischargeNote: "",
         doctorSignature: "",
+        nurseSignature: "",
+    })
+    const [vitals, setVitals] = useState({
+        height: "",
+        weight: "",
+        bloodPressure: "",
+        pulse: "",
+        temperature: "",
+        respiratoryRate: "",
+        oxygenSaturation: "",
+        bloodSugar: "",
+        bmi: "",
+        painLevel: "",
+        vision: "",
+        hearing: "",
+        other: "",
     })
     const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value } = e.target
         setFormData({ ...formData, [name]: value })
+    }
+    const handleVitalChange = (e) => {
+        const { name, value } = e.target
+        setVitals({ ...vitals, [name]: value })
     }
     const handleMedicationChange = (index, field, value) => {
         const updatedMedications = [...prescriptionData.medications];
@@ -330,6 +354,9 @@ function NewDischarge() {
         if (!formData.doctorSignature.trim()) {
             errors.doctorSignature = "Doctor signature is required";
         }
+        if (!formData.nurseSignature.trim()) {
+            errors.nurseSignature = "Nurse signature is required";
+        }
 
         // Confirmation checkboxes
         const confirmation = formData.confirmation;
@@ -360,7 +387,7 @@ function NewDischarge() {
             setErrors(validationErrors);
             return;
         }
-        const data = { allotmentId, ...formData }
+        const data = { allotmentId, ...formData, vitals: JSON.stringify(vitals) }
         try {
             setLoading(true)
             const res = await securePostData('api/bed/discharge-patient', data)
@@ -383,8 +410,8 @@ function NewDischarge() {
             height: 200,
             readonly: false,
             toolbarAdaptive: false,
-             iframe: true,
-    iframeStyle: `
+            iframe: true,
+            iframeStyle: `
       body { font-family: sans-serif; padding: 10px; }
       ul { list-style-type: disc !important; padding-left: 2rem !important; margin: 0.5rem 0 !important; }
       ol { list-style-type: decimal !important; padding-left: 2rem !important; margin: 0.5rem 0 !important; }
@@ -431,7 +458,10 @@ function NewDischarge() {
                         {dischargeData?.customId &&
                             <div className='d-flex justify-content-between align-items-center'>
                                 <h6>Discharge QR</h6>
-                                <div className="" style={{ width: '200px', height: '200px' }} >
+                                <div>
+                                    <button className='nw-thm-btn' disabled={pdfLoading} onClick={() => setPdfLoading(true)}>{pdfLoading ? 'Downloading...' : 'Download'}</button>
+                                </div>
+                                {/* <div className="" style={{ width: '200px', height: '200px' }} >
 
                                     <QRCodeCanvas
                                         value={`http://hospitals.neohealthcard.com/download/discharge/${dischargeData?.customId}`}
@@ -439,7 +469,7 @@ function NewDischarge() {
                                         className="qr-code"
                                         style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                                     />
-                                </div>
+                                </div> */}
                             </div>}
                         <form>
                             <div className="row">
@@ -1033,17 +1063,110 @@ function NewDischarge() {
                                     </div>
                                     {errors?.confirmationFollowUp && <small className='text-danger'>{errors?.confirmationFollowUp}</small>}
                                 </div>
-                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                <div className="col-12">
+                                    <div className="">
+                                        <h5 className="add-contact-title">Vitals</h5>
+                                    </div>
+                                </div>
+                                <div className="col-lg-3 col-md-4 col-sm-6">
                                     <div className="custom-frm-bx">
-                                        <label className='form-label'>Doctor Signature</label>
+                                        <label className='form-label'>Height (cm)</label>
                                         <input
                                             type="text"
-                                            value={formData.doctorSignature}
-                                            name='doctorSignature'
-                                            onChange={handleChange}
+                                            value={vitals.height}
+                                            name='height'
+                                            onChange={handleVitalChange}
                                             className="form-control"
                                         />
-                                        {errors?.doctorSignature && <small className='text-danger'>{errors?.doctorSignature}</small>}
+                                    </div>
+                                </div>
+                                <div className="col-lg-3 col-md-4 col-sm-6">
+                                    <div className="custom-frm-bx">
+                                        <label className='form-label'>Weigth (kg)</label>
+                                        <input
+                                            type="text"
+                                            value={vitals.weight}
+                                            name='weight'
+                                            onChange={handleVitalChange}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-3 col-md-4 col-sm-6">
+                                    <div className="custom-frm-bx">
+                                        <label className='form-label'>Pulse</label>
+                                        <input
+                                            type="text"
+                                            value={vitals.pulse}
+                                            name='pulse'
+                                            onChange={handleVitalChange}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-3 col-md-4 col-sm-6">
+                                    <div className="custom-frm-bx">
+                                        <label className='form-label'>S<sub>p</sub>O<sub>2</sub></label>
+                                        <input
+                                            type="text"
+                                            value={vitals.oxygenSaturation}
+                                            name='oxygenSaturation'
+                                            onChange={handleVitalChange}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-3 col-md-4 col-sm-6">
+                                    <div className="custom-frm-bx">
+                                        <label className='form-label'>Blood Pressure</label>
+                                        <input
+                                            type="text"
+                                            value={vitals.bloodPressure}
+                                            name='bloodPressure'
+                                            onChange={handleVitalChange}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-3 col-md-4 col-sm-6">
+                                    <div className="custom-frm-bx">
+                                        <label className='form-label'>Temperature (F)</label>
+                                        <input
+                                            type="text"
+                                            value={vitals.temperature}
+                                            name='temperature'
+                                            onChange={handleVitalChange}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row">
+
+                                    <div className="col-lg-4 col-md-6 col-sm-12">
+                                        <div className="custom-frm-bx">
+                                            <label className='form-label'>Doctor Signature</label>
+                                            <input
+                                                type="text"
+                                                value={formData.doctorSignature}
+                                                name='doctorSignature'
+                                                onChange={handleChange}
+                                                className="form-control"
+                                            />
+                                            {errors?.doctorSignature && <small className='text-danger'>{errors?.doctorSignature}</small>}
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-4 col-md-6 col-sm-12">
+                                        <div className="custom-frm-bx">
+                                            <label className='form-label'>Nurse Signature</label>
+                                            <input
+                                                type="text"
+                                                value={formData.nurseSignature}
+                                                name='nurseSignature'
+                                                onChange={handleChange}
+                                                className="form-control"
+                                            />
+                                            {errors?.nurseSignature && <small className='text-danger'>{errors?.nurseSignature}</small>}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1063,6 +1186,9 @@ function NewDischarge() {
                         >
                             Go Back
                         </Link>
+                    </div>
+                    <div className='d-none'>
+                        <DischargeSummary allotmentId={allotmentId} pdfLoading={pdfLoading} endLoading={()=>setPdfLoading(false)}/>
                     </div>
 
 

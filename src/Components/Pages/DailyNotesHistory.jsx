@@ -29,6 +29,9 @@ function DailyNotesHistory() {
     const navigate = useNavigate()
 
     const fetchHistory = async () => {
+        if(!allotmentId){
+            return
+        }
         try {
             setLoading(true)
             const res = await getSecureApiData(`api/ipd-note/history/${allotmentId}?page=${page}`);
@@ -81,11 +84,11 @@ function DailyNotesHistory() {
         const tab = new window.bootstrap.Tab(tabEl);
         tab.show();
     };
-    useEffect(() => {
-        if (!allotmentId) {
-            navigate('/bed-allotment-history')
-        }
-    }, [allotmentId])
+    // useEffect(() => {
+    //     if (!allotmentId) {
+    //         navigate('/bed-allotment-history')
+    //     }
+    // }, [allotmentId])
     return (
         <>
             {loading ? <Loader />

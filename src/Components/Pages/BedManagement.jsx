@@ -25,6 +25,7 @@ import DepartmentTransfer from "./DepartmentTransfer";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
 import { Hospital } from "lucide-react";
 import HospitalTransfer from "./HospitalTransfer";
+import BedInvoice from "../../All Template file/Bed invoice";
 function BedManagement() {
   const navigate = useNavigate();
   const dispatch = useDispatch()
@@ -32,6 +33,7 @@ function BedManagement() {
   const [selectedBed, setSelectedBed] = useState(null);
   const [floors, setFloors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pdfLoading, setPdfLoading] = useState(false)
   const [openDailyNotes, setOpenDailyNotes] = useState(false);
   const { permissions, isOwner } = useSelector(state => state.user)
   const fetchBedManagement = async () => {
@@ -180,7 +182,6 @@ function BedManagement() {
     }
   }
   const handleDischarge = () => {
-    console.log(selectedBed)
     // Close modal manually
     const modal = document.getElementById("bed-Option");
     const modalInstance = window.bootstrap.Modal.getInstance(modal);
@@ -292,7 +293,8 @@ function BedManagement() {
                                   onClick={() => {
                                     if (searchParams.get('patientId') && bed.status !== "Booked") {
                                       navigate(`/allotment/${bed._id}?patientId=${searchParams.get('patientId')}`)
-                                    } else { openBedModal(bed) 
+                                    } else {
+                                      openBedModal(bed)
 
                                     }
                                   }
@@ -507,12 +509,14 @@ function BedManagement() {
                     </button>
                   </li>
                   <li className="bed-list-item">
-                    <NavLink to="" className="bed-nav-link">
-                      Print Details
+                    <button onClick={()=>{
+                      setPdfLoading(true)
+                    }} disabled={pdfLoading} className="bed-nav-link">
+                      {pdfLoading?'Printing...':'Print'} Details
                       <span className="nw-chevron-btn">
                         <FontAwesomeIcon icon={faChevronRight} />
                       </span>
-                    </NavLink>
+                    </button>
                   </li>
                   <li className="bed-list-item">
                     <button
@@ -620,6 +624,9 @@ function BedManagement() {
       {/* <!--  data-bs-toggle="modal" data-bs-target="#discharge-Patient" --> */}
       <DischargePatient allotmentId={(selectedBed?.allotmentId)} fetchData={() => fetchBedManagement()} />
       {/* <!-- Discharge Patient Popup End --> */}
+      <div className="d-none" >
+        <BedInvoice allotmentId={selectedBed?.allotmentId} pdfLoading={pdfLoading} endLoading={() => setPdfLoading(false)} />
+      </div>
       <DailyIPDNotes data={selectedBed} openTrigger={openDailyNotes} />
       <AddAllotmentTest allotmentId={selectedBed?.allotmentId} />
       <DepartmentTransfer data={selectedBed} getData={fetchBedManagement} />

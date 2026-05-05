@@ -15,6 +15,7 @@ import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import DoctorAppointmentBilling from "./DoctorAppointmentBilling";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
 import DoctorAptBookingReceipt from "../../All Template file/Booking receipt";
+import OPDReceipt from "../../All Template file/opd receipt";
 function Appointments() {
     const navigate = useNavigate()
     const user = JSON.parse(localStorage.getItem('user'))
@@ -648,7 +649,7 @@ function Appointments() {
 
                                         <div className="laboratory-report-bx">
                                             <ul className="laboratory-report-list">
-                                                <li className="laboratory-item border-0">Sub Total <span className="laboratory-title">${totalAmount}</span></li>
+                                                <li className="laboratory-item border-0">Sub Total <span className="laboratory-title">₹ {totalAmount}</span></li>
                                                 {isDiscount &&
                                                     <>
                                                         <li className="laboratory-item border-0">Discount Type <span className="laboratory-title">
@@ -668,7 +669,7 @@ function Appointments() {
                                                             </div>
                                                         </span></li>
                                                     </>}
-                                                <li className="laboratory-item border-0">Total Amount <span className="laboratory-title">${finalAmount}</span></li>
+                                                <li className="laboratory-item border-0">Total Amount <span className="laboratory-title">₹ {finalAmount}</span></li>
                                             </ul>
                                         </div>
 
@@ -683,9 +684,9 @@ function Appointments() {
                         </div>
                     </div>
                     <div className="d-none">
-                        {activeApt && <DoctorAptBookingReceipt paymentId={activeApt?.invoiceId}
+                         <OPDReceipt appointmentId={activeApt?._id}
                             endLoading={() => setPdfLoading(false)}
-                            pdfLoading={pdfLoading} />}
+                            pdfLoading={pdfLoading} />
                     </div>
                     <div className="modal step-modal fade" id="apt-Vitals" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1"
                         aria-labelledby="staticBackdropLabel" aria-hidden="true">

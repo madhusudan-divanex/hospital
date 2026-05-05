@@ -1,4 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getApiData } from "../Service/api";
+import { toast } from "react-toastify";
+import html2pdf from "html2pdf.js";
+import { calculateAge } from "../Service/globalFunction";
+import base_url from "../baseUrl";
+import { QRCodeCanvas } from "qrcode.react";
 
 // ─── Fonts & Bootstrap (CDN — no install needed) ─────────────────────────
 const ExternalLinks = () => (
@@ -23,35 +30,35 @@ const QRCode = () => (
   >
     <rect width="70" height="70" fill="white" />
     {/* TL finder */}
-    <rect x="3"  y="3"  width="19" height="19" fill="#222" rx="1" />
-    <rect x="6"  y="6"  width="13" height="13" fill="white" />
-    <rect x="9"  y="9"  width="7"  height="7"  fill="#222" />
+    <rect x="3" y="3" width="19" height="19" fill="#222" rx="1" />
+    <rect x="6" y="6" width="13" height="13" fill="white" />
+    <rect x="9" y="9" width="7" height="7" fill="#222" />
     {/* TR finder */}
-    <rect x="48" y="3"  width="19" height="19" fill="#222" rx="1" />
-    <rect x="51" y="6"  width="13" height="13" fill="white" />
-    <rect x="54" y="9"  width="7"  height="7"  fill="#222" />
+    <rect x="48" y="3" width="19" height="19" fill="#222" rx="1" />
+    <rect x="51" y="6" width="13" height="13" fill="white" />
+    <rect x="54" y="9" width="7" height="7" fill="#222" />
     {/* BL finder */}
-    <rect x="3"  y="48" width="19" height="19" fill="#222" rx="1" />
-    <rect x="6"  y="51" width="13" height="13" fill="white" />
-    <rect x="9"  y="54" width="7"  height="7"  fill="#222" />
+    <rect x="3" y="48" width="19" height="19" fill="#222" rx="1" />
+    <rect x="6" y="51" width="13" height="13" fill="white" />
+    <rect x="9" y="54" width="7" height="7" fill="#222" />
     {/* Data modules */}
     {[
-      [26,3],[32,3],[38,3],[44,3],
-      [26,9],[35,9],[41,9],
-      [26,15],[32,15],[38,15],
-      [3,26],[9,26],[15,26],[21,26],
-      [6,32],[12,32],[18,32],
-      [3,38],[9,38],[15,38],
-      [3,44],[9,44],[15,44],[21,44],
-      [26,26],[32,26],[38,26],[44,26],
-      [29,32],[38,32],[47,32],[53,32],[59,32],[65,32],
-      [26,38],[35,38],[44,38],[50,38],[56,38],[65,38],
-      [26,44],[32,44],[38,44],[47,44],[53,44],[59,44],
-      [47,47],[53,47],[62,47],
-      [47,53],[56,53],[65,53],
-      [50,56],[59,56],
-      [47,62],[53,62],[59,62],[65,62],
-      [50,65],[56,65],[62,65],
+      [26, 3], [32, 3], [38, 3], [44, 3],
+      [26, 9], [35, 9], [41, 9],
+      [26, 15], [32, 15], [38, 15],
+      [3, 26], [9, 26], [15, 26], [21, 26],
+      [6, 32], [12, 32], [18, 32],
+      [3, 38], [9, 38], [15, 38],
+      [3, 44], [9, 44], [15, 44], [21, 44],
+      [26, 26], [32, 26], [38, 26], [44, 26],
+      [29, 32], [38, 32], [47, 32], [53, 32], [59, 32], [65, 32],
+      [26, 38], [35, 38], [44, 38], [50, 38], [56, 38], [65, 38],
+      [26, 44], [32, 44], [38, 44], [47, 44], [53, 44], [59, 44],
+      [47, 47], [53, 47], [62, 47],
+      [47, 53], [56, 53], [65, 53],
+      [50, 56], [59, 56],
+      [47, 62], [53, 62], [59, 62], [65, 62],
+      [50, 65], [56, 65], [62, 65],
     ].map(([x, y], i) => (
       <rect key={i} x={x} y={y} width="3" height="3" fill="#222" />
     ))}
@@ -61,33 +68,110 @@ const QRCode = () => (
 // ─── Lab tests data ───────────────────────────────────────────────────────
 const tests = [
   {
-    name:     "Complete Blood Count (CBC)",
-    panel:    "Haematology",
-    sample:   "Blood (EDTA)",
-    reason:   "Anemia workup · fever",
+    name: "Complete Blood Count (CBC)",
+    panel: "Haematology",
+    sample: "Blood (EDTA)",
+    reason: "Anemia workup · fever",
   },
   {
-    name:     "Peripheral Blood Smear",
-    panel:    "Haematology",
-    sample:   "Blood (EDTA)",
-    reason:   "Anemia morphology",
+    name: "Peripheral Blood Smear",
+    panel: "Haematology",
+    sample: "Blood (EDTA)",
+    reason: "Anemia morphology",
   },
   {
-    name:     "Serum Iron + TIBC + Ferritin",
-    panel:    "Iron Studies",
-    sample:   "Blood (Plain)",
-    reason:   "Iron deficiency eval",
+    name: "Serum Iron + TIBC + Ferritin",
+    panel: "Iron Studies",
+    sample: "Blood (Plain)",
+    reason: "Iron deficiency eval",
   },
   {
-    name:     "Vitamin B12 + Folate",
-    panel:    "Vitamins",
-    sample:   "Blood (Plain)",
-    reason:   "Nutritional anemia",
+    name: "Vitamin B12 + Folate",
+    panel: "Vitamins",
+    sample: "Blood (Plain)",
+    reason: "Nutritional anemia",
   },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────
-export default function LabTestOrder() {
+export default function LabTestOrder({ appointmentId, pdfLoading, endLoading }) {
+  const { id } = useParams();
+  const [appointmentData, setAppointmentData] = useState(null);
+  const [patientData, setPatientData] = useState(null);
+  const [labData, setLabData] = useState(null);
+  const [orgData, setOrgData] = useState();
+
+  const invoiceRef = useRef();
+
+  // ── Fetch ──────────────────────────────────────────────────────────────────
+  async function fetchAllotmentDetail() {
+    try {
+      const res = await getApiData(
+        `api/comman/lab-order/${appointmentId || id}`
+      );
+      if (res.success) {
+        setAppointmentData(res.orderData);
+        setPatientData(res.ptData);
+        setLabData(res.orgData);
+      } else {
+        toast.error(res.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
+
+  useEffect(() => {
+    if (id || appointmentId) fetchAllotmentDetail();
+  }, [id, appointmentId]);
+
+  // ── PDF Download ───────────────────────────────────────────────────────────
+  const handleDownload = () => {
+    try {
+      const element = invoiceRef.current;
+      document.body.classList.add("hide-buttons");
+      const opt = {
+        margin: 0,
+        filename: `LabReport-${appointmentData?.customId}.pdf`,
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      };
+      html2pdf()
+        .from(element)
+        .set(opt)
+        .save()
+        .then(() => document.body.classList.remove("hide-buttons"));
+    } catch (_) {
+    } finally {
+      if (pdfLoading) endLoading();
+    }
+  };
+
+  useEffect(() => {
+    if (appointmentData && patientData && labData && pdfLoading) {
+      const timer = setTimeout(handleDownload, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [appointmentData, patientData, labData, pdfLoading]);
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const statusStyle = (status) => {
+    if (!status) return {};
+    const s = status.toLowerCase();
+    if (s === "high") return { color: "#dc2626", fontWeight: 600 };
+    if (s === "low") return { color: "#d97706", fontWeight: 600 };
+    if (s === "normal") return { color: "#16a34a" };
+    return {};
+  };
+
+  const computeStatus = (resultStr, minRange, maxRange) => {
+    const num = parseFloat(resultStr);
+    if (isNaN(num)) return "—";
+    if (num < minRange) return "Low";
+    if (num > maxRange) return "High";
+    return "Normal";
+  };
+
   return (
     <>
       <ExternalLinks />
@@ -97,7 +181,7 @@ export default function LabTestOrder() {
         .lto * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
 
         /* ── Page background ── */
-        .lto-page { background: #e2e2e2; min-height: 100vh; padding: 32px 16px; }
+        .lto-page { background: #f4f6f7; min-height: 100vh; padding: 32px 16px; }
 
         /* ── Card ── */
         .lto-card {
@@ -114,7 +198,7 @@ export default function LabTestOrder() {
         .lto-header { padding: 17px 24px 13px; border-bottom: 1px solid #e0e0e0; }
         .lto-logo {
           width: 40px; height: 40px; border-radius: 50%;
-          background: linear-gradient(140deg, #1b90c8, #1fcdd8);
+          // background: linear-gradient(140deg, #1b90c8, #1fcdd8);
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
@@ -149,7 +233,7 @@ export default function LabTestOrder() {
         .lto-pt-l  { font-size: 10.5px; color: #777; }
         .lto-pt-v  { font-size: 10.5px; color: #111; font-weight: 500; }
         .lto-pt-v.mono { font-family: 'Courier New', monospace; font-size: 10px; }
-        .lto-qr-wrap { border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; flex-shrink: 0; }
+        .lto-qr-wrap { border: 1px solid #ddd; border-radius: 4px; padding: 2px;background: #fff; flex-shrink: 0; }
         .lto-scan { font-size: 8.5px; color: #1ecece; text-align: right; margin-top: 5px; line-height: 1.6; }
 
         /* ── Tests table ── */
@@ -198,24 +282,22 @@ export default function LabTestOrder() {
         .lto-tagline { font-style: italic; }
       `}</style>
 
-      <div className="lto lto-page">
+      <div className="lto lto-page" ref={invoiceRef}>
         <div className="lto-card">
 
           {/* ── HEADER ── */}
           <div className="lto-header d-flex justify-content-between align-items-start">
             <div className="d-flex align-items-start gap-3">
               <div className="lto-logo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.18)" />
-                  <path d="M8 12h8M12 8v8" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
+                <img src={labData?.logo ?
+                  `${base_url}/${labData?.logo}` : "/logo.png"} alt="" />
               </div>
               <div>
                 <div className="lto-h-title">Lab Test Order</div>
-                <div className="lto-h-name">Apollo General Hospital</div>
+                <div className="lto-h-name">{appointmentData?.labId?.name}</div>
                 <div className="lto-h-addr">
-                  NHC-H-2022-MH-G00009 · Reg. MH-HOSP-2010-00891 · NABH Accredited<br />
-                  Plot 22, Healthcare Ave, Andheri West, Mumbai — 400053
+                  {appointmentData?.labId?.nh12} <br />
+                  {labData?.address}
                 </div>
               </div>
             </div>
@@ -232,7 +314,7 @@ export default function LabTestOrder() {
                 <span className="lto-eco">Fully Automated</span>
                 <span className="lto-eco">Ecosystem Connected</span>
               </div>
-              <div className="lto-h-contact">hospital@apollogeneral.com · +91 98765 43210</div>
+              <div className="lto-h-contact">{appointmentData?.labId?.email} · {appointmentData?.labId?.contactNumber}</div>
             </div>
           </div>
 
@@ -240,19 +322,19 @@ export default function LabTestOrder() {
           <div className="lto-meta">
             <div className="lto-mc">
               <div className="lto-ml">Lab ID</div>
-              <div className="lto-mv mono">NHC-RX-2026-0412-00011</div>
+              <div className="lto-mv mono">{appointmentData?.labId?.nh12}</div>
             </div>
             <div className="lto-mc">
               <div className="lto-ml">Date &amp; Time</div>
-              <div className="lto-mv">12/04/2026 10:45</div>
+              <div className="lto-mv">{new Date(appointmentData?.date)?.toLocaleString('en-GB')}</div>
             </div>
-            <div className="lto-mc">
+            {/* <div className="lto-mc">
               <div className="lto-ml">Urgency</div>
               <div className="lto-mv urgent">Urgent</div>
-            </div>
+            </div> */}
             <div className="lto-mc wide">
               <div className="lto-ml">Report To</div>
-              <div className="lto-mv">City Diagnostics Lab · NHC-L-000071</div>
+              <div className="lto-mv">{appointmentData?.labId?.name} · {appointmentData?.labId?.nh12}</div>
             </div>
           </div>
 
@@ -260,26 +342,33 @@ export default function LabTestOrder() {
           <div className="lto-patient">
             <div className="flex-fill">
               <div className="lto-pt-sec-lbl">Patient</div>
-              <div className="lto-pt-name">Vijay Kumar</div>
+              <div className="lto-pt-name">{appointmentData?.patientId?.name}</div>
               <div className="lto-pt-grid">
-                <span className="lto-pt-l">Age / Sex</span>      <span className="lto-pt-v">24 / Male</span>
-                <span className="lto-pt-l">Email Address</span>   <span className="lto-pt-v">V@gmail.com</span>
+                <span className="lto-pt-l">Age / Sex</span>      <span className="lto-pt-v">{calculateAge(patientData?.dob, appointmentData?.createdAt)}/ {patientData?.gender}</span>
+                <span className="lto-pt-l">Email Address</span>   <span className="lto-pt-v">{appointmentData?.patientId?.email}</span>
 
-                <span className="lto-pt-l">DOB</span>             <span className="lto-pt-v">15/03/2001</span>
-                <span className="lto-pt-l">Address</span>         <span className="lto-pt-v">32-A, Vashali Nagar, Jaipur</span>
+                <span className="lto-pt-l">DOB</span>             <span className="lto-pt-v">{new Date(patientData?.dob)?.toLocaleDateString('en-GB')}</span>
+                <span className="lto-pt-l">Address</span>         <span className="lto-pt-v">{patientData?.fullAddress}</span>
 
-                <span className="lto-pt-l">Blood</span>           <span className="lto-pt-v">B+</span>
-                <span className="lto-pt-l">Patient ID</span>      <span className="lto-pt-v mono">NHC-P-2026-MH-000123</span>
+                <span className="lto-pt-l">Blood</span>           <span className="lto-pt-v">{patientData?.bloodGroup}</span>
+                <span className="lto-pt-l">Patient ID</span>      <span className="lto-pt-v mono">{appointmentData?.patientId?.nh12}</span>
 
-                <span className="lto-pt-l">Contact no</span>      <span className="lto-pt-v">+91 9658265898</span>
-                <span className="lto-pt-l">Dr Name</span>         <span className="lto-pt-v">Dr. Amit Mishra</span>
+                <span className="lto-pt-l">Contact no</span>      <span className="lto-pt-v">{appointmentData?.patientId?.contactNumber}</span>
+                <span className="lto-pt-l">Dr Name</span>         <span className="lto-pt-v">{appointmentData?.staff?.name}</span>
 
                 <span className="lto-pt-l"></span>                 <span className="lto-pt-v"></span>
-                <span className="lto-pt-l">Dr ID</span>           <span className="lto-pt-v mono">NHC-D-2024-MH-007821</span>
+                <span className="lto-pt-l">Dr ID</span>           <span className="lto-pt-v mono">{appointmentData?.staff?.nh12}</span>
               </div>
             </div>
             <div>
-              <div className="lto-qr-wrap"><QRCode /></div>
+              <div className="lto-qr-wrap" style={{ width: '74px', height: '74px' }}>
+                <QRCodeCanvas
+                  value={`https://www.neohealthcard.com/lab-order/${appointmentData?.customId}`}
+                  size={256}
+                  // className="qr-code"
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                />
+              </div>
               <div className="lto-scan">Scan to verify<br />verify.neohealthcard.in</div>
             </div>
           </div>
@@ -293,16 +382,16 @@ export default function LabTestOrder() {
                   <th>Test Name</th>
                   <th>Panel / Group</th>
                   <th>Sample Type</th>
-                  <th>Clinical Reason</th>
+                  <th>Code</th>
                 </tr>
               </thead>
               <tbody>
-                {tests.map((t, i) => (
+                {appointmentData?.subCatId.map((sub, i) => (
                   <tr key={i}>
-                    <td>{t.name}</td>
-                    <td>{t.panel}</td>
-                    <td>{t.sample}</td>
-                    <td>{t.reason}</td>
+                    <td>{sub?.subCategory}</td>
+                    <td>{sub?.category?.name}</td>
+                    <td>{sub?.sample?.map(s=>s?.type).join(', ')}</td>
+                    <td>{sub.code}</td>
                   </tr>
                 ))}
               </tbody>
@@ -323,20 +412,20 @@ export default function LabTestOrder() {
           {/* ── SIGNATURES ── */}
           <div className="lto-sig-row">
             <div className="lto-sig-blk">
-              <div className="lto-sig-name">Dr. Amit Mishra</div>
-              <div className="lto-sig-role">MD, General Physician · Apollo Hospital</div>
-              <div className="lto-sig-id">NHC-D-2024-MH-004512 · MMC Reg: 04821</div>
+              <div className="lto-sig-name">{appointmentData?.staff?.name}</div>
+              <div className="lto-sig-role">{appointmentData?.staff?.n12}</div>
+              <div className="lto-sig-id">{appointmentData?.staff?.contactNumber}</div>
             </div>
             <div className="lto-sig-blk">
-              <div className="lto-sig-name">City Diagnostics Lab</div>
+              <div className="lto-sig-name">{appointmentData?.labId?.name}</div>
               <div className="lto-sig-role">Accepted &amp; Registered</div>
-              <div className="lto-sig-id">NHC-L-2023-MH-000071</div>
+              <div className="lto-sig-id">{appointmentData?.labId?.nh12}</div>
             </div>
           </div>
 
           {/* ── FOOTER ── */}
           <div className="lto-footer">
-            <span>Apollo General Hospital, Mumbai · hospital@apollogeneral.com · +91 98765 43210</span>
+            <span>{appointmentData?.labId?.name}, {labData?.address} · {appointmentData?.labId?.email} · {appointmentData?.labId?.contactNumber}</span>
             <span className="lto-tagline">Wishing you a speedy recovery</span>
           </div>
 

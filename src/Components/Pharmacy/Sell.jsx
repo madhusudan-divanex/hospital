@@ -5,6 +5,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { deleteApiData, getSecureApiData } from "../../Service/api";
 import { useEffect, useState } from "react";
+import PharmacyInvoice from "../../All Template file/Pharmacy invoice";
 // import Scanner from "./Scanner";
 
 function Sell() {
@@ -24,10 +25,12 @@ function Sell() {
     const openScanner = () => setScannerOpen(true);
     const closeScanner = () => setScannerOpen(false);
     const [tableView, setTableView] = useState("sell")
-    const [returnList,setReturnList]=useState([])
+    const [returnList, setReturnList] = useState([])
     const [currentReturnPage, setCurrentReturnPage] = useState(1)
     const [totalReturnPage, setTotalReturnPage] = useState(1)
-    const [loading,setLoading]=useState(false)
+    const [loading, setLoading] = useState(false)
+    const [pdfLoading, setPdfLoading] = useState(false)
+    const [selectedId, setSelectedId] = useState()
     const fetchSellData = async () => {
         try {
             const response = await getSecureApiData(`pharmacy/sell/${userId}?page=${currentPage}&search=${name}&schedule=${schedule}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`);
@@ -44,7 +47,7 @@ function Sell() {
     useEffect(() => {
         fetchSellData()
     }, [userId, currentPage])
-        const fetchReturnData = async () => {
+    const fetchReturnData = async () => {
         // if(tableView!=="return") returnList
         setLoading(true)
         try {
@@ -161,7 +164,7 @@ function Sell() {
                                     </div>
                                 </div>
                             </div>
-                              <div className="filters">
+                            <div className="filters">
                                 <div className="field custom-frm-bx mb-0 custom-select admin-table-search-frm ">
                                     <label className="label">View  :</label>
                                     <select className="" value={tableView} onChange={(e) => setTableView(e.target.value)}>
@@ -172,38 +175,38 @@ function Sell() {
                             </div>
 
                             <>
-                            {tableView=="sell"&& totalPage > 1 && <div className="page-selector d-flex align-items-center mb-2 mb-md-0 gap-2">
-                                <div>
-                                    <select
-                                        value={currentPage}
-                                        onChange={(e) => setCurrentPage(e.target.value)}
-                                        className="form-select custom-page-dropdown nw-custom-page ">
-                                        {Array.from({ length: totalPage }, (_, i) => (
-                                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                {tableView == "sell" && totalPage > 1 && <div className="page-selector d-flex align-items-center mb-2 mb-md-0 gap-2">
+                                    <div>
+                                        <select
+                                            value={currentPage}
+                                            onChange={(e) => setCurrentPage(e.target.value)}
+                                            className="form-select custom-page-dropdown nw-custom-page ">
+                                            {Array.from({ length: totalPage }, (_, i) => (
+                                                <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                            ))}
+                                        </select>
+                                    </div>
 
 
-                            </div>}
-                            {tableView=="return"&& totalReturnPage > 1 && <div className="page-selector d-flex align-items-center mb-2 mb-md-0 gap-2">
-                                <div>
-                                    <select
-                                        value={currentReturnPage}
-                                        onChange={(e) => setCurrentReturnPage(e.target.value)}
-                                        className="form-select custom-page-dropdown nw-custom-page ">
-                                        {Array.from({ length: totalReturnPage }, (_, i) => (
-                                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                </div>}
+                                {tableView == "return" && totalReturnPage > 1 && <div className="page-selector d-flex align-items-center mb-2 mb-md-0 gap-2">
+                                    <div>
+                                        <select
+                                            value={currentReturnPage}
+                                            onChange={(e) => setCurrentReturnPage(e.target.value)}
+                                            className="form-select custom-page-dropdown nw-custom-page ">
+                                            {Array.from({ length: totalReturnPage }, (_, i) => (
+                                                <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                            ))}
+                                        </select>
+                                    </div>
 
 
-                            </div>}
+                                </div>}
                             </>
                         </div>
                     </div>
-                    {tableView=="sell"?<div className="row">
+                    {tableView == "sell" ? <div className="row">
                         <div className="col-lg-12">
                             <div className="table-section">
                                 <div className="table table-responsive mb-0">
@@ -251,7 +254,7 @@ function Sell() {
                                                         </td>
                                                         <td>
                                                             <div className="d-flex align-items-centet gap-2">
-                                                                <div className="dropdown">
+                                                                <div className="dropdown position-static">
                                                                     <Link
                                                                         to={`/scan-prescription-detail/${item?._id}`}
                                                                         className="admin-sub-dropdown"
@@ -273,6 +276,7 @@ function Sell() {
                                                                             </NavLink>
                                                                         </li>
 
+
                                                                         {/* <li className="prescription-item">
                                                                             <button className=" prescription-nav" onClick={() => deleteSellRecord(item?._id)}>
 
@@ -288,7 +292,7 @@ function Sell() {
 
                                                         <td>
                                                             <div className="d-flex align-items-centet gap-2">
-                                                                <div className="dropdown">
+                                                                <div className="dropdown position-static">
                                                                     <a
 
                                                                         href="javascript:void(0)"
@@ -313,6 +317,14 @@ function Sell() {
                                                                                 Return
                                                                             </NavLink>
                                                                         </li>
+                                                                        <li className="prescription-item">
+                                                                            <button className="prescription-nav" onClick={() => {
+                                                                                setSelectedId(item?._id)
+                                                                                setPdfLoading(true)
+                                                                            }} >
+                                                                                {(pdfLoading && item?._id === selectedId) ? 'Downloading' : 'Download'} Invoice
+                                                                            </button>
+                                                                        </li>
                                                                         {/* <li className="prescription-item">
                                                                             <a className=" prescription-nav" href="#">
 
@@ -334,7 +346,7 @@ function Sell() {
                             </div>
                         </div>
                     </div>
-                    :<div className="row">
+                        : <div className="row">
                             <div className="col-lg-12">
                                 <div className="table-section">
                                     <div className="table table-responsive mb-0">
@@ -438,6 +450,9 @@ function Sell() {
                 </div>
                 <div className="text-end mt-4">
                     <Link to={-1} className="nw-thm-btn outline">Go Back</Link>
+                </div>
+                <div className="d-none">
+                    <PharmacyInvoice sellId={selectedId} pdfLoading={pdfLoading} endLoading={()=>setPdfLoading(false)}/>
                 </div>
             </div>
 

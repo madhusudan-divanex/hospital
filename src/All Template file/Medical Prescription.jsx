@@ -268,7 +268,7 @@ export default function MedicalPrescription({presId, pdfLoading, endLoading }) {
               </div>
             </div>
             <div>
-              <div className="rx-qr-wrap">
+              <div className="rx-qr-wrap" style={{ width: '74px', height: '74px' }}>
                  <QRCodeCanvas
                      value={`https://www.neohealthcard.com/prescription/${prescription?.customId}`}
                     size={256}

@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import html2pdf from "html2pdf.js";
+import { toast } from "react-toastify";
+import { getApiData } from "../Service/api";
+import html2canvas from "html2canvas";
+import { useSelector } from "react-redux";
 
 const styles = {
   page: {
@@ -62,7 +67,55 @@ const styles = {
   },
 };
 
-const PatientConsentForm = () => {
+const PatientConsentForm = ({insert,pdfLoading,endLoading}) => {
+    const [hospitalData, setHospitalData] = useState(null);
+    const [nh12,setNh12]=useState()
+    const [isDownloaded, setIsDownloaded] = useState(false);
+
+    const letterRef = useRef();
+
+    const downloadPDF = () => {
+        const element = letterRef.current;
+
+        const opt = {
+            margin: 0.5,
+            filename: "Hospital_Consent_Letter.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2,useCORS: true, allowTaint: true },
+            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            setIsDownloaded(true);
+        });
+    };
+
+    async function fetchConsentData() {
+        try {
+            const res = await getApiData(`api/comman/consent-letter/${insertId}`);
+            if (res.success) {
+                setHospitalData(res.hospitalData);
+                setNh12(res.customId)
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message);
+        }
+    }
+
+    // ✅ Fetch data when insert comes
+    useEffect(() => {
+        if (insert) {
+            fetchConsentData(); // FIXED
+        }
+    }, [insert]);
+
+   
+    // ✅ Call handleConsent AFTER download
+    useEffect(() => {
+        if (isDownloaded) {
+            handleConsent(); // clear state or whatever you want
+        }
+    }, [isDownloaded]);
   return (
     <div style={styles.page}>
       <div style={styles.wrapper}>

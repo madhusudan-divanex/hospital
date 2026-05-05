@@ -9,6 +9,8 @@ import Loader from '../Common/Loader';
 import { useSelector } from 'react-redux';
 import base_url from '../../baseUrl';
 import BedPaymentTemplate from './BedPaymentTemplate';
+import BedInvoice from '../../All Template file/Bed invoice';
+import HospitalBill from '../../All Template file/Hospital bill';
 function AllotmentPayment({ allotmentId, getData }) {
     const user = JSON.parse(localStorage.getItem('user'))
     const [feesData, setFeesData] = useState([])
@@ -162,7 +164,7 @@ function AllotmentPayment({ allotmentId, getData }) {
 
         }
     }
-    console.log(formData)
+    
     useEffect(() => {
         if (allotmentId) {
             fetchAllotmentPayment()
@@ -264,9 +266,12 @@ function AllotmentPayment({ allotmentId, getData }) {
         setLoading(true)
         try {
             const res = await API.get(`/bed/allotment/${allotmentId}`);
-            const data = res.data.data
-            setAllotmentData(data);
+            if(res.data.success){
 
+                const data = res.data.data
+                setAllotmentData(data);
+                
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -332,7 +337,8 @@ function AllotmentPayment({ allotmentId, getData }) {
                                     <h6 className="lg_title mb-0">Payment Add</h6>
                                 </div>
                                 <div>
-                                    {/* {havePayment && <button className="print-btn no-print" onClick={handleReportDownload}> <FontAwesomeIcon icon={faDownload} /> Download PDF</button>} */}
+                                    {havePayment && <button className="print-btn no-print" onClick={() => setPdfLoading(true)}> 
+                                        <FontAwesomeIcon icon={faDownload} /> {pdfLoading?'Downloading...':'Download'} PDF</button>}
 
                                     {/* <button type="button" className="" onClick={handleCloseModal} aria-label="Close" style={{ color: "#00000040" }}>
                                         <FontAwesomeIcon icon={faCircleXmark} />
@@ -443,7 +449,7 @@ function AllotmentPayment({ allotmentId, getData }) {
 
                                         {formData?.bedCharges?.map((item, key) =>
                                             <div className="education-frm-bx mb-3 py-2 bg-transparent" key={key}>
-                                                
+
                                                 <div action="">
                                                     <div className="row">
                                                         <div className="col-lg-6 col-md-6 col-sm-12">
@@ -666,14 +672,9 @@ function AllotmentPayment({ allotmentId, getData }) {
                             </div>
                         </div>
                     </div>
-                    <div
-                        className="d-none"
-                    >
-                        {/* <BedPaymentTemplate
-                            allotmentId={allotmentId}
-                            endLoading={() => setPdfLoading(false)}
-                            pdfLoading={pdfLoading}
-                        /> */}
+
+                    <div className="d-none" >
+                        <HospitalBill allotmentId={allotmentData?._id} pdfLoading={pdfLoading} endLoading={() => setPdfLoading(false)} />
                     </div>
                 </div>}
         </>

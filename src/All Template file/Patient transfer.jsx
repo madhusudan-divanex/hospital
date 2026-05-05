@@ -26,6 +26,10 @@ const S = {
     background: "#FFFFFF",
     color: "#1C1C1C",
   },
+  logo: {
+    width: 34,
+    height: 34,
+  },
   header: {
     display: "flex",
     justifyContent: "space-between",
@@ -145,7 +149,7 @@ export default function PatientTransferLetter() {
 
     const opt = {
       margin: 0,
-      filename: `${transferData?.customId}.pdf`,
+      filename: `Patient-Transfer-${transferData?.fromHospital?.nh12}.pdf`,
       image: { type: "jpeg", quality: 1 },
       html2canvas: {
         scale: 2, // better quality
@@ -190,21 +194,27 @@ export default function PatientTransferLetter() {
             </div>
           </div>
         </div>
-        <div style={S.page}>
+        <div style={S.page} ref={pdfRef}>
           <div style={S.sheet}>
 
             {/* HEADER */}
             <div style={S.header}>
-              <div>
-                <div style={S.title}>Patient Transfer Letter</div>
-                <div style={S.sub}>{organization?.name}</div>
-                <div style={S.small}>
-                  {/* {organization?.nh12} · Reg. MH-HOSP-2010-00891 · NABH Accredited */}
-                  {organization?.nh12}
+              <div className="d-flex gap-3">
+                <div style={S.logo}>
+                <img src={organization?.logoFileId ?
+                  `${base_url}/api/file/${organization?.logoFileId}` : "/logo.png"} alt="" />
+              </div>
+                <div>    
+                  <div style={S.title}>Patient Transfer Letter</div>
+                  <div style={S.sub}>{organization?.name}</div>
+                  <div style={S.small}>
+                    {/* {organization?.nh12} · Reg. MH-HOSP-2010-00891 · NABH Accredited */}
+                    {organization?.nh12}
 
-                </div>
-                <div style={S.small}>
-                  {organization?.fullAddress}, {organization?.city?.name}, {organization?.state?.name}, {organization?.country?.name}, {organization?.pinCode}
+                  </div>
+                  <div style={S.small}>
+                    {organization?.address}
+                  </div>
                 </div>
               </div>
 

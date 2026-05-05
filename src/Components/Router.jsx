@@ -161,6 +161,12 @@ import PatientEmergencyData from "./Pages/PatientEmergencyData";
 import BedInvoice from "../All Template file/Bed invoice";
 import LabTestOrder from "../All Template file/Lab Test Order";
 import LabReportPdf from "../All Template file/Lab report file/Lab report";
+import HospitalBillPerfect from "../All Template file/Hospital bill";
+import OPDReceipt from "../All Template file/opd receipt";
+import PharmacyInvoice from "../All Template file/Pharmacy invoice";
+import DischargeSummary from "../All Template file/Discharge summary";
+import HospitalBill from "../All Template file/Hospital bill";
+import PatientConsentForm from "../All Template file/patient_consent_form_react_component";
 
 function Router() {
  const { socket, startCall } = useGlobalSocket();
@@ -222,7 +228,7 @@ function Router() {
         },
         {        
           path:"/bed-invoice/:id",
-          element: <LabReportPdf />
+          element: <PatientConsentForm />
         }
       ]
     },

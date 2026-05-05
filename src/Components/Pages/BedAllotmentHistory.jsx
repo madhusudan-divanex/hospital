@@ -17,6 +17,7 @@ import { saveAs } from "file-saver";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
 import { Hospital } from "lucide-react";
 import HospitalTransfer from "./HospitalTransfer";
+import BedInvoice from "../../All Template file/Bed invoice";
 function BedAllotmentHistory() {
     const user = JSON.parse(localStorage.getItem('user'))
     const userId = user.id
@@ -30,6 +31,7 @@ function BedAllotmentHistory() {
     const [doctorId, setDoctorId] = useState('')
     const [filters, setFilters] = useState({ bedStatus: '', paymentStatus: '', floor: [], search: '' })
     const [myFloors, setMyFloors] = useState([])
+    const [pdfLoading, setPdfLoading] = useState(false)
     async function fetchAllotments(filter = filters) {
         setLoading(true);
         try {
@@ -107,6 +109,16 @@ function BedAllotmentHistory() {
         const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
         const fileData = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(fileData, "Bed_Allotments_List.xlsx");
+    };
+    const handlePaymentModal = (item) => {
+        setSelected(item);
+
+        setTimeout(() => {
+            const modal = new window.bootstrap.Modal(
+                document.getElementById('add-Payment')
+            );
+            modal.show();
+        }, 0);
     };
     return (
         <>
@@ -451,11 +463,11 @@ function BedAllotmentHistory() {
                                                                         </Link>
                                                                     </li> */}
                                                                     <li className="prescription-item">
-                                                                        <button className="prescription-nav" onClick={() => setSelected(item)} data-bs-toggle="modal" data-bs-target="#add-Payment">
+                                                                        <button className="prescription-nav" onClick={() => handlePaymentModal(item)}>
                                                                             Add Payment
                                                                         </button>
                                                                     </li>
-                                                                    {item?.status=="Discharged" && !item?.transferId && <li className="prescription-item">
+                                                                    {item?.status == "Discharged" && !item?.transferId && <li className="prescription-item">
                                                                         <a
                                                                             href="#"
                                                                             className="prescription-nav"
@@ -466,8 +478,8 @@ function BedAllotmentHistory() {
                                                                             Hospital Transfer
                                                                         </a>
                                                                     </li>}
-                                                                    {item?.transferId && 
-                                                                      <li className="prescription-item">
+                                                                    {item?.transferId &&
+                                                                        <li className="prescription-item">
                                                                             <NavLink to={`/patient-transfer/${item?.transferId}`} className="prescription-nav">
                                                                                 See Transfer
                                                                             </NavLink>
@@ -487,10 +499,13 @@ function BedAllotmentHistory() {
                                                                         </li>
                                                                     </>}
                                                                     <li className="prescription-item">
-                                                                        <a className=" prescription-nav" href="#">
+                                                                        <button className=" prescription-nav" disabled={pdfLoading} onClick={() => {
+                                                                            setSelected(item)
+                                                                            setPdfLoading(true)
+                                                                        }}>
 
-                                                                            Print Details
-                                                                        </a>
+                                                                            {pdfLoading ? 'Printing...' : 'Print'} Details
+                                                                        </button>
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -518,13 +533,15 @@ function BedAllotmentHistory() {
 
             {/* <!-- Payment Add Popup Start --> */}
             {/* <!--  data-bs-toggle="modal" data-bs-target="#add-Payment" --> */}
-            <AllotmentPayment allotmentId={selected?._id}  getData={fetchAllotments} />
+            <AllotmentPayment allotmentId={selected?._id} getData={fetchAllotments} />
             {/* <!-- Payment Add Popup End --> */}
 
-
+            <div className="d-none" >
+                <BedInvoice allotmentId={selected?._id} pdfLoading={pdfLoading} endLoading={() => setPdfLoading(false)} />
+            </div>
             {/* <!-- Discharge Patient Popup Start --> */}
             {/* <!--  data-bs-toggle="modal" data-bs-target="#discharge-Patient" --> */}
-            <DischargePatient allotmentId={selected?._id} fetchData={() => fetchAllotments()} />         
+            <DischargePatient allotmentId={selected?._id} fetchData={() => fetchAllotments()} />
             {/* <!-- Discharge Patient Popup End --> */}
             <HospitalTransfer data={selected} getData={fetchAllotments} />
 

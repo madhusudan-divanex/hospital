@@ -305,6 +305,7 @@ const KV = ({ k, v }) => (
 );
 
 export default function BedInvoice({ allotmentId, pdfLoading, endLoading }) {
+  
   const { id } = useParams()
   const [allotmentData, setAllotmentData] = useState()
   const [patientData, setPatientData] = useState()
@@ -312,6 +313,9 @@ export default function BedInvoice({ allotmentId, pdfLoading, endLoading }) {
   const [dischargeData, setDischargeData] = useState()
   const [paymentData, setPaymentData] = useState()
   async function fetchAllotmentDetail() {
+    if(!allotmentData && !id){
+      return
+    }
     try {
       const res = await getApiData(`api/comman/bed-invoice/${allotmentId || id}`)
       if (res.success) {
@@ -535,7 +539,7 @@ export default function BedInvoice({ allotmentId, pdfLoading, endLoading }) {
                       0
                     )}</td>
                   </tr>}
-                {paymentData?.services?.length > 0 &&
+                {/* {paymentData?.services?.length > 0 &&
                   <tr style={s.tdBorderTop}>
                     <td style={s.tdLeft}><div>Services </div>
                       <div style={s.tdSubText}>{paymentData?.services?.map(item => item?.name)?.join(',')}</div>
@@ -544,13 +548,13 @@ export default function BedInvoice({ allotmentId, pdfLoading, endLoading }) {
                       (sum, s) => sum + Number(s.amount || 0),
                       0
                     )}</td>
-                  </tr>}
+                  </tr>} */}
               </tbody>
             </table>
           </div>
 
           {/* PAYMENT */}
-          <div style={s.tableSection}>
+          {/*<div style={s.tableSection}>
             <p style={s.tableTitle}>Payments</p>
 
             <table style={s.table}>
@@ -589,7 +593,7 @@ export default function BedInvoice({ allotmentId, pdfLoading, endLoading }) {
 
               </tbody>
             </table>
-          </div>
+          </div>*/}
 
           <div style={s.paymentRow}>
             {/* <div style={s.paymentCell}>

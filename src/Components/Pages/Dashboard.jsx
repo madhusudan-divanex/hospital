@@ -12,6 +12,7 @@ import AllotmentPayment from "./AllotmentPayment";
 import DischargePatient from "./DischargePatient";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmpDetail } from "../../redux/features/userSlice";
+import BedInvoice from "../../All Template file/Bed invoice";
 
 
 
@@ -22,11 +23,11 @@ function Dashboard() {
   const [selected, setSelected] = useState()
   const [departments, setDepartments] = useState([])
   const dispatch = useDispatch()
-  const { staffUser ,isOwner} = useSelector(state => state.user)
+  const { staffUser, isOwner } = useSelector(state => state.user)
   const [nextStep, setNextStep] = useState()
   const [profileComlete, setProfileComplete] = useState(0)
   const [doctorId, setDoctorId] = useState('')
-
+  const [pdfLoading, setPdfLoading] = useState(false)
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -393,7 +394,7 @@ function Dashboard() {
                                   <li className="ad-info-item"> <b>Expected Discharge Date :</b><span className="add-info-title"> {item?.expectedDischargeDate ?
                                     new Date(item?.expectedDischargeDate)?.toLocaleDateString('en-GB') : '-'}</span></li>
                                   <li className="ad-info-item"> <b>Actual Discharge :</b><span className="add-info-title not-discharge">
-                                    {item?.status == 'Active' ? 'Not discharged yet' : new Date(item?.dischargeId?.dischargeDate)?.toLocaleDateString('en-GB',
+                                    {item?.status == 'Active' ? 'Not discharged yet' : new Date(item?.dischargeId?.createdAt)?.toLocaleDateString('en-GB',
                                       { day: "numeric", month: "long", year: "numeric" })}</span></li>
 
                                 </ul>
@@ -407,7 +408,7 @@ function Dashboard() {
                             <td>
 
 
-                              <div className="dropdown">
+                              <div className="dropdown position-static">
                                 <a
                                   href="javascript:void(0)"
                                   className="grid-dots-btn"
@@ -445,10 +446,13 @@ function Dashboard() {
                                   </li>
 
                                   <li className="prescription-item">
-                                    <a className=" prescription-nav" href="#">
+                                    <button onClick={() => {
+                                      setSelected(item)
+                                      setPdfLoading(true)
+                                    }} className=" prescription-nav" disabled={pdfLoading}>
 
                                       Print Details
-                                    </a>
+                                    </button>
                                   </li>
                                 </ul>
                               </div>
@@ -543,7 +547,9 @@ function Dashboard() {
       {/* <!--  data-bs-toggle="modal" data-bs-target="#add-Payment" --> */}
       <AllotmentPayment allotmentId={selected?._id} patientId={selected?.patientId?._id} />
       {/* <!-- Payment Add Popup End --> */}
-
+      <div className="d-none" >
+        <BedInvoice allotmentId={selected?._id} pdfLoading={pdfLoading} endLoading={() => setPdfLoading(false)} />
+      </div>
       {/* <!-- Discharge Patient Popup Start --> */}
       {/* <!--  data-bs-toggle="modal" data-bs-target="#discharge-Patient" --> */}
       <DischargePatient allotmentId={selected?._id} fetchData={() => fetchAllotments()} />
